@@ -1,0 +1,47 @@
+{
+  "extends": [
+    "tslint:recommended"
+  ],
+  "rules": {
+    "align": false,
+    "member-access": false,
+    "curly": false,
+    "interface-name": false,
+    "eofline": false,
+    "indent": false,
+    "no-empty": false,
+    "max-line-length": [
+      false,
+      100
+    ],
+    "no-empty-interface": false,
+    "no-console": [
+      true,
+      "time",
+      "timeEnd",
+      "trace"
+    ],
+    "no-string-literal": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "quotemark": [
+      false,
+      "single",
+      "avoid-escape"
+    ],
+    "trailing-comma": [
+      false,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "variable-name": [
+      true,
+      "allow-leading-underscore",
+      "ban-keywords",
+      "check-format"
+    ],
+    "prefer-for-of": false
+  }
+}

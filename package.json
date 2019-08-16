@@ -1,0 +1,69 @@
+{
+    "name": "verifalia",
+    "version": "2.0.0",
+    "description": "Verifalia email validation library for Javascript",
+    "homepage": "https://verifalia.com",
+    "main": "dist/umd/verifalia.js",
+    "module": "dist/es2015/verifalia.mjs",
+    "browser": "dist/iife/verifalia.js",
+    "scripts": {
+        "build:genversion": "genversion --es6 src/version.ts",
+        "build:definitions": "tsc -p tsconfig.definitions.json",
+        "build": "npm run build:genversion && rollup -c && npm run build:definitions",
+        "build:watch": "rollup -c -w",
+        "lint": "tslint"
+    },
+    "typings": "dist/definitions/index.d.ts",
+    "keywords": [
+        "email",
+        "validation",
+        "verification",
+        "free",
+        "verifalia",
+        "service",
+        "list",
+        "cleaning",
+        "scrubbing",
+        "e-mail",
+        "syntax",
+        "smtp",
+        "disposable",
+        "mailbox"
+    ],
+    "author": "Verifalia <support@verifalia.com>",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/verifalia/verifalia-js-sdk"
+    },
+    "dependencies": {
+        "axios": "^0.19.0",
+        "date-fns": "^1.30.1"
+    },
+    "bugs": {
+        "url": "https://github.com/verifalia/verifalia-js-sdk/issues"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "devDependencies": {
+        "@types/node": "^12.6.9",
+        "dts-bundle-generator": "^3.2.0",
+        "genversion": "^2.2.0",
+        "rollup": "^1.19.4",
+        "rollup-plugin-commonjs": "^10.0.2",
+        "rollup-plugin-json": "^4.0.0",
+        "rollup-plugin-node-builtins": "^2.1.2",
+        "rollup-plugin-node-globals": "^1.4.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-terser": "^5.1.1",
+        "rollup-plugin-typescript2": "^0.22.1",
+        "rollup-plugin-uglify": "^6.0.2",
+        "ts-loader": "^6.0.4",
+        "tslint": "^5.18.0",
+        "typescript": "^3.5.3"
+    },
+    "files": [
+        "dist/**/*"
+    ]
+}
