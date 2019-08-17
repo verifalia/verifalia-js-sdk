@@ -1,13 +1,13 @@
 import { DailyUsageListSegment } from './models/DailyUsageListSegment';
 import { DailyUsageListingOptions } from './models/DailyUsageListingOptions';
-import { IRestClientFactory } from "../IRestClientFactory";
+import { RestClientFactory } from "../RestClientFactory";
 import { Balance } from "./models/Balance";
 import { Direction } from '../common/Direction';
 
 export class CreditsRestClient {
-    private _restClientFactory: IRestClientFactory;
+    private readonly _restClientFactory: RestClientFactory;
 
-    constructor(restClientFactory: IRestClientFactory) {
+    constructor(restClientFactory: RestClientFactory) {
         this._restClientFactory = restClientFactory;
     }
 

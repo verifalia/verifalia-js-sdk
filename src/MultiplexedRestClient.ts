@@ -1,19 +1,21 @@
 import axios from 'axios';
-import { IAuthenticator } from './security/IAuthenticator';
+import { Authenticator } from './security/Authenticator';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { ServiceUnreachableError } from './errors/ServiceUnreachableError';
 import { EndpointServerError } from './errors/EndpointServerError';
 import { AuthorizationError } from './errors/AuthorizationError';
 import { WellKnowMimeContentTypes } from './WellKnowMimeContentTypes';
+import debug from 'debug';
 
 export class MultiplexedRestClient {
-    private _authenticator: IAuthenticator;
-    private _userAgent: string;
+    private _log = debug('verifalia');
+    
+    private _authenticator: Authenticator;
     private _baseUris: string[];
+    private _userAgent: string | undefined;
 
-    constructor(authenticator: IAuthenticator, userAgent: string, baseUris: string[]) {
+    constructor(authenticator: Authenticator, baseUris: string[], userAgent: string | undefined = undefined) {
         if (!authenticator) throw new Error('authenticator is null');
-        if (!userAgent) throw new Error('userAgent is null');
         if (!baseUris || !baseUris.length) throw new Error('baseUris is null or empty');
 
         this._authenticator = authenticator;
@@ -35,11 +37,16 @@ export class MultiplexedRestClient {
                 validateStatus: () => true,
                 maxRedirects: 0,
                 headers: {
-                    'User-Agent': this._userAgent,
                     // Default accepted MIME content type
                     'Accept': WellKnowMimeContentTypes.applicationJson
                 }
             } as AxiosRequestConfig;
+
+            // Adds the user-agent header only if it has been specified (can't be forced in the browser)
+
+            if (this._userAgent) {
+                axiosConfig.headers['User-Agent'] = this._userAgent;
+            }
 
             if (method === 'POST' || method === 'PUT') {
                 axiosConfig = {
@@ -58,7 +65,7 @@ export class MultiplexedRestClient {
 
             const axiosConfigWithAuthentication = this._authenticator.addAuthentication(axiosConfig);
 
-            console.log('Axios config', axiosConfigWithAuthentication);
+            this._log('Axios config', axiosConfigWithAuthentication);
 
             let response: AxiosResponse<T>;
 

@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
 
-export interface IAuthenticator {
+export interface Authenticator {
     addAuthentication(axiosConfig: AxiosRequestConfig): AxiosRequestConfig;
 }

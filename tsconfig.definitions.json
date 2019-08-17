@@ -1,6 +1,8 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "strict": true,
+    "moduleResolution": "node",
+    "stripInternal": true,
     "module": "ESNext",
     "declaration": true,
     "declarationMap": true,
@@ -8,4 +10,6 @@
     "declarationDir": "./dist/definitions",
     "outDir": "./dist/definitions"
   },
+  "include": ["src"],
+  "exclude": ["node_modules"],  
 }

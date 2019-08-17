@@ -1,4 +1,4 @@
-import { IRestClientFactory } from "../IRestClientFactory";
+import { RestClientFactory } from "../RestClientFactory";
 import { Validation } from "./models/Validation";
 import { ValidationRequestEntry } from "./models/ValidationRequestEntry";
 import { ValidationRequest } from "./models/ValidationRequest";
@@ -17,9 +17,9 @@ declare type PartialValidation = {
 };
 
 export class EmailValidationsRestClient {
-    _restClientFactory: IRestClientFactory;
+    private readonly _restClientFactory: RestClientFactory;
 
-    constructor(restClientFactory: IRestClientFactory) {
+    constructor(restClientFactory: RestClientFactory) {
         this._restClientFactory = restClientFactory;
     }
 

@@ -1,7 +1,7 @@
-import { IAuthenticator } from "./security/IAuthenticator";
+import { Authenticator } from "./security/Authenticator";
 import { UsernamePasswordAuthenticator } from "./security/UsernamePasswordAuthenticator";
 import { EmailValidationsRestClient } from "./email-validations/EmailValidationsRestClient";
-import { IRestClientFactory } from "./IRestClientFactory";
+import { RestClientFactory } from "./RestClientFactory";
 import { MultiplexedRestClient } from "./MultiplexedRestClient";
 import { CreditsRestClient } from "./credits/CreditsRestClient";
 import { VerifaliaRestClientConfiguration } from "./VerifaliaRestClientConfiguration";
@@ -10,7 +10,7 @@ import { version as packageVersion } from './version';
 /**
  * HTTPS-based REST client for Verifalia.
  */
-export class VerifaliaRestClient implements IRestClientFactory {
+export class VerifaliaRestClient implements RestClientFactory {
     /**
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
@@ -27,7 +27,7 @@ export class VerifaliaRestClient implements IRestClientFactory {
      */
     public readonly emailValidations = new EmailValidationsRestClient(this);
 
-    private _authenticator: IAuthenticator;
+    private readonly _authenticator: Authenticator;
     private _baseUris = [
         'https://api-1.verifalia.com',
         'https://api-2.verifalia.com',
@@ -52,32 +52,34 @@ export class VerifaliaRestClient implements IRestClientFactory {
     /** @internal */
     build(): MultiplexedRestClient {
         if (!this._cachedRestClient) {
-            // TODO: Initial uris shuffling
+            // Initial uris shuffling (see https://stackoverflow.com/a/12646864/904178)
 
-            const uris = this._baseUris.map((uri) => `${uri}/${this.apiVersion}`);
+            let shuffledUris = [ ...this._baseUris ];
+
+            for (let i = shuffledUris.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledUris[i], shuffledUris[j]] = [shuffledUris[j], shuffledUris[i]];
+            }
 
             this._cachedRestClient = new MultiplexedRestClient(this._authenticator,
-                this.getUserAgent(),
-                uris);
+                shuffledUris.map((uri) => `${uri}/${this.apiVersion}`),
+                this.getUserAgent());
         }
 
         return this._cachedRestClient as MultiplexedRestClient;
     }
 
     /** @internal */
-    private getUserAgent() {
+    private getUserAgent(): string | undefined {
         const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
-        const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof navigator !== 'undefined';
 
-        let userAgent = `verifalia-rest-client/js/${packageVersion}`;
-        
         if (isNode) {
-            userAgent += `/node/${process.platform + '/' + process.version}`;
-        }
-        else if (isBrowser) {
-            userAgent += `/browser/${navigator.userAgent}`;
+            return `verifalia-rest-client/js/${packageVersion}/node/${process.platform + '/' + process.version}`;
         }
 
-        return userAgent;
+        // Since we can't force the User-Agent header in the browser, we return it as undefined here so that
+        // the related header won't be set later, while making requests to the API.
+
+        return undefined;
     }
 }

@@ -1,7 +1,7 @@
-import { IAuthenticator } from "./IAuthenticator";
+import { Authenticator } from "./Authenticator";
 import { AxiosRequestConfig } from "axios";
 
-export class UsernamePasswordAuthenticator implements IAuthenticator {
+export class UsernamePasswordAuthenticator implements Authenticator {
     private _username: string;
     private _password: string;
 

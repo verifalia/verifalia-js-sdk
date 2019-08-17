@@ -1,24 +1,32 @@
-/*
-// Uncomment to display outgoing requests to the API on the console
-
+import debug from 'debug';
 import axios from 'axios';
+
+// @ts-ignore
+if (ENV !== 'production') {
+	debug.enable('*');
+} else {
+	debug.disable();
+}
+
+// Display outgoing requests to the API on the console (debug build only)
+
+const log = debug('verifalia');
 
 axios
 	.interceptors
 	.request
 	.use(
 		(config: any) => {
-			// Do something before request is sent
-			console.log(`** Invoking URL ${config.url}`);
-			console.log(`** - params: ${JSON.stringify(config.params)}`);
-			console.log(`** - data: ${JSON.stringify(config.data)}`);
-			console.log(`** - headers: ${JSON.stringify(config.headers)}`);
+			log('invoking URL', config.url);
+			log('params', config.params);
+			log('data', config.data);
+			log('headers', config.headers);
+
 			return config;
 		},
 		(error: any) => {
 			return Promise.reject(error);
 		});
-*/
 
 export { VerifaliaRestClient } from './VerifaliaRestClient';
 export { DateEqualityPredicate } from './common/filters/DateEqualityPredicate';

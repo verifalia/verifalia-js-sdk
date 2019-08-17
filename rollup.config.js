@@ -5,6 +5,7 @@ import json from 'rollup-plugin-json';
 import { terser } from "rollup-plugin-terser";
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
+import replace from 'rollup-plugin-replace';
 import pkg from './package.json';
 
 export default [
@@ -49,15 +50,20 @@ export default [
         external: [
             'axios',
             'tslib',
-            'date-fns'
+            'date-fns',
+            'debug'
         ],
         plugins: [
             resolve(),
             builtins(),
             globals(),
+            replace({
+                exclude: 'node_modules/**',
+                ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+            }),
             typescript({
                 target: 'es2019'
-            })
+            }),
         ],
         output: [{
             file: pkg.module,
@@ -71,26 +77,30 @@ export default [
         external: [
             'axios',
             'tslib',
-            'date-fns'
+            'date-fns',
+            'debug'
         ],
         globals: {
             'axios': 'axios',
-            'date-fns/format': '_.random'
         },
         plugins: [
             resolve(),
             builtins(),
             globals(),
+            replace({
+                exclude: 'node_modules/**',
+                ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+            }),
             typescript({
                 target: "es5"
-            })
+            }),
         ],
         output: [{
             file: pkg.main,
             format: 'umd',
             name: 'Verifalia',
             esModule: false
-        }, ]
+        },]
     },
 
     // browser-friendly IIFE build, with no external dependencies
@@ -111,6 +121,10 @@ export default [
                 include: 'node_modules/**'
             }),
             json(),
+            replace({
+                exclude: 'node_modules/**',
+                ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+            }),
             typescript({
                 target: 'es5'
             }),

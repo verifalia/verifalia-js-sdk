@@ -1,5 +1,5 @@
 import { MultiplexedRestClient } from "./MultiplexedRestClient";
 
-export interface IRestClientFactory {
+export interface RestClientFactory {
     build(): MultiplexedRestClient;
 }

@@ -1,8 +1,11 @@
 import { ValidationOverview } from "./models/ValidationOverview";
+import debug from 'debug';
 
 type ProgressCallback = (value: ValidationOverview) => void;
 
 export class WaitingStrategy {
+    private _log = debug('verifalia');
+
     public waitForCompletion: boolean;
     public progress: ProgressCallback | null;
 
@@ -20,9 +23,23 @@ export class WaitingStrategy {
             const timespanMatch = validationOverview.progress.estimatedTimeRemaining.match(/^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/);
 
             if (timespanMatch) {
-                console.log('timespanMatch', timespanMatch);
+                const hours = parseInt(timespanMatch[2]);
+                const minutes = parseInt(timespanMatch[3]);
+                const seconds = parseInt(timespanMatch[4]);
+
+                // Calculate the delay (in seconds)
+
+                delay = seconds;
+                delay += minutes * 60;
+                delay += hours * 3600;
+
+                // TODO: Follow the ETA more precisely: as a safenet, we are constraining it to a maximum of 30s for now.
+
+                delay = Math.max(0.5, Math.min(30, delay));
             }
         }
+
+        this._log('waitForNextPoll delay (seconds)', delay);
 
         return new Promise((resolve) => setTimeout(resolve, delay * 1000));
     }
