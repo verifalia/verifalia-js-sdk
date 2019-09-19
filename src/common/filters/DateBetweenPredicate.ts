@@ -1,6 +1,6 @@
-import { format } from 'date-fns';
 import { FilterPredicateFragment } from './FilterPredicateFragment';
 import { DateFilterPredicate } from './DateFilterPredicate';
+import { formatDateToIso8601 } from '../DateUtils';
 
 export class DateBetweenPredicate extends DateFilterPredicate {
     public since?: Date;
@@ -19,14 +19,14 @@ export class DateBetweenPredicate extends DateFilterPredicate {
         if (this.since) {
             fragments.push({
                 key: `${fieldName}:since`,
-                value: format(this.since, 'YYYY-MM-DD')
+                value: formatDateToIso8601(this.since)
             });
         }
 
         if (this.until) {
             fragments.push({
                 key: `${fieldName}:until`,
-                value: format(this.until, 'YYYY-MM-DD')
+                value: formatDateToIso8601(this.until)
             });
         }
 

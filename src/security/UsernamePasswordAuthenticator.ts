@@ -10,10 +10,6 @@ export class UsernamePasswordAuthenticator implements Authenticator {
             throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user, if you don\'t have one.');
         }
 
-        if (!password && password.length === 0) {
-            throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user, if you don\'t have one.');
-        }
-
         this._username = username;
         this._password = password;
     }

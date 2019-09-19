@@ -5,11 +5,12 @@ import { ServiceUnreachableError } from './errors/ServiceUnreachableError';
 import { EndpointServerError } from './errors/EndpointServerError';
 import { AuthorizationError } from './errors/AuthorizationError';
 import { WellKnowMimeContentTypes } from './WellKnowMimeContentTypes';
-import debug from 'debug';
+import { LoggerFactory } from './environments/environment';
+
+const loggerFactory = new LoggerFactory();
+const logger = loggerFactory.build('verifalia');
 
 export class MultiplexedRestClient {
-    private _log = debug('verifalia');
-    
     private _authenticator: Authenticator;
     private _baseUris: string[];
     private _userAgent: string | undefined;
@@ -65,7 +66,7 @@ export class MultiplexedRestClient {
 
             const axiosConfigWithAuthentication = this._authenticator.addAuthentication(axiosConfig);
 
-            this._log('Axios config', axiosConfigWithAuthentication);
+            logger.log('Axios config', axiosConfigWithAuthentication);
 
             let response: AxiosResponse<T>;
 

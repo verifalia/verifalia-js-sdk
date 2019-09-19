@@ -1,5 +1,8 @@
 import { VerifaliaError } from "./VerifaliaError";
 
+/**
+ * Thrown in the event all the Verifalia API endpoints are unreachable.
+ */
 export class ServiceUnreachableError extends VerifaliaError {
     public readonly innerErrors: any[];
     /**

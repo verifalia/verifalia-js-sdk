@@ -1,6 +1,6 @@
-import { format } from 'date-fns';
 import { FilterPredicateFragment } from './FilterPredicateFragment';
 import { DateFilterPredicate } from './DateFilterPredicate';
+import { formatDateToIso8601 } from '../DateUtils';
 
 export class DateEqualityPredicate extends DateFilterPredicate {
     public date: Date;
@@ -15,7 +15,7 @@ export class DateEqualityPredicate extends DateFilterPredicate {
         return [
             {
                 key: fieldName,
-                value: `${format(this.date, 'YYYY-MM-DD')}`
+                value: `${formatDateToIso8601(this.date)}`
             }
         ];
     }

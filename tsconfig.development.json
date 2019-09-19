@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./src",
+      "outDir": "./dist",
+      "strict": true,
+      "moduleResolution": "node",
+      "target": "es2019",
+      "module": "ESNext"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"],    
+}

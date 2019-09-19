@@ -1,13 +1,16 @@
 import { ValidationOverview } from "./models/ValidationOverview";
-import debug from 'debug';
+import { LoggerFactory } from "../environments/environment";
+import { OperationCancelledError } from "../errors/OperationCancelledError";
+
+const loggerFactory = new LoggerFactory();
+const logger = loggerFactory.build('verifalia');
 
 type ProgressCallback = (value: ValidationOverview) => void;
 
 export class WaitingStrategy {
-    private _log = debug('verifalia');
-
     public waitForCompletion: boolean;
     public progress: ProgressCallback | null;
+    public isCancellationRequested: boolean = false;
 
     constructor(waitForCompletion: boolean, progress: ProgressCallback | null = null) {
         this.waitForCompletion = waitForCompletion;
@@ -15,6 +18,12 @@ export class WaitingStrategy {
     }
 
     public async waitForNextPoll(validationOverview: ValidationOverview): Promise<void> {
+        // Throws in the event the user requested to cancel a pending waiting
+
+        if (this.isCancellationRequested) {
+            throw new OperationCancelledError();
+        }
+
         // Observe the ETA if we have one, otherwise a delay given the formula: max(0.5, min(30, 2^(log(noOfEntries, 10) - 1)))
 
         let delay: number = Math.max(0.5, Math.min(30, Math.pow(2, Math.log10(validationOverview.noOfEntries) - 1)));
@@ -39,8 +48,12 @@ export class WaitingStrategy {
             }
         }
 
-        this._log('waitForNextPoll delay (seconds)', delay);
+        logger.log('waitForNextPoll delay (seconds)', delay);
 
         return new Promise((resolve) => setTimeout(resolve, delay * 1000));
+    }
+
+    public cancel() {
+        this.isCancellationRequested = true;
     }
 }

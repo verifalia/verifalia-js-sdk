@@ -1,3 +1,6 @@
+/**
+ * Base error class for exceptions thrown by the Verifalia SDK for JavaScript.
+ */
 export class VerifaliaError {
     message?: string;
 

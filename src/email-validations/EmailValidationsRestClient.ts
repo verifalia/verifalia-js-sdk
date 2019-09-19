@@ -218,7 +218,7 @@ export class EmailValidationsRestClient {
 
             // Wait for the next polling schedule
 
-            await waitingStrategy.waitForNextPoll(validationOverview);
+            await waitingStrategy.waitForNextPoll(resultOverview);
 
             // Fetch the job from the API
 

@@ -49,7 +49,6 @@ export class VerifaliaRestClient implements RestClientFactory {
         // TODO: Support for client certificates
     }
 
-    /** @internal */
     build(): MultiplexedRestClient {
         if (!this._cachedRestClient) {
             // Initial uris shuffling (see https://stackoverflow.com/a/12646864/904178)
@@ -69,9 +68,8 @@ export class VerifaliaRestClient implements RestClientFactory {
         return this._cachedRestClient as MultiplexedRestClient;
     }
 
-    /** @internal */
     private getUserAgent(): string | undefined {
-        const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+        const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
 
         if (isNode) {
             return `verifalia-rest-client/js/${packageVersion}/node/${process.platform + '/' + process.version}`;

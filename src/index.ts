@@ -1,26 +1,20 @@
-import debug from 'debug';
 import axios from 'axios';
-
-// @ts-ignore
-if (ENV !== 'production') {
-	debug.enable('*');
-} else {
-	debug.disable();
-}
+import { LoggerFactory } from './environments/environment';
 
 // Display outgoing requests to the API on the console (debug build only)
 
-const log = debug('verifalia');
+const loggerFactory = new LoggerFactory();
+const logger = loggerFactory.build('verifalia');
 
 axios
 	.interceptors
 	.request
 	.use(
 		(config: any) => {
-			log('invoking URL', config.url);
-			log('params', config.params);
-			log('data', config.data);
-			log('headers', config.headers);
+			logger.log('invoking URL', config.url);
+			logger.log('params', config.params);
+			logger.log('data', config.data);
+			logger.log('headers', config.headers);
 
 			return config;
 		},
@@ -40,9 +34,12 @@ export { ValidationPriority } from './email-validations/models/ValidationPriorit
 export { ValidationStatus } from './email-validations/models/ValidationStatus';
 export { ValidationEntryClassification } from './email-validations/models/ValidationEntryClassification';
 export { ValidationEntryStatus } from './email-validations/models/ValidationEntryStatus';
+export { Validation } from './email-validations/models/Validation'
 export { ValidationOverview } from './email-validations/models/ValidationOverview'
+export { ValidationEntry } from './email-validations/models/ValidationEntry'
 export { VerifaliaRestClientConfiguration } from './VerifaliaRestClientConfiguration';
 export { DailyUsageListingOptions } from './credits/models/DailyUsageListingOptions';
 export { Balance } from './credits/models/Balance';
 export { DailyUsage } from './credits/models/DailyUsage';
 export { Direction } from './common/Direction';
+export { OperationCancelledError } from './errors/OperationCancelledError';

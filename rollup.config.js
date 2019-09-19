@@ -9,41 +9,6 @@ import replace from 'rollup-plugin-replace';
 import pkg from './package.json';
 
 export default [
-    // // browser-friendly IIFE build, with everything external
-    // {
-    // 	input: 'src/main.ts',
-    // 	output: {
-    // 		name: 'VerifaliaRestClient',
-    // 		file: pkg.browser,
-    // 		format: 'iife',
-    // 		globals: {
-    // 			'axios': 'axios',
-    // 			'rxjs': 'rxjs',
-    // 			'rxjs/operators': 'rxjs.operators'
-    // 		}
-    // 	},
-    // 	external: [
-    // 		// axios-observable does not (yet) have a ready-made redistributable module and is super small,
-    // 		// so we are embedding it into the Verifalia SDK and not referring to it as an "external" module.
-    // 		'axios',
-    // 		'rxjs',
-    // 		'rxjs/operators',
-    // 		'tslib'
-    // 	],
-    // 	plugins: [
-    // 		resolve({
-    // 			jsnext: true,
-    // 			main: true,
-    // 			browser: true
-    // 		}),
-    // 		commonjs({
-    // 			include: 'node_modules/**'
-    // 		}),
-    // 		json(),
-    // 		typescript() // so Rollup can convert TypeScript to JavaScript
-    // 	]
-    // },
-
     // ES module
     {
         input: 'src/index.ts',
@@ -60,9 +25,11 @@ export default [
             replace({
                 exclude: 'node_modules/**',
                 ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+                './environments/environment': './environments/environment.' + (process.env.NODE_ENV || 'development')
             }),
             typescript({
-                target: 'es2019'
+                target: 'es2019',
+                tsconfig: 'tsconfig.' + (process.env.NODE_ENV || 'development') + '.json'
             }),
         ],
         output: [{
@@ -90,9 +57,11 @@ export default [
             replace({
                 exclude: 'node_modules/**',
                 ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+                './environments/environment': './environments/environment.' + (process.env.NODE_ENV || 'development')
             }),
             typescript({
-                target: "es5"
+                target: "es5",
+                tsconfig: 'tsconfig.' + (process.env.NODE_ENV || 'development') + '.json'
             }),
         ],
         output: [{
@@ -109,7 +78,8 @@ export default [
         output: {
             name: 'Verifalia',
             file: pkg.browser,
-            format: 'iife'
+            format: 'iife',
+            exports: 'named'
         },
         plugins: [
             resolve({
@@ -124,9 +94,11 @@ export default [
             replace({
                 exclude: 'node_modules/**',
                 ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+                'environments/environment': 'environments/environment.' + (process.env.NODE_ENV || 'development')
             }),
             typescript({
-                target: 'es5'
+                target: 'es5',
+                tsconfig: 'tsconfig.' + (process.env.NODE_ENV || 'development') + '.json'
             }),
             terser({
                 compress: {
