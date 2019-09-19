@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "description": "Verifalia email validation library for Javascript",
     "homepage": "https://verifalia.com",
     "main": "dist/umd/verifalia.js",
@@ -12,7 +12,7 @@
         "build": "npm run build:genversion && rollup -c && npm run build:definitions",
         "build:production": "cross-env NODE_ENV=production npm run build",
         "lint": "tslint",
-        "test": "echo \"No test specified\""        
+        "test": "echo \"No test specified\""
     },
     "typings": "dist/definitions/index.d.ts",
     "keywords": [
