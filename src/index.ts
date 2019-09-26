@@ -43,3 +43,4 @@ export { Balance } from './credits/models/Balance';
 export { DailyUsage } from './credits/models/DailyUsage';
 export { Direction } from './common/Direction';
 export { OperationCancelledError } from './errors/OperationCancelledError';
+export { RequestThrottledError } from './errors/RequestThrottledError';

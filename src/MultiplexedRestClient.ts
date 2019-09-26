@@ -6,6 +6,7 @@ import { EndpointServerError } from './errors/EndpointServerError';
 import { AuthorizationError } from './errors/AuthorizationError';
 import { WellKnowMimeContentTypes } from './WellKnowMimeContentTypes';
 import { LoggerFactory } from './environments/environment';
+import { RequestThrottledError } from './errors/RequestThrottledError';
 
 const loggerFactory = new LoggerFactory();
 const logger = loggerFactory.build('verifalia');
@@ -78,13 +79,23 @@ export class MultiplexedRestClient {
                 continue;
             }
 
+            // Internal server error HTTP 5xx
+
             if (response.status >= 500 && response.status <= 599) {
                 errors.push(new EndpointServerError(`Endpoint ${baseUri} returned an HTTP ${response.status} status code.`));
                 continue;
             }
 
+            // Authentication / authorization error
+
             if (response.status === 401 || response.status === 403) {
                 throw new AuthorizationError(response.statusText);
+            }
+
+            // Throttling
+
+            if (response.status === 429) {
+                throw new RequestThrottledError();
             }
 
             return response;
