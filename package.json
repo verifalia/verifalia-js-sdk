@@ -12,6 +12,7 @@
         "build": "npm run build:genversion && rollup -c && npm run build:definitions",
         "build:production": "cross-env NODE_ENV=production npm run build",
         "lint": "tslint",
+        "version": "npm run build:production",
         "test": "echo \"No test specified\""
     },
     "typings": "dist/definitions/index.d.ts",
