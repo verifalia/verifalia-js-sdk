@@ -42,5 +42,11 @@ export { DailyUsageListingOptions } from './credits/models/DailyUsageListingOpti
 export { Balance } from './credits/models/Balance';
 export { DailyUsage } from './credits/models/DailyUsage';
 export { Direction } from './common/Direction';
+
+// Errors
+
+export { AuthorizationError } from './errors/AuthorizationError';
+export { EndpointServerError } from './errors/EndpointServerError';
 export { OperationCancelledError } from './errors/OperationCancelledError';
 export { RequestThrottledError } from './errors/RequestThrottledError';
+export { ServiceUnreachableError } from './errors/ServiceUnreachableError';

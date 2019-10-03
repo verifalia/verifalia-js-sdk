@@ -5,6 +5,7 @@
     "homepage": "https://verifalia.com",
     "main": "dist/umd/verifalia.js",
     "module": "dist/es2015/verifalia.mjs",
+    "module:es5": "dist/es5/verifalia.mjs",
     "browser": "dist/iife/verifalia.js",
     "scripts": {
         "build:genversion": "genversion --es6 src/version.ts",
