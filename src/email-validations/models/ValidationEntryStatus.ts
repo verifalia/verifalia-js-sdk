@@ -78,6 +78,10 @@ export enum ValidationEntryStatus {
     */
     DomainIsMisconfigured = 'DomainIsMisconfigured',
 
+    /** The domain has a NULL MX (RFC 7505) resource record and can't thus accept email messages.
+     */
+    DomainHasNullMx = 'DomainHasNullMx',
+
     /** The email address is provided by a well-known disposable email address provider (DEA).
     */
     DomainIsWellKnownDea = 'DomainIsWellKnownDea',

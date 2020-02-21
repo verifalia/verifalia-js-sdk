@@ -44,4 +44,15 @@ export interface ValidationRequest {
      * will be returned on subsequent API calls and shown on the Verifalia clients area.
      */
     name?: string;
+
+    /**
+     * An optional maximum data retention period Verifalia observes for this verification job,
+     * after which the job will be automatically deleted, in the format: [dd.]hh.mm.ss.
+     * If unset, forces the service to fall back to the default retention period for the user
+     * or browser app which is submitting the job.
+     * A verification job can be deleted anytime prior to its retention period through the
+     * delete() method; if set, the retention period must have a value between 5 minutes and 30
+     * days. 
+     */
+    retention?: string;
 }

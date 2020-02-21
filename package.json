@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "Verifalia email validation library for Javascript",
     "homepage": "https://verifalia.com",
     "main": "dist/umd/verifalia.js",
@@ -12,7 +12,6 @@
         "build:definitions": "tsc -p tsconfig.definitions.json",
         "build": "npm run build:genversion && rollup -c && npm run build:definitions",
         "build:production": "cross-env NODE_ENV=production npm run build",
-        "lint": "tslint",
         "version": "npm run build:production",
         "test": "echo \"No test specified\""
     },
@@ -40,7 +39,8 @@
     },
     "dependencies": {
         "axios": "^0.19.0",
-        "debug": "^4.1.1"
+        "debug": "^4.1.1",
+        "tslib": "^1.10.0"
     },
     "bugs": {
         "url": "https://github.com/verifalia/verifalia-js-sdk/issues"
@@ -50,23 +50,22 @@
         "node": ">= 0.8.0"
     },
     "devDependencies": {
+        "@rollup/plugin-commonjs": "^11.0.2",
+        "@rollup/plugin-json": "^4.0.2",
+        "@rollup/plugin-node-resolve": "^7.1.1",
+        "@rollup/plugin-replace": "^2.3.1",
         "@types/debug": "^4.1.5",
-        "@types/node": "^12.6.9",
-        "cross-env": "^5.2.0",
+        "@types/node": "^13.7.4",
+        "cross-env": "^7.0.0",
         "dts-bundle-generator": "^3.2.0",
         "genversion": "^2.2.0",
-        "rollup": "^1.19.4",
-        "rollup-plugin-commonjs": "^10.0.2",
-        "rollup-plugin-json": "^4.0.0",
+        "rollup": "^1.31.1",
         "rollup-plugin-node-builtins": "^2.1.2",
         "rollup-plugin-node-globals": "^1.4.0",
-        "rollup-plugin-node-resolve": "^5.2.0",
-        "rollup-plugin-replace": "^2.2.0",
         "rollup-plugin-terser": "^5.1.1",
-        "rollup-plugin-typescript2": "^0.22.1",
+        "rollup-plugin-typescript2": "^0.26.0",
         "rollup-plugin-uglify": "^6.0.2",
         "ts-loader": "^6.0.4",
-        "tslint": "^5.18.0",
         "typescript": "^3.5.3"
     },
     "files": [

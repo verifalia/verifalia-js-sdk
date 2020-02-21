@@ -15,7 +15,7 @@ export class VerifaliaRestClient implements RestClientFactory {
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
      */
-    public apiVersion: string = 'v2.0';
+    public apiVersion: string = 'v2.1';
 
     /**
      * Allows to manage the credits for the Verifalia account.

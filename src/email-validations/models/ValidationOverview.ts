@@ -63,6 +63,11 @@ export interface ValidationOverview {
     deduplication: DeduplicationMode;
 
     /**
+     * The maximum data retention period for this verification job, in the format [dd.]hh.mm.ss.
+     */
+    retention: string;
+
+    /**
      * The processing status for the validation job.
      */
     status: ValidationStatus;
