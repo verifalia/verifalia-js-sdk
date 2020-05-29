@@ -7,6 +7,7 @@ import { AuthorizationError } from './errors/AuthorizationError';
 import { WellKnowMimeContentTypes } from './WellKnowMimeContentTypes';
 import { LoggerFactory } from './environments/environment';
 import { RequestThrottledError } from './errors/RequestThrottledError';
+import { InsufficientCreditError } from './errors/InsufficientCreditError';
 
 const loggerFactory = new LoggerFactory();
 const logger = loggerFactory.build('verifalia');
@@ -90,6 +91,12 @@ export class MultiplexedRestClient {
 
             if (response.status === 401 || response.status === 403) {
                 throw new AuthorizationError(response.statusText);
+            }
+
+            // Payment required
+
+            if (response.status === 402) {
+                throw new InsufficientCreditError();
             }
 
             // Throttling

@@ -50,3 +50,4 @@ export { EndpointServerError } from './errors/EndpointServerError';
 export { OperationCancelledError } from './errors/OperationCancelledError';
 export { RequestThrottledError } from './errors/RequestThrottledError';
 export { ServiceUnreachableError } from './errors/ServiceUnreachableError';
+export { InsufficientCreditError } from './errors/InsufficientCreditError';

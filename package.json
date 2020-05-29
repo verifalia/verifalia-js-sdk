@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "description": "Verifalia email validation library for Javascript",
     "homepage": "https://verifalia.com",
     "main": "dist/umd/verifalia.js",
