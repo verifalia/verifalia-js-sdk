@@ -1,8 +1,9 @@
-import { DailyUsageListSegment } from './models/DailyUsageListSegment';
 import { DailyUsageListingOptions } from './models/DailyUsageListingOptions';
-import { RestClientFactory } from "../RestClientFactory";
+import { RestClientFactory } from "../rest/RestClientFactory";
 import { Balance } from "./models/Balance";
-import { Direction } from '../common/Direction';
+import { CancellationToken } from '../common/CancellationToken';
+import { getCreditsBalance, listCreditsDailyUsages } from './functions';
+import { DailyUsage } from './models/DailyUsage';
 
 export class CreditsRestClient {
     private readonly _restClientFactory: RestClientFactory;
@@ -13,51 +14,64 @@ export class CreditsRestClient {
 
     /**
      * Returns the current credits balance for the Verifalia account.
+     * 
+     * Here is an example:
+     * ```ts
+     * // Option 1 - async/await
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * const balance = await verifalia
+     *     .credits
+     *     .getBalance();
+     * 
+     * console.log(`Credit packs: ${balance.creditPacks}, free credits: ${balance.freeCredits}`);
+     * // 'Credit packs: 507.23, free credits: 10.86'
+     * 
+     * // Option 2 - callback
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * verifalia
+     *     .credits
+     *     .getBalance()
+     *     .then(balance => {
+     *         console.log(`Credit packs: ${balance.creditPacks}, free credits: ${balance.freeCredits}`);
+     *         // 'Credit packs: 507.23, free credits: 10.86'
+     *     });
+     * ```
+     * 
+     * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
-    public async getBalance(): Promise<Balance> {
-        const restClient = this._restClientFactory.build();
-        return (await restClient.invoke<Balance>('GET', '/credits/balance')).data;
+    public getBalance(cancellationToken?: CancellationToken): Promise<Balance> {
+        return getCreditsBalance(this._restClientFactory, cancellationToken);
     }
 
     /**
-     * Lists the daily usages of the credits for the Verifalia account.
-     * @param options The options for the listing operation.
+     * Lists the daily usages of the credits for the Verifalia account, according to the specified
+     * listing options.
+     * 
+     * Here is how to list the credit daily usages between two dates:
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     * const dailyUsages = verifalia
+     *     .credits
+     *     .listDailyUsages({
+     *         dateFilter: new DateBetweenPredicate(new Date(2020, 10, 15), new Date(2020, 10, 23))
+     *     });
+     * 
+     * for await (const dailyUsage of dailyUsages) {
+     *     console.log(`Date: ${dailyUsage.date}, credit packs: ${dailyUsage.creditPacks}, free credits: ${dailyUsage.freeCredits}`);
+     *     // 'Date: 2020-10-15, credit packs: 98.85, free credits: 50'
+     *     // 'Date: 2020-10-16, credit packs: 0, free credits: 19.26'
+     *     // ...
+     *     // 'Date: 2020-10-23, credit packs: 1.565, free credits: 50'
+     * }
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     * @param options A `DailyUsageListingOptions` with the options for the listing operation.
+     * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
-    public async * listDailyUsages(options: DailyUsageListingOptions) {
-        const restClient = this._restClientFactory.build();
-        let listSegment: DailyUsageListSegment | null = null;
-
-        do {
-            const params: any = {};
-
-            if (listSegment && listSegment.meta && listSegment.meta.cursor) {
-                const cursorParamName = options.direction === Direction.Backward
-                    ? "cursor:prev"
-                    : "cursor";
-
-                params[cursorParamName] = listSegment.meta.cursor;
-            }
-            else {
-                // Filters
-
-                if (options.dateFilter) {
-                    for (const fragment of options.dateFilter.serialize('date')) {
-                        params[fragment.key] = fragment.value;
-                    }
-                }
-            }
-
-            const response = await restClient.invoke<DailyUsageListSegment>('GET',
-                `/credits/daily-usage`,
-                params);
-
-            // TODO: Check the response status code
-
-            listSegment = response.data;
-
-            for (const item of listSegment.data) {
-                yield item;
-            }
-        } while ((listSegment.meta || {}).isTruncated);
+    public listDailyUsages(options?: DailyUsageListingOptions, cancellationToken?: CancellationToken): AsyncGenerator<DailyUsage> {
+        return listCreditsDailyUsages(this._restClientFactory, options, cancellationToken);
     }
 }

@@ -1,176 +1,217 @@
-/**
- * Provides enumerated values for the supported validation statuses for a ValidationEntry.
- */
-export enum ValidationEntryStatus {
+import {
+    ValidationEntryStatus_AtSignNotFound,
+    ValidationEntryStatus_CatchAllConnectionFailure,
+    ValidationEntryStatus_CatchAllValidationTimeout,
+    ValidationEntryStatus_DnsConnectionFailure,
+    ValidationEntryStatus_DnsQueryTimeout,
+    ValidationEntryStatus_DomainDoesNotExist,
+    ValidationEntryStatus_DomainHasNullMx,
+    ValidationEntryStatus_DomainIsMisconfigured,
+    ValidationEntryStatus_DomainIsWellKnownDea,
+    ValidationEntryStatus_DomainPartCompliancyFailure,
+    ValidationEntryStatus_DoubleDotSequence,
+    ValidationEntryStatus_Duplicate,
+    ValidationEntryStatus_InvalidAddressLength,
+    ValidationEntryStatus_InvalidCharacterInSequence,
+    ValidationEntryStatus_InvalidEmptyQuotedWord,
+    ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence,
+    ValidationEntryStatus_InvalidLocalPartLength,
+    ValidationEntryStatus_InvalidWordBoundaryStart,
+    ValidationEntryStatus_IspSpecificSyntaxFailure,
+    ValidationEntryStatus_LocalEndPointRejected,
+    ValidationEntryStatus_LocalPartIsWellKnownRoleAccount,
+    ValidationEntryStatus_LocalSenderAddressRejected,
+    ValidationEntryStatus_MailboxConnectionFailure,
+    ValidationEntryStatus_MailboxDoesNotExist,
+    ValidationEntryStatus_MailboxIsDea,
+    ValidationEntryStatus_MailboxTemporarilyUnavailable,
+    ValidationEntryStatus_MailboxValidationTimeout,
+    ValidationEntryStatus_MailExchangerIsHoneypot,
+    ValidationEntryStatus_MailExchangerIsWellKnownDea,
+    ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes,
+    ValidationEntryStatus_ServerIsCatchAll,
+    ValidationEntryStatus_ServerTemporaryUnavailable,
+    ValidationEntryStatus_SmtpConnectionFailure,
+    ValidationEntryStatus_SmtpConnectionTimeout,
+    ValidationEntryStatus_SmtpDialogError,
+    ValidationEntryStatus_Success,
+    ValidationEntryStatus_UnacceptableDomainLiteral,
+    ValidationEntryStatus_UnbalancedCommentParenthesis,
+    ValidationEntryStatus_UnexpectedQuotedPairSequence,
+    ValidationEntryStatus_UnhandledException,
+    ValidationEntryStatus_UnmatchedQuotedPair
+} from "../constants";
+
+export const ValidationEntryStatus = {
     /** The email address has been successfully validated.
     */
-    Success = 'Success',
+    Success: ValidationEntryStatus_Success,
 
     /** A quoted pair within a quoted word is not closed properly.
     */
-    UnmatchedQuotedPair = 'UnmatchedQuotedPair',
+    UnmatchedQuotedPair: ValidationEntryStatus_UnmatchedQuotedPair,
 
     /** An unexpected quoted pair sequence has been found within a quoted word.
     */
-    UnexpectedQuotedPairSequence = 'UnexpectedQuotedPairSequence',
+    UnexpectedQuotedPairSequence: ValidationEntryStatus_UnexpectedQuotedPairSequence,
 
     /** A new word boundary start has been detected at an invalid position.
     */
-    InvalidWordBoundaryStart = 'InvalidWordBoundaryStart',
+    InvalidWordBoundaryStart: ValidationEntryStatus_InvalidWordBoundaryStart,
 
     /** An invalid character has been detected in the provided sequence.
     */
-    InvalidCharacterInSequence = 'InvalidCharacterInSequence',
+    InvalidCharacterInSequence: ValidationEntryStatus_InvalidCharacterInSequence,
 
     /** The number of parenthesis used to open comments is not equal to the one used to close them.
     */
-    UnbalancedCommentParenthesis = 'UnbalancedCommentParenthesis',
+    UnbalancedCommentParenthesis: ValidationEntryStatus_UnbalancedCommentParenthesis,
 
     /** An invalid sequence of two adjacent dots has been found.
     */
-    DoubleDotSequence = 'DoubleDotSequence',
+    DoubleDotSequence: ValidationEntryStatus_DoubleDotSequence,
 
     /** The local part of the e-mail address has an invalid length.
     */
-    InvalidLocalPartLength = 'InvalidLocalPartLength',
+    InvalidLocalPartLength: ValidationEntryStatus_InvalidLocalPartLength,
 
     /** An invalid folding white space (FWS) sequence has been found.
     */
-    InvalidFoldingWhiteSpaceSequence = 'InvalidFoldingWhiteSpaceSequence',
+    InvalidFoldingWhiteSpaceSequence: ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence,
 
-    /** The at sign symbol (@), used to separate the local part from the domain part of the address, has not been found.
+    /** The at sign symbol (@); used to separate the local part from the domain part of the address; has not been found.
     */
-    AtSignNotFound = 'AtSignNotFound',
+    AtSignNotFound: ValidationEntryStatus_AtSignNotFound,
 
     /** An invalid quoted word with no content has been found.
     */
-    InvalidEmptyQuotedWord = 'InvalidEmptyQuotedWord',
+    InvalidEmptyQuotedWord: ValidationEntryStatus_InvalidEmptyQuotedWord,
 
     /** The email address has an invalid total length.
     */
-    InvalidAddressLength = 'InvalidAddressLength',
+    InvalidAddressLength: ValidationEntryStatus_InvalidAddressLength,
 
     /** The domain part of the email address is not compliant with the IETF standards.
     */
-    DomainPartCompliancyFailure = 'DomainPartCompliancyFailure',
+    DomainPartCompliancyFailure: ValidationEntryStatus_DomainPartCompliancyFailure,
 
     /** The email address is not compliant with the additional syntax rules of the email service provider
     * which should eventually manage it.
     */
-    IspSpecificSyntaxFailure = 'IspSpecificSyntaxFailure',
+    IspSpecificSyntaxFailure: ValidationEntryStatus_IspSpecificSyntaxFailure,
 
     /** The local part of the email address is a well-known role account. */
-    LocalPartIsWellKnownRoleAccount = 'LocalPartIsWellKnownRoleAccount,',
+    LocalPartIsWellKnownRoleAccount: ValidationEntryStatus_LocalPartIsWellKnownRoleAccount,
 
     /** A timeout has occured while querying the DNS server(s) for records about the email address domain. */
-    DnsQueryTimeout = 'DnsQueryTimeout',
+    DnsQueryTimeout: ValidationEntryStatus_DnsQueryTimeout,
 
     /** Verification failed because of a socket connection error occured while querying the DNS server.
     */
-    DnsConnectionFailure = 'DnsConnectionFailure',
+    DnsConnectionFailure: ValidationEntryStatus_DnsConnectionFailure,
 
     /** The domain of the email address does not exist.
     */
-    DomainDoesNotExist = 'DomainDoesNotExist',
+    DomainDoesNotExist: ValidationEntryStatus_DomainDoesNotExist,
 
     /** The domain of the email address does not have any valid DNS record and couldn't accept messages from another
     * host on the Internet.
     */
-    DomainIsMisconfigured = 'DomainIsMisconfigured',
+    DomainIsMisconfigured: ValidationEntryStatus_DomainIsMisconfigured,
 
     /** The domain has a NULL MX (RFC 7505) resource record and can't thus accept email messages.
      */
-    DomainHasNullMx = 'DomainHasNullMx',
+    DomainHasNullMx: ValidationEntryStatus_DomainHasNullMx,
 
     /** The email address is provided by a well-known disposable email address provider (DEA).
     */
-    DomainIsWellKnownDea = 'DomainIsWellKnownDea',
+    DomainIsWellKnownDea: ValidationEntryStatus_DomainIsWellKnownDea,
 
     /** The mail exchanger being tested is a well-known disposable email address provider (DEA).
     */
-    MailExchangerIsWellKnownDea = 'MailExchangerIsWellKnownDea',
+    MailExchangerIsWellKnownDea: ValidationEntryStatus_MailExchangerIsWellKnownDea,
 
     /** While both the domain and the mail exchanger for the email address being tested are not from a well-known
-    * disposable email address provider (DEA), the mailbox is actually disposable.
+    * disposable email address provider (DEA); the mailbox is actually disposable.
     */
-    MailboxIsDea = 'MailboxIsDea',
+    MailboxIsDea: ValidationEntryStatus_MailboxIsDea,
 
     /** A timeout has occured while connecting to the mail exchanger which serves the email address domain.
     */
-    SmtpConnectionTimeout = 'SmtpConnectionTimeout',
+    SmtpConnectionTimeout: ValidationEntryStatus_SmtpConnectionTimeout,
 
     /** A socket connection error occured while connecting to the mail exchanger which serves the email address domain.
     */
-    SmtpConnectionFailure = 'SmtpConnectionFailure',
+    SmtpConnectionFailure: ValidationEntryStatus_SmtpConnectionFailure,
 
     /** The mailbox for the e-mail address does not exist.
     */
-    MailboxDoesNotExist = 'MailboxDoesNotExist',
+    MailboxDoesNotExist: ValidationEntryStatus_MailboxDoesNotExist,
 
     /** A connection error occurred while validating the mailbox for the e-mail address.
     */
-    MailboxConnectionFailure = 'MailboxConnectionFailure',
+    MailboxConnectionFailure: ValidationEntryStatus_MailboxConnectionFailure,
 
     /** The external mail exchanger rejected the validation request.
     */
-    LocalSenderAddressRejected = 'LocalSenderAddressRejected',
+    LocalSenderAddressRejected: ValidationEntryStatus_LocalSenderAddressRejected,
 
     /** A timeout occured while verifying the existence of the mailbox.
     */
-    MailboxValidationTimeout = 'MailboxValidationTimeout',
+    MailboxValidationTimeout: ValidationEntryStatus_MailboxValidationTimeout,
 
     /** The requested mailbox is temporarily unavailable; it could be experiencing technical issues or some other transient problem
-    * (could be over quota, for example).
+    * (could be over quota; for example).
     */
-    MailboxTemporarilyUnavailable = 'MailboxTemporarilyUnavailable',
+    MailboxTemporarilyUnavailable: ValidationEntryStatus_MailboxTemporarilyUnavailable,
 
-    /** The external mail exchanger does not support international mailbox names. To support this feature, mail exchangers must comply
+    /** The external mail exchanger does not support international mailbox names. To support this feature; mail exchangers must comply
      * with <a href="http://www.ietf.org/rfc/rfc5336.txt">RFC 5336</a> and support and announce both the 8BITMIME and the UTF8SMTP
      * protocol extensions.
     */
-    ServerDoesNotSupportInternationalMailboxes = 'ServerDoesNotSupportInternationalMailboxes',
+    ServerDoesNotSupportInternationalMailboxes: ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes,
 
     /** A timeout occured while verifying fake e-mail address rejection for the mail server.
     */
-    CatchAllValidationTimeout = 'CatchAllValidationTimeout',
+    CatchAllValidationTimeout: ValidationEntryStatus_CatchAllValidationTimeout,
 
-    /** The external mail exchanger accepts fake, non existent, email addresses; therefore the provided email address MAY be nonexistent too.
+    /** The external mail exchanger accepts fake; non existent; email addresses; therefore the provided email address MAY be nonexistent too.
     */
-    ServerIsCatchAll = 'ServerIsCatchAll',
+    ServerIsCatchAll: ValidationEntryStatus_ServerIsCatchAll,
 
     /** A connection error occurred while verifying the external mail exchanger rejects nonexistent email addresses.
     */
-    CatchAllConnectionFailure = 'CatchAllConnectionFailure',
+    CatchAllConnectionFailure: ValidationEntryStatus_CatchAllConnectionFailure,
 
     /** The mail exchanger responsible for the email address under test is temporarily unavailable.
     */
-    ServerTemporaryUnavailable = 'ServerTemporaryUnavailable',
+    ServerTemporaryUnavailable: ValidationEntryStatus_ServerTemporaryUnavailable,
 
     /** The mail exchanger responsible for the email address under test replied one or more non-standard SMTP replies which
     * caused the SMTP session to be aborted.
     */
-    SmtpDialogError = 'SmtpDialogError',
+    SmtpDialogError: ValidationEntryStatus_SmtpDialogError,
 
-    /** The external mail exchanger responsible for the email address under test rejected the local endpoint, probably because
+    /** The external mail exchanger responsible for the email address under test rejected the local endpoint; probably because
     * of its own policy rules.
     */
-    LocalEndPointRejected = 'LocalEndPointRejected',
+    LocalEndPointRejected: ValidationEntryStatus_LocalEndPointRejected,
 
     /** One or more unhandled exceptions have been thrown during the verification process and something went wrong
     * on the Verifalia side.
     */
-    UnhandledException = 'UnhandledException',
+    UnhandledException: ValidationEntryStatus_UnhandledException,
 
     /** The mail exchanger responsible for the email address under test hides a honeypot / spam trap.
     */
-    MailExchangerIsHoneypot = 'MailExchangerIsHoneypot',
+    MailExchangerIsHoneypot: ValidationEntryStatus_MailExchangerIsHoneypot,
 
     /** The domain literal of the email address couldn't accept messages from the Internet. */
-    UnacceptableDomainLiteral = 'UnacceptableDomainLiteral',
+    UnacceptableDomainLiteral: ValidationEntryStatus_UnacceptableDomainLiteral,
 
     /** The item is a duplicate of another email address in the list.
-    * To find out the entry this item is a duplicate of, check the duplicateOf property for the ValidationEntry
+    * To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
     * instance which exposes this status code</remarks>
     */
-    Duplicate = 'Duplicate'
+    Duplicate: ValidationEntryStatus_Duplicate
 }

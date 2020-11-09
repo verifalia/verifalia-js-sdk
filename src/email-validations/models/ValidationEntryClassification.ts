@@ -1,25 +1,29 @@
-/**
- * A classification of the status of a validation entry.
- */
-export enum ValidationEntryClassification {
+import {
+    ValidationEntryClassification_Deliverable,
+    ValidationEntryClassification_Risky,
+    ValidationEntryClassification_Undeliverable,
+    ValidationEntryClassification_Unknown
+} from "../constants";
+
+export const ValidationEntryClassification = {
     /**
      * A validation entry marked as Deliverable refers to an email address which is deliverable.
      */
-    Deliverable = 'Deliverable',
+    Deliverable: ValidationEntryClassification_Deliverable,
 
     /**
      * A validation entry marked as Risky refers to an email address which could be no longer valid.
      */
-    Risky = 'Risky',
+    Risky: ValidationEntryClassification_Risky,
 
     /**
      * A validation entry marked as Undeliverable refers to an email address which is either invalid or
      * no longer deliverable.
      */
-    Undeliverable = 'Undeliverable',
+    Undeliverable: ValidationEntryClassification_Undeliverable,
 
     /**
      * A validation entry marked as Unknown contains an email address whose deliverability is unknown.
      */
-    Unknown = 'Unknown'
-}
+    Unknown: ValidationEntryClassification_Unknown
+};

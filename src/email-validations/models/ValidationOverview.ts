@@ -1,8 +1,4 @@
 import { ValidationProgress } from "./ValidationProgress";
-import { ValidationStatus } from "./ValidationStatus";
-import { ValidationPriority } from "./ValidationPriority";
-import { QualityLevelName } from "./QualityLevelName";
-import { DeduplicationMode } from "./DeduplicationMode";
 
 /**
  * Overview information for an email validation.
@@ -29,8 +25,9 @@ export interface ValidationOverview {
      * The allowed range of values spans from 0 (lowest priority) to 255 (highest priority), where the midway value (127) means
      * normal priority; if not specified, Verifalia processes all the concurrent validation jobs for an account using the same
      * priority.
+     * See the constants exported in the ValidationPriority.ts file.
      */
-    priority?: ValidationPriority;
+    priority?: number;
 
     /**
      * An optional user-defined name for the validation job, for your own reference.
@@ -53,14 +50,16 @@ export interface ValidationOverview {
     createdOn: Date;
 
     /**
-     * A reference to the results quality level this job was validated against.
+     * A reference to the results quality level this job was validated against. See the
+     * constants exported in the QualityLevelName.ts file.
      */
-    quality: QualityLevelName;
+    quality: string;
 
     /**
-     * A deduplication option which affected the way Verifalia eventually marked entries as duplicates upon processing.
+     * A deduplication option which affected the way Verifalia eventually marked entries as
+     * duplicates upon processing. See the constants exported in the DeduplicationMode.ts file.
      */
-    deduplication: DeduplicationMode;
+    deduplication: string;
 
     /**
      * The maximum data retention period for this verification job, in the format [dd.]hh.mm.ss.
@@ -68,9 +67,10 @@ export interface ValidationOverview {
     retention: string;
 
     /**
-     * The processing status for the validation job.
+     * The processing status for the validation job. See the constants exported in the
+     * ValidationStatus.ts file.
      */
-    status: ValidationStatus;
+    status: string;
 
     /**
      * The number of entries the validation job contains.

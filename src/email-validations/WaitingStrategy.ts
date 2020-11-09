@@ -1,27 +1,26 @@
 import { ValidationOverview } from "./models/ValidationOverview";
-import { LoggerFactory } from "../environments/environment";
-import { OperationCancelledError } from "../errors/OperationCancelledError";
+import { Logger } from '../diagnostics/Logger';
+import { OperationCanceledError } from "../errors/OperationCanceledError";
+import { CancellationToken } from "../common/CancellationToken";
 
-const loggerFactory = new LoggerFactory();
-const logger = loggerFactory.build('verifalia');
+const logger = new Logger('verifalia');
 
 type ProgressCallback = (value: ValidationOverview) => void;
 
 export class WaitingStrategy {
     public waitForCompletion: boolean;
     public progress: ProgressCallback | null;
-    public isCancellationRequested: boolean = false;
 
     constructor(waitForCompletion: boolean, progress: ProgressCallback | null = null) {
         this.waitForCompletion = waitForCompletion;
         this.progress = progress;
     }
 
-    public async waitForNextPoll(validationOverview: ValidationOverview): Promise<void> {
+    public async waitForNextPoll(validationOverview: ValidationOverview, cancellationToken?: CancellationToken): Promise<void> {
         // Throws in the event the user requested to cancel a pending waiting
 
-        if (this.isCancellationRequested) {
-            throw new OperationCancelledError();
+        if (cancellationToken) {
+            cancellationToken.throwIfCancellationRequested();
         }
 
         // Observe the ETA if we have one, otherwise a delay given the formula: max(0.5, min(30, 2^(log(noOfEntries, 10) - 1)))
@@ -48,12 +47,32 @@ export class WaitingStrategy {
             }
         }
 
+        /* @if ENVIRONMENT!='production' */
         logger.log('waitForNextPoll delay (seconds)', delay);
+        /* @endif */
 
-        return new Promise((resolve) => setTimeout(resolve, delay * 1000));
-    }
+        return new Promise((resolve, reject) => {
+            let timeout: any;
 
-    public cancel() {
-        this.isCancellationRequested = true;
+            // Upon the eventual cancellation of the token, will clear the pending timeout and immediately reject the promise
+            // with an OperationCanceledError.
+
+            const onCanceled = () => {
+                clearTimeout(timeout);
+                reject(new OperationCanceledError());
+            };
+
+            timeout = setTimeout(() => {
+                if (cancellationToken) {
+                    cancellationToken.unregister(onCanceled)
+                }
+
+                resolve();
+            }, delay * 1000);
+
+            if (cancellationToken) {
+                cancellationToken.register(onCanceled);
+            }
+        });
     }
 }

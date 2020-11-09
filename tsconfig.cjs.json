@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+      "outDir": "./dist/cjs",
+      "target": "ES5",
+      "module": "ES2015",
+      "allowSyntheticDefaultImports": true
+    }
+}

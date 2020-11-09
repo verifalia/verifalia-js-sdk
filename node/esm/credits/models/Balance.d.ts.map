@@ -1,0 +1,1 @@
+{"version":3,"file":"Balance.d.ts","sourceRoot":"","sources":["../../src/credits/models/Balance.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,MAAM,WAAW,OAAO;IACpB;;;;OAIG;IACH,WAAW,EAAE,MAAM,CAAC;IAEpB;;;;OAIG;IACH,WAAW,EAAE,MAAM,GAAG,IAAI,CAAC;IAE3B;;OAEG;IACH,kBAAkB,EAAE,MAAM,GAAG,IAAI,CAAC;CACrC"}

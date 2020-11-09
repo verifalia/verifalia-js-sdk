@@ -3,4 +3,3 @@ import { ValidationEntry } from "./ValidationEntry";
 
 export interface ValidationEntryListSegment extends ListSegment<ValidationEntry> {
 }
-

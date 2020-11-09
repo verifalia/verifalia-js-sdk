@@ -1,21 +1,18 @@
 {
     "name": "verifalia",
-    "version": "2.5.1",
+    "version": "3.0.0",
     "description": "Verifalia email validation library for Javascript",
     "homepage": "https://verifalia.com",
-    "main": "dist/umd/verifalia.js",
-    "module": "dist/es2015/verifalia.mjs",
-    "module:es5": "dist/es5/verifalia.mjs",
-    "browser": "dist/iife/verifalia.js",
+    "main": "node/cjs/index.js",
+    "module": "browser/esm/index.js",
     "scripts": {
-        "build:genversion": "genversion --es6 src/version.ts",
-        "build:definitions": "tsc -p tsconfig.definitions.json",
-        "build": "npm run build:genversion && rollup -c && npm run build:definitions",
-        "build:production": "cross-env NODE_ENV=production npm run build",
-        "version": "npm run build:production",
-        "test": "echo \"No test specified\""
+        "build-genversion": "genversion --es6 src/version.ts",
+        "prebuild": "rimraf dist node browser",
+        "build": "npm run build-genversion && rollup -c",
+        "build:production": "cross-env NODE_ENV=production npm run build"
     },
-    "typings": "dist/definitions/index.d.ts",
+    "typings": "browser/esm/index.d.ts",
+    "types": "browser/esm/index.d.ts",
     "keywords": [
         "email",
         "validation",
@@ -32,15 +29,27 @@
         "disposable",
         "mailbox"
     ],
-    "author": "Verifalia <support@verifalia.com>",
+    "contributors": [
+        {
+            "name": "Verifalia",
+            "email": "support@verifalia.com",
+            "url": "https://verifalia.com"
+        },
+        {
+            "name": "Efran Cobisi"
+        }
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/verifalia/verifalia-js-sdk"
     },
     "dependencies": {
-        "axios": "^0.19.0",
-        "debug": "^4.1.1",
-        "tslib": "^1.10.0"
+        "abort-controller": "^3.0.0",
+        "node-fetch": "^2.6.1",
+        "tslib": "^2.0.3"
+    },
+    "peerDependencies": {
+        "debug": "^4.1.1"
     },
     "bugs": {
         "url": "https://github.com/verifalia/verifalia-js-sdk/issues"
@@ -56,17 +65,25 @@
         "@rollup/plugin-replace": "^2.3.1",
         "@types/debug": "^4.1.5",
         "@types/node": "^13.7.4",
+        "@types/node-fetch": "^2.5.7",
         "cross-env": "^7.0.0",
         "dts-bundle-generator": "^3.2.0",
+        "form-data": "^3.0.0",
         "genversion": "^2.2.0",
-        "rollup": "^1.31.1",
+        "preprocess": "^3.2.0",
+        "rimraf": "^3.0.2",
+        "rollup": "^1.32.1",
+        "rollup-plugin-banner": "^0.2.1",
+        "rollup-plugin-multi-input": "^1.1.1",
         "rollup-plugin-node-builtins": "^2.1.2",
         "rollup-plugin-node-globals": "^1.4.0",
+        "rollup-plugin-preprocess": "^0.0.4",
+        "rollup-plugin-sourcemaps": "^0.6.3",
         "rollup-plugin-terser": "^5.1.1",
         "rollup-plugin-typescript2": "^0.26.0",
         "rollup-plugin-uglify": "^6.0.2",
         "ts-loader": "^6.0.4",
-        "typescript": "^3.5.3"
+        "typescript": "^3.9.7"
     },
     "files": [
         "dist/**/*"

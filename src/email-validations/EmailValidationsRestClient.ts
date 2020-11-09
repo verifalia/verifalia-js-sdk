@@ -1,20 +1,21 @@
-import { RestClientFactory } from "../RestClientFactory";
+import { RestClientFactory } from "../rest/RestClientFactory";
 import { Validation } from "./models/Validation";
 import { ValidationRequestEntry } from "./models/ValidationRequestEntry";
 import { ValidationRequest } from "./models/ValidationRequest";
 import { WaitingStrategy } from "./WaitingStrategy";
-import { ValidationOverview } from "./models/ValidationOverview";
-import { ValidationEntryListSegment } from "./models/ValidationEntryListSegment";
-import { VerifaliaError } from "../errors/VerifaliaError";
-import { ValidationStatus } from "./models/ValidationStatus";
-import { ValidationEntry } from "./models/ValidationEntry";
-import { ListingCursor } from "../common/models/ListingCursor";
-import { Direction } from "../common/Direction";
+import { CancellationToken } from "../common/CancellationToken";
 
-declare type PartialValidation = {
-    overview: ValidationOverview,
-    entries: ValidationEntryListSegment
-};
+import { submitEmailValidation, deleteEmailValidation, getEmailValidation, submitEmailValidationFile, listEmailValidations } from './functions';
+import { FileValidationRequest } from "./models/FileValidationRequest";
+import { ValidationOverviewListingOptions } from "./models/ValidationOverviewListingOptions";
+import { ValidationOverview } from "./models/ValidationOverview";
+
+type NonFileValidationRequest = string | string[] | ValidationRequestEntry | ValidationRequestEntry[] | ValidationRequest;
+
+/* @if ENVIRONMENT!='production' */
+import { Logger } from "../diagnostics/Logger";
+const logger = new Logger('verifalia');
+/* @endif */
 
 export class EmailValidationsRestClient {
     private readonly _restClientFactory: RestClientFactory;
@@ -24,219 +25,156 @@ export class EmailValidationsRestClient {
     }
 
     /**
-     * Submits a new email validation for processing. By default, this method does not wait for
-     * the completion of the email validation job: specify a waitingStrategy to request a different
-     * waiting behavior.
-     * @param data An object with one or more email addresses to validate. Can be of type string, string[],
-     * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
+     * Submits one or more email addresses for validation. By default, this method does not wait for
+     * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
+     * until the job is completed) to request a different waiting behavior.
+     * This method accepts a wide range of input types, including:
+     * - `string` and `string[]`
+     * - `ValidationRequestEntry` and `ValidationRequestEntry[]`
+     * - `ValidationRequest`
+     * - `FileValidationRequest`
+     * 
+     * Here is the simplest case, showing how to validate one email address:
+     * ```ts
+     * // Option 1 - async/await
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit('batman@gmail.com', true);
+     * 
+     * console.log(result.entries[0].classification); // 'Deliverable'
+     * 
+     * // Option 2 - callback
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * verifalia
+     *     .emailValidations
+     *     .submit('batman@gmail.com', true)
+     *     .then(result => {
+     *         console.log(result.entries[0].classification); // 'Deliverable'
+     *     });
+     * ```
+     * 
+     * To validate multiple email addresses at once, just submit an array of strings:
+     * ```ts
+     * // Option 1 - async/await
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     * 
+     * result.entries.forEach((item) => {
+     *     console.log(`${item.inputData}: ${item.classification}`);
+     * }); // 'batman@gmail.com: Deliverable' 'robin1940@yahoo.com: Undeliverable'
+     * 
+     * // Option 2 - callback
+     * 
+     * const verifalia = new VerifaliaRestClient(...);
+     * verifalia
+     *     .emailValidations
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     *     .then(result => {
+     *         result.entries.forEach((item) => {
+     *             console.log(`${item.inputData}: ${item.classification}`);
+     *         }); // 'batman@gmail.com: Deliverable' 'robin1940@yahoo.com: Undeliverable'
+     *     });
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
+     * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-     * email validation. Can be true to wait for the completion or an instance of WaitingStrategy for
+     * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
      * advanced scenarios and progress tracking.
      */
-    public async submit(data: string | string[] | ValidationRequestEntry | ValidationRequestEntry[] | ValidationRequest, waitingStrategy?: WaitingStrategy | boolean): Promise<Validation | null> {
-        const restClient = this._restClientFactory.build();
-        let request: ValidationRequest;
+    public async submit(request: FileValidationRequest | NonFileValidationRequest,
+        waitingStrategy?: WaitingStrategy | boolean,
+        cancellationToken?: CancellationToken): Promise<Validation | null> {
 
-        if (typeof data === 'string') {
-            request = {
-                entries: [{
-                    inputData: data
-                }]
-            } as ValidationRequest;
-        } else if (Array.isArray(data) && data.every((item: any) => typeof item === 'string')) {
-            const entries = (<string[]>data).map((item) => <ValidationRequestEntry>{
-                inputData: item
-            });
+        /* @if ENVIRONMENT!='production' */
+        logger.log('submitting', request, waitingStrategy);
+        /* @endif */
+            
+        // Use the "file" field as a discriminator to detect whether the argument is a FileValidationRequest
+        // or not.
 
-            request = {
-                entries: entries
-            } as ValidationRequest;
-        } else if ((<any>data).inputData) {
-            // Single ValidationRequestEntry
-
-            request = {
-                entries: [<ValidationRequestEntry>data]
-            }
-        } else if (Array.isArray(data) && data.every((item: any) => item.inputData)) {
-            // Array of ValidationRequestEntry
-
-            request = {
-                entries: data
-            } as ValidationRequest;
-        } else if ((<any>data).entries) {
-            // ValidationRequest
-
-            request = <ValidationRequest>data;
-        } else {
-            throw new Error('data type is unsupportd.');
+        if ((request as FileValidationRequest).file) {
+            return submitEmailValidationFile(this._restClientFactory,
+                request as FileValidationRequest,
+                waitingStrategy,
+                cancellationToken);
         }
 
-        if (typeof waitingStrategy === 'boolean') {
-            waitingStrategy = new WaitingStrategy(waitingStrategy);
-        }
-
-        const response = await restClient.invoke<PartialValidation>('POST',
-            '/email-validations',
-            undefined,
-            request);
-
-        if (response.status === 200 || response.status === 202) {
-            const partialValidation = response.data;
-
-            // Returns immediately if the validation has been completed or if we should not wait for it
-
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus.Completed) {
-                return this.retrieveValidationFromPartialValidation(partialValidation);
-            }
-
-            return this.waitValidationForCompletion(partialValidation.overview, waitingStrategy);
-        }
-
-        if (response.status === 404 || response.status === 410) {
-            return null;
-        }
-
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        return submitEmailValidation(this._restClientFactory,
+            request as NonFileValidationRequest,
+            waitingStrategy,
+            cancellationToken);
     }
 
     /**
      * Returns an email validation job previously submitted for processing. By default, this method does
-     * not wait for the eventual completion of the email validation job: pass a waitingStrategy to
-     * request a different waiting behavior.
+     * not wait for the eventual completion of the email validation job: pass a `WaitingStrategy` (or `true`,
+     * to wait until the job is completed) to request a different waiting behavior.
+     * 
+     * Here is how to retrieve an email validation job, given its ID:
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     * await verifalia
+     *     .emailValidations
+     *     .get('JOB-ID-HERE'); // validation.id (returned by submit() or list())
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      * @param id The ID of the email validation job to retrieve.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
      * validation.
      */
-    public async get(id: string, waitingStrategy?: WaitingStrategy | boolean): Promise<Validation | null> {
-        const restClient = this._restClientFactory.build();
-        const response = await restClient.invoke<PartialValidation>('GET', `/email-validations/${id}`);
-
-        if (response.status === 200 || response.status === 202) {
-            const partialValidation = response.data;
-
-            // Returns immediately if the validation has been completed or if we should not wait for it
-
-            if (typeof waitingStrategy === 'boolean') {
-                waitingStrategy = new WaitingStrategy(waitingStrategy);
-            }
-
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus.Completed) {
-                return this.retrieveValidationFromPartialValidation(partialValidation);
-            }
-
-            return this.waitValidationForCompletion(partialValidation.overview, waitingStrategy);
-        }
-
-        if (response.status === 404 || response.status === 410) {
-            return null;
-        }
-
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+    public async get(id: string, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null> {
+        return getEmailValidation(this._restClientFactory, id, waitingStrategy, cancellationToken);
     }
 
     /**
      * Deletes an email validation job previously submitted for processing.
+     * 
+     * Here is how to delete an email validation job:
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     * await verifalia
+     *     .emailValidations
+     *     .delete('JOB-ID-HERE'); // validation.id (returned by submit(), get() or list())
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      * @param id The ID of the email validation job to delete.
      */
-    public async delete(id: string) {
-        const restClient = this._restClientFactory.build();
-        const response = await restClient.invoke<void>('DELETE', `/email-validations/${id}`);
-
-        if (response.status === 200 || response.status === 410) {
-            return;
-        }
-
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+    public async delete(id: string, cancellationToken?: CancellationToken): Promise<void> {
+        return deleteEmailValidation(this._restClientFactory, id, cancellationToken);
     }
 
-    private async retrieveValidationFromPartialValidation(partialValidation: PartialValidation): Promise<Validation> {
-        const allEntries: ValidationEntry[] = [];
-        let currentSegment = partialValidation.entries;
-
-        while (currentSegment && currentSegment.data) {
-            allEntries.push(...currentSegment.data);
-
-            if (!currentSegment.meta.isTruncated) {
-                break;
-            }
-
-            currentSegment = await this.listEntriesSegmentedAsync(partialValidation.overview.id,
-                <ListingCursor>{ cursor: currentSegment.meta.cursor });
-        }
-
-        return {
-            overview: partialValidation.overview,
-            entries: allEntries
-        };
-    }
-
-    private async listEntriesSegmentedAsync(validationId: string, cursor: ListingCursor): Promise<ValidationEntryListSegment> {
-        if (!validationId) throw new Error('validationId is null');
-        if (!cursor) throw new Error('cursor is null');
-
-        // Generate the additional parameters, where needed
-
-        const restClient = this._restClientFactory.build();
-
-        // Send the request to the Verifalia servers
-
-        const cursorParamName = cursor.direction === Direction.Backward
-            ? "cursor:prev"
-            : "cursor";
-
-        const queryParams = {
-            [cursorParamName]: cursor.cursor
-        };
-
-        if (cursor.limit > 0) {
-            queryParams["limit"] = cursor.limit.toString();
-        }
-
-        const response = await restClient.invoke<ValidationEntryListSegment>('GET',
-            `/email-validations/${validationId}/entries`,
-            queryParams);
-
-        if (response.status === 200) {
-            return response.data;
-        }
-
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
-    }
-
-    private async waitValidationForCompletion(validationOverview: ValidationOverview, waitingStrategy: WaitingStrategy): Promise<Validation | null> {
-        if (!validationOverview) throw new Error('validationOverview is null');
-        if (!waitingStrategy) throw new Error('waitingStrategy is null');
-
-        let resultOverview = validationOverview;
-
-        do {
-            // Fires a progress, since we are not yet completed
-
-            if (waitingStrategy.progress) {
-                waitingStrategy.progress(resultOverview);
-            }
-
-            // Wait for the next polling schedule
-
-            await waitingStrategy.waitForNextPoll(resultOverview);
-
-            // Fetch the job from the API
-
-            const result = await this.get(validationOverview.id);
-
-            if (!result) {
-                // A null result means the validation has been deleted (or is expired) between a poll and the next one
-
-                return null;
-            }
-
-            resultOverview = result.overview;
-
-            // Returns immediately if the validation has been completed
-
-            if (resultOverview.status === ValidationStatus.Completed) {
-                return result;
-            }
-        } while (true);
-    }
+    /**
+     * Lists all the email validation jobs, according to the specified listing options.
+     * 
+     * Here is how to list all the jobs submitted on a specific date:
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     * const validations = verifalia
+     *     .emailValidations
+     *     .list({
+     *         createdOn: new DateEqualityPredicate(new Date(2020, 10, 15))
+     *     });
+     * 
+     * for await (const validation of validations) {
+     *     console.log(`ID: ${validation.id}, submitted: ${validation.submittedOn}`);
+     * }
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     * @param options The options for the listing operation.
+     * @param cancellationToken An optional token used to cancel the asynchronous request.
+     */
+    public list(options?: ValidationOverviewListingOptions, cancellationToken?: CancellationToken): AsyncGenerator<ValidationOverview> {
+        return listEmailValidations(this._restClientFactory, options, cancellationToken);
+    }    
 }

@@ -1,6 +1,3 @@
-import { ValidationEntryStatus } from "./ValidationEntryStatus";
-import { ValidationEntryClassification } from "./ValidationEntryClassification";
-
 /**
  * Represents a single validated entry within a validation.
  */
@@ -81,15 +78,17 @@ export interface ValidationEntry {
     isRoleAccount?: boolean;
 
     /**
-     * The validation status for this entry.
+     * The validation status for this entry. See the constants exported in the
+     * ValidationEntryStatus.ts file.
      */
-    status?: ValidationEntryStatus;
+    status?: string;
 
     /**
      * The classification for the status of this email address. Standard values include
-     * Deliverable, Risky, Undeliverable and Unknown.
+     * Deliverable, Risky, Undeliverable and Unknown. See the constants exported in
+     * the ValidationEntryClassification.ts file.
      */
-    classification?: ValidationEntryClassification;
+    classification?: string;
 
     /**
      * The position of the character in the email address that eventually caused the syntax
