@@ -7,9 +7,10 @@ import { DailyUsageListSegment } from "../models/DailyUsageListSegment";
 
 /**
  * Returns the current credits balance for the Verifalia account.
+ *
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-export async function getCreditsBalance(restClientFactory: RestClientFactory, cancellationToken?: CancellationToken): Promise<Balance> {
+export const getCreditsBalance = async (restClientFactory: RestClientFactory, cancellationToken?: CancellationToken): Promise<Balance> => {
     const restClient = restClientFactory.build();
 
     return await (
@@ -25,6 +26,7 @@ export async function getCreditsBalance(restClientFactory: RestClientFactory, ca
 
 /**
  * Lists the daily usages of the credits for the Verifalia account.
+ *
  * @param options The options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
@@ -41,6 +43,7 @@ export async function* listCreditsDailyUsages(restClientFactory: RestClientFacto
                     ? "cursor:prev"
                     : "cursor";
 
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 params[cursorParamName] = listSegment.meta.cursor;
             }
             else {
@@ -48,6 +51,7 @@ export async function* listCreditsDailyUsages(restClientFactory: RestClientFacto
 
                 if (options.dateFilter) {
                     for (const fragment of options.dateFilter.serialize('date')) {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         params[fragment.key] = fragment.value;
                     }
                 }

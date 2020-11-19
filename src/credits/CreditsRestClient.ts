@@ -14,21 +14,21 @@ export class CreditsRestClient {
 
     /**
      * Returns the current credits balance for the Verifalia account.
-     * 
+     *
      * Here is an example:
      * ```ts
      * // Option 1 - async/await
-     * 
+     *
      * const verifalia = new VerifaliaRestClient(...);
      * const balance = await verifalia
      *     .credits
      *     .getBalance();
-     * 
+     *
      * console.log(`Credit packs: ${balance.creditPacks}, free credits: ${balance.freeCredits}`);
      * // 'Credit packs: 507.23, free credits: 10.86'
-     * 
+     *
      * // Option 2 - callback
-     * 
+     *
      * const verifalia = new VerifaliaRestClient(...);
      * verifalia
      *     .credits
@@ -38,7 +38,7 @@ export class CreditsRestClient {
      *         // 'Credit packs: 507.23, free credits: 10.86'
      *     });
      * ```
-     * 
+     *
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
     public getBalance(cancellationToken?: CancellationToken): Promise<Balance> {
@@ -48,7 +48,7 @@ export class CreditsRestClient {
     /**
      * Lists the daily usages of the credits for the Verifalia account, according to the specified
      * listing options.
-     * 
+     *
      * Here is how to list the credit daily usages between two dates:
      * ```ts
      * const verifalia = new VerifaliaRestClient(...);
@@ -57,7 +57,7 @@ export class CreditsRestClient {
      *     .listDailyUsages({
      *         dateFilter: new DateBetweenPredicate(new Date(2020, 10, 15), new Date(2020, 10, 23))
      *     });
-     * 
+     *
      * for await (const dailyUsage of dailyUsages) {
      *     console.log(`Date: ${dailyUsage.date}, credit packs: ${dailyUsage.creditPacks}, free credits: ${dailyUsage.freeCredits}`);
      *     // 'Date: 2020-10-15, credit packs: 98.85, free credits: 50'
@@ -66,8 +66,9 @@ export class CreditsRestClient {
      *     // 'Date: 2020-10-23, credit packs: 1.565, free credits: 50'
      * }
      * ```
-     * 
+     *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param options A `DailyUsageListingOptions` with the options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */

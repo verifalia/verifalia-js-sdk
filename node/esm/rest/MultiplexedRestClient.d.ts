@@ -5,6 +5,7 @@ export declare class MultiplexedRestClient {
     private _authenticator;
     private _baseUris;
     private _userAgent;
+    private _noOfInvocations;
     constructor(authenticator: Authenticator, baseUris: string[], userAgent?: string | undefined);
     invoke<T>(method: 'HEAD' | 'GET' | 'POST' | 'PUT' | 'DELETE', resource: string, params?: any, data?: any, configOverride?: any, cancellationToken?: CancellationToken): Promise<RestResponse<T>>;
 }

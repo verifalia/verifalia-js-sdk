@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Verifalia email validation library for Javascript",
     "homepage": "https://verifalia.com",
     "main": "node/cjs/index.js",
@@ -8,8 +8,9 @@
     "scripts": {
         "build-genversion": "genversion --es6 src/version.ts",
         "prebuild": "rimraf dist node browser",
-        "build": "npm run build-genversion && rollup -c",
-        "build:production": "cross-env NODE_ENV=production npm run build"
+        "build": "npm run build-genversion && npm run lint && rollup -c",
+        "build:production": "cross-env NODE_ENV=production npm run build",
+        "lint": "eslint -c .eslintrc.js --ext .ts ./src"
     },
     "typings": "browser/esm/index.d.ts",
     "types": "browser/esm/index.d.ts",
@@ -66,8 +67,14 @@
         "@types/debug": "^4.1.5",
         "@types/node": "^13.7.4",
         "@types/node-fetch": "^2.5.7",
+        "@typescript-eslint/eslint-plugin": "^4.8.1",
+        "@typescript-eslint/parser": "^4.8.1",
         "cross-env": "^7.0.0",
         "dts-bundle-generator": "^3.2.0",
+        "eslint": "^7.13.0",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-jsdoc": "^30.7.8",
+        "eslint-plugin-prefer-arrow": "^1.2.2",
         "form-data": "^3.0.0",
         "genversion": "^2.2.0",
         "preprocess": "^3.2.0",
@@ -86,6 +93,9 @@
         "typescript": "^3.9.7"
     },
     "files": [
-        "dist/**/*"
+        "browser/**/*",
+        "node/**/*",
+        "README.md",
+        "LICENSE"
     ]
 }

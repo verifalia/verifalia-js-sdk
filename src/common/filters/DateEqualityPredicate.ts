@@ -7,7 +7,7 @@ export class DateEqualityPredicate extends DateFilterPredicate {
 
     constructor(date: Date) {
         super();
-        
+
         this.date = date;
     }
 

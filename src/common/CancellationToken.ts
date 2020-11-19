@@ -8,7 +8,7 @@ export class CancellationToken {
         return this._isCanceled;
     }
 
-    public register(callback: () => void) {
+    public register(callback: () => void): void {
         if (this._isCanceled) {
             callback();
             return;
@@ -17,9 +17,9 @@ export class CancellationToken {
         this._callbacks.push(callback);
     }
 
-    public unregister(callback: () => void) {
+    public unregister(callback: () => void): void {
         const index = this._callbacks.indexOf(callback);
-        
+
         if (index >= 0) {
             this._callbacks.splice(index, 1);
         }
@@ -33,7 +33,7 @@ export class CancellationToken {
         }
 
         this._callbacks = [];
-    }    
+    }
 
     public throwIfCancellationRequested(): void {
         if (this.isCanceled()) {

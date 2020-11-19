@@ -77,16 +77,19 @@ export const ValidationEntryClassification_Undeliverable = 'Undeliverable';
  */
 export const ValidationEntryClassification_Unknown = 'Unknown';
 
-/** The email address has been successfully validated.
-*/
+/**
+ * The email address has been successfully validated.
+ */
 export const ValidationEntryStatus_Success = 'Success';
 
-/** A quoted pair within a quoted word is not closed properly.
-*/
+/**
+ * A quoted pair within a quoted word is not closed properly.
+ */
 export const ValidationEntryStatus_UnmatchedQuotedPair = 'UnmatchedQuotedPair';
 
-/** An unexpected quoted pair sequence has been found within a quoted word.
-*/
+/**
+ * An unexpected quoted pair sequence has been found within a quoted word.
+ */
 export const ValidationEntryStatus_UnexpectedQuotedPairSequence = 'UnexpectedQuotedPairSequence';
 
 /** A new word boundary start has been detected at an invalid position.
@@ -243,10 +246,11 @@ export const ValidationEntryStatus_MailExchangerIsHoneypot = 'MailExchangerIsHon
 /** The domain literal of the email address couldn't accept messages from the Internet. */
 export const ValidationEntryStatus_UnacceptableDomainLiteral = 'UnacceptableDomainLiteral';
 
-/** The item is a duplicate of another email address in the list.
-* To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
-* instance which exposes this status code</remarks>
-*/
+/**
+ * The item is a duplicate of another email address in the list.
+ * To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
+ * instance which exposes this status code</remarks>
+ */
 export const ValidationEntryStatus_Duplicate = 'Duplicate';
 
 /**

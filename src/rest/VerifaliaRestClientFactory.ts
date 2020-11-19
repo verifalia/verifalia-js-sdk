@@ -13,7 +13,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
      */
-    public apiVersion: string = 'v2.2';
+    public apiVersion = 'v2.2';
 
     private _cachedRestClient: MultiplexedRestClient | undefined;
 
@@ -26,6 +26,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
 
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
+     *
      * @param authenticator The authenticator used to invoke the Verifalia service.
      */
     constructor(authenticator: Authenticator) {
@@ -38,7 +39,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
     build(): MultiplexedRestClient {
         if (!this._cachedRestClient) {
             // Initial uris shuffling (see https://stackoverflow.com/a/12646864/904178)
-            let shuffledUris = [...this._baseUris];
+            const shuffledUris = [...this._baseUris];
 
             for (let i = shuffledUris.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -50,7 +51,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
                 this.getUserAgent());
         }
 
-        return this._cachedRestClient as MultiplexedRestClient;
+        return this._cachedRestClient;
     }
 
     private getUserAgent(): string | undefined {

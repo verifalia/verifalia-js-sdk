@@ -4,6 +4,7 @@ import { OperationCanceledError } from "../errors/OperationCanceledError";
 import { CancellationToken } from "../common/CancellationToken";
 
 const logger = new Logger('verifalia');
+const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
 
 type ProgressCallback = (value: ValidationOverview) => void;
 
@@ -28,11 +29,14 @@ export class WaitingStrategy {
         let delay: number = Math.max(0.5, Math.min(30, Math.pow(2, Math.log10(validationOverview.noOfEntries) - 1)));
 
         if (validationOverview.progress && validationOverview.progress.estimatedTimeRemaining) {
-            const timespanMatch = validationOverview.progress.estimatedTimeRemaining.match(/^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/);
+            const timespanMatch = timeSpanMatchRegex.exec(validationOverview.progress.estimatedTimeRemaining);
 
             if (timespanMatch) {
+                // eslint-disable-next-line radix
                 const hours = parseInt(timespanMatch[2]);
+                // eslint-disable-next-line radix
                 const minutes = parseInt(timespanMatch[3]);
+                // eslint-disable-next-line radix
                 const seconds = parseInt(timespanMatch[4]);
 
                 // Calculate the delay (in seconds)
@@ -52,6 +56,7 @@ export class WaitingStrategy {
         /* @endif */
 
         return new Promise((resolve, reject) => {
+            // eslint-disable-next-line prefer-const
             let timeout: any;
 
             // Upon the eventual cancellation of the token, will clear the pending timeout and immediately reject the promise

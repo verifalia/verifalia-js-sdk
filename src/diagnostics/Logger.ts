@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 /* @if ENVIRONMENT!='production' */
 import debug, { Debugger } from 'debug';
 /* @endif */

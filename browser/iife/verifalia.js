@@ -131,6 +131,7 @@ var Verifalia = (function (exports) {
         return OperationCanceledError;
     }(VerifaliaError));
 
+    var timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
     var WaitingStrategy = /** @class */ (function () {
         function WaitingStrategy(waitForCompletion, progress) {
             if (progress === void 0) { progress = null; }
@@ -147,7 +148,7 @@ var Verifalia = (function (exports) {
                     }
                     delay = Math.max(0.5, Math.min(30, Math.pow(2, Math.log10(validationOverview.noOfEntries) - 1)));
                     if (validationOverview.progress && validationOverview.progress.estimatedTimeRemaining) {
-                        timespanMatch = validationOverview.progress.estimatedTimeRemaining.match(/^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/);
+                        timespanMatch = timeSpanMatchRegex.exec(validationOverview.progress.estimatedTimeRemaining);
                         if (timespanMatch) {
                             hours = parseInt(timespanMatch[2]);
                             minutes = parseInt(timespanMatch[3]);
@@ -161,6 +162,7 @@ var Verifalia = (function (exports) {
                         }
                     }
                     return [2 /*return*/, new Promise(function (resolve, reject) {
+                            // eslint-disable-next-line prefer-const
                             var timeout;
                             // Upon the eventual cancellation of the token, will clear the pending timeout and immediately reject the promise
                             // with an OperationCanceledError.
@@ -252,14 +254,17 @@ var Verifalia = (function (exports) {
      * A validation entry marked as Unknown contains an email address whose deliverability is unknown.
      */
     var ValidationEntryClassification_Unknown = 'Unknown';
-    /** The email address has been successfully validated.
-    */
+    /**
+     * The email address has been successfully validated.
+     */
     var ValidationEntryStatus_Success = 'Success';
-    /** A quoted pair within a quoted word is not closed properly.
-    */
+    /**
+     * A quoted pair within a quoted word is not closed properly.
+     */
     var ValidationEntryStatus_UnmatchedQuotedPair = 'UnmatchedQuotedPair';
-    /** An unexpected quoted pair sequence has been found within a quoted word.
-    */
+    /**
+     * An unexpected quoted pair sequence has been found within a quoted word.
+     */
     var ValidationEntryStatus_UnexpectedQuotedPairSequence = 'UnexpectedQuotedPairSequence';
     /** A new word boundary start has been detected at an invalid position.
     */
@@ -378,10 +383,11 @@ var Verifalia = (function (exports) {
     var ValidationEntryStatus_MailExchangerIsHoneypot = 'MailExchangerIsHoneypot';
     /** The domain literal of the email address couldn't accept messages from the Internet. */
     var ValidationEntryStatus_UnacceptableDomainLiteral = 'UnacceptableDomainLiteral';
-    /** The item is a duplicate of another email address in the list.
-    * To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
-    * instance which exposes this status code</remarks>
-    */
+    /**
+     * The item is a duplicate of another email address in the list.
+     * To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
+     * instance which exposes this status code</remarks>
+     */
     var ValidationEntryStatus_Duplicate = 'Duplicate';
     /**
      * The lowest possible processing priority (speed) for a validation job.
@@ -401,6 +407,7 @@ var Verifalia = (function (exports) {
      * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
      * until the job is completed) to request a different waiting behavior.
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param request An object with one or more email addresses to validate. Can be of type string, string[],
      * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -467,6 +474,7 @@ var Verifalia = (function (exports) {
      * By default, this method does not wait for the completion of the email validation job: pass a
      * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
      * This method can be cancelled through a `CancellationToken`.
+     *
      * @param request An object with the file which includes the email addresses to validate and its processing
      * options. Must be of type `FileValidationRequest`.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -486,7 +494,7 @@ var Verifalia = (function (exports) {
                             var _a, _b;
                             formData.append('inputFile', request.file, {
                                 contentType: request.contentType,
-                                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /*ReadStream*/.filename) !== null && _b !== void 0 ? _b : 'file'
+                                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
                             });
                             formData.append('settings', JSON.stringify({
                                 name: request.name,
@@ -535,7 +543,7 @@ var Verifalia = (function (exports) {
                     case 1:
                         partialValidation = _a.sent();
                         // Returns immediately if the validation has been completed or if we should not wait for it
-                        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+                        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
                             return [2 /*return*/, retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken)];
                         }
                         return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken)];
@@ -553,6 +561,7 @@ var Verifalia = (function (exports) {
      * not wait for the eventual completion of the email validation job: pass a
      * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
      * This method can be cancelled through a `CancellationToken`.
+     *
      * @param id The ID of the email validation job to retrieve.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
      * validation.
@@ -576,7 +585,7 @@ var Verifalia = (function (exports) {
                         if (typeof waitingStrategy === 'boolean') {
                             waitingStrategy = new WaitingStrategy(waitingStrategy);
                         }
-                        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+                        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
                             return [2 /*return*/, retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken)];
                         }
                         return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken)];
@@ -591,6 +600,7 @@ var Verifalia = (function (exports) {
     }
     /**
      * Deletes an email validation job previously submitted for processing.
+     *
      * @param id The ID of the email validation job to delete.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -717,6 +727,7 @@ var Verifalia = (function (exports) {
      * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
      * to specify filters and a different sorting.
      * This method can be cancelled through a `CancellationToken`.
+     *
      * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -843,6 +854,7 @@ var Verifalia = (function (exports) {
          * ```
          *
          * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+         *
          * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
          * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
          * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -875,6 +887,7 @@ var Verifalia = (function (exports) {
          * ```
          *
          * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+         *
          * @param id The ID of the email validation job to retrieve.
          * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
          * validation.
@@ -898,6 +911,7 @@ var Verifalia = (function (exports) {
          * ```
          *
          * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+         *
          * @param id The ID of the email validation job to delete.
          */
         EmailValidationsRestClient.prototype.delete = function (id, cancellationToken) {
@@ -925,6 +939,7 @@ var Verifalia = (function (exports) {
          * ```
          *
          * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+         *
          * @param options The options for the listing operation.
          * @param cancellationToken An optional token used to cancel the asynchronous request.
          */
@@ -936,24 +951,24 @@ var Verifalia = (function (exports) {
 
     /**
      * Returns the current credits balance for the Verifalia account.
+     *
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
-    function getCreditsBalance(restClientFactory, cancellationToken) {
-        return __awaiter(this, void 0, void 0, function () {
-            var restClient;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        restClient = restClientFactory.build();
-                        return [4 /*yield*/, restClient.invoke("GET", '/credits/balance', undefined, undefined, undefined, cancellationToken)];
-                    case 1: return [4 /*yield*/, (_a.sent()).deserialize()];
-                    case 2: return [2 /*return*/, _a.sent()];
-                }
-            });
+    var getCreditsBalance = function (restClientFactory, cancellationToken) { return __awaiter(void 0, void 0, void 0, function () {
+        var restClient;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    restClient = restClientFactory.build();
+                    return [4 /*yield*/, restClient.invoke("GET", '/credits/balance', undefined, undefined, undefined, cancellationToken)];
+                case 1: return [4 /*yield*/, (_a.sent()).deserialize()];
+                case 2: return [2 /*return*/, _a.sent()];
+            }
         });
-    }
+    }); };
     /**
      * Lists the daily usages of the credits for the Verifalia account.
+     *
      * @param options The options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -973,6 +988,7 @@ var Verifalia = (function (exports) {
                                 cursorParamName = options.isBackward
                                     ? "cursor:prev"
                                     : "cursor";
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                 params[cursorParamName] = listSegment.meta.cursor;
                             }
                             else {
@@ -980,6 +996,7 @@ var Verifalia = (function (exports) {
                                 if (options.dateFilter) {
                                     for (_i = 0, _a = options.dateFilter.serialize('date'); _i < _a.length; _i++) {
                                         fragment = _a[_i];
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                         params[fragment.key] = fragment.value;
                                     }
                                 }
@@ -1076,6 +1093,7 @@ var Verifalia = (function (exports) {
          * ```
          *
          * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+         *
          * @param options A `DailyUsageListingOptions` with the options for the listing operation.
          * @param cancellationToken An optional token used to cancel the asynchronous request.
          */
@@ -1094,7 +1112,9 @@ var Verifalia = (function (exports) {
          *
          */
         function ServiceUnreachableError(innerErrors) {
-            var _this = _super.call(this, "All the base URIs are unreachable: " + innerErrors.map(function (error) { return error; }).join(', ')) || this;
+            var _this = 
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            _super.call(this, "All the base URIs are unreachable: " + innerErrors.map(function (error) { return "" + error; }).join(', ')) || this;
             _this.innerErrors = innerErrors;
             return _this;
         }
@@ -1169,6 +1189,7 @@ var Verifalia = (function (exports) {
      */
     var MimeContentType_ExcelXlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     var MultiplexedRestClient = /** @class */ (function () {
         function MultiplexedRestClient(authenticator, baseUris, userAgent) {
             if (userAgent === void 0) { userAgent = undefined; }
@@ -1179,10 +1200,11 @@ var Verifalia = (function (exports) {
             this._authenticator = authenticator;
             this._userAgent = userAgent;
             this._baseUris = baseUris;
+            this._noOfInvocations = 0;
         }
         MultiplexedRestClient.prototype.invoke = function (method, resource, params, data, configOverride, cancellationToken) {
             return __awaiter(this, void 0, void 0, function () {
-                var errors, abortController, onCanceled, _loop_1, this_1, idxUri, state_1;
+                var errors, abortController, onCanceled, _loop_1, this_1, idxAttempt, state_1;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -1196,12 +1218,12 @@ var Verifalia = (function (exports) {
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, , 6, 7]);
-                            _loop_1 = function (idxUri) {
+                            _loop_1 = function (idxAttempt) {
                                 var baseUri, requestInit, queryString, url, response, error_1, _a, _b;
                                 return __generator(this, function (_c) {
                                     switch (_c.label) {
                                         case 0:
-                                            baseUri = this_1._baseUris[idxUri];
+                                            baseUri = this_1._baseUris[this_1._noOfInvocations++ % this_1._baseUris.length];
                                             requestInit = {
                                                 method: method,
                                                 body: data && data instanceof FormData
@@ -1233,6 +1255,7 @@ var Verifalia = (function (exports) {
                                             queryString = params
                                                 ? Object
                                                     .entries(params)
+                                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                                     .map(function (_a) {
                                                     var key = _a[0];
                                                     return key + "=" + encodeURIComponent(params[key]);
@@ -1290,18 +1313,18 @@ var Verifalia = (function (exports) {
                                 });
                             };
                             this_1 = this;
-                            idxUri = 0;
+                            idxAttempt = 0;
                             _a.label = 2;
                         case 2:
-                            if (!(idxUri < this._baseUris.length)) return [3 /*break*/, 5];
-                            return [5 /*yield**/, _loop_1(idxUri)];
+                            if (!(idxAttempt < this._baseUris.length)) return [3 /*break*/, 5];
+                            return [5 /*yield**/, _loop_1(idxAttempt)];
                         case 3:
                             state_1 = _a.sent();
                             if (typeof state_1 === "object")
                                 return [2 /*return*/, state_1.value];
                             _a.label = 4;
                         case 4:
-                            idxUri++;
+                            idxAttempt++;
                             return [3 /*break*/, 2];
                         case 5: throw new ServiceUnreachableError(errors);
                         case 6:
@@ -1318,7 +1341,7 @@ var Verifalia = (function (exports) {
     }());
 
     // generated by genversion
-    var version = '3.0.0';
+    var version = '3.0.1';
 
     /**
      * A factory of MultiplexedRestClient instances, used to issue REST commands against the Verifalia API.
@@ -1328,6 +1351,7 @@ var Verifalia = (function (exports) {
     var VerifaliaRestClientFactory = /** @class */ (function () {
         /**
          * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
+         *
          * @param authenticator The authenticator used to invoke the Verifalia service.
          */
         function VerifaliaRestClientFactory(authenticator) {
@@ -1413,6 +1437,7 @@ var Verifalia = (function (exports) {
     var VerifaliaRestClient = /** @class */ (function () {
         /**
          * Initializes a new HTTPS-based REST client for Verifalia with the specified configuration.
+         *
          * @param config Contains the configuration for the Verifalia API client, including the credentials
          * to use while authenticating to the Verifalia service.
          */
@@ -1446,16 +1471,16 @@ var Verifalia = (function (exports) {
     }(FilterPredicate));
 
     // Adapted from https://stackoverflow.com/a/23593099/904178
-    function formatDateToIso8601(date) {
-        var month = '' + (date.getMonth() + 1);
-        var day = '' + date.getDate();
+    var formatDateToIso8601 = function (date) {
+        var month = "" + (date.getMonth() + 1);
+        var day = "" + date.getDate();
         var year = date.getFullYear();
         return [
             year,
             month.length < 2 ? '0' + month : month,
             day.length < 2 ? '0' + day : day
         ].join('-');
-    }
+    };
 
     var DateEqualityPredicate = /** @class */ (function (_super) {
         __extends(DateEqualityPredicate, _super);

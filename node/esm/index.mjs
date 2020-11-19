@@ -1,7 +1,7 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter } from 'tslib';
-import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, V as VerifaliaError, O as OperationCanceledError } from './index-39d11188.mjs';
-export { O as OperationCanceledError, W as WaitingStrategy, d as deleteEmailValidation, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-39d11188.mjs';
+import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, V as VerifaliaError, O as OperationCanceledError } from './index-bf9f495d.mjs';
+export { O as OperationCanceledError, W as WaitingStrategy, d as deleteEmailValidation, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-bf9f495d.mjs';
 export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.mjs';
 import 'fs';
 import FormData from 'form-data';
@@ -76,6 +76,7 @@ class EmailValidationsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
      * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -106,6 +107,7 @@ class EmailValidationsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param id The ID of the email validation job to retrieve.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
      * validation.
@@ -127,6 +129,7 @@ class EmailValidationsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param id The ID of the email validation job to delete.
      */
     delete(id, cancellationToken) {
@@ -152,6 +155,7 @@ class EmailValidationsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param options The options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -219,6 +223,7 @@ class CreditsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param options A `DailyUsageListingOptions` with the options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -235,7 +240,8 @@ class ServiceUnreachableError extends VerifaliaError {
      *
      */
     constructor(innerErrors) {
-        super(`All the base URIs are unreachable: ${innerErrors.map(error => error).join(', ')}`);
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        super(`All the base URIs are unreachable: ${innerErrors.map(error => `${error}`).join(', ')}`);
         this.innerErrors = innerErrors;
     }
 }
@@ -2897,6 +2903,7 @@ fetch.isRedirect = function (code) {
 // expose Promise
 fetch.Promise = global.Promise;
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 class MultiplexedRestClient {
     constructor(authenticator, baseUris, userAgent = undefined) {
         if (!authenticator)
@@ -2906,6 +2913,7 @@ class MultiplexedRestClient {
         this._authenticator = authenticator;
         this._userAgent = userAgent;
         this._baseUris = baseUris;
+        this._noOfInvocations = 0;
     }
     invoke(method, resource, params, data, configOverride, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2916,10 +2924,11 @@ class MultiplexedRestClient {
                 cancellationToken.register(onCanceled);
             }
             try {
-                for (let idxUri = 0; idxUri < this._baseUris.length; idxUri++) {
-                    const baseUri = this._baseUris[idxUri];
+                // We will attempt invoking the Verifalia API a maximum of once per endpoint
+                for (let idxAttempt = 0; idxAttempt < this._baseUris.length; idxAttempt++) {
+                    const baseUri = this._baseUris[this._noOfInvocations++ % this._baseUris.length];
                     let requestInit = {
-                        method: method,
+                        method,
                         body: data && data instanceof FormData
                             ? data
                             : JSON.stringify(data),
@@ -2947,6 +2956,7 @@ class MultiplexedRestClient {
                     const queryString = params
                         ? Object
                             .entries(params)
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                             .map(([key]) => `${key}=${encodeURIComponent(params[key])}`)
                             .join('&')
                         : null;
@@ -3000,7 +3010,7 @@ class MultiplexedRestClient {
 }
 
 // generated by genversion
-const version = '3.0.0';
+const version = '3.0.1';
 
 /**
  * A factory of MultiplexedRestClient instances, used to issue REST commands against the Verifalia API.
@@ -3010,6 +3020,7 @@ const version = '3.0.0';
 class VerifaliaRestClientFactory {
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
+     *
      * @param authenticator The authenticator used to invoke the Verifalia service.
      */
     constructor(authenticator) {
@@ -3030,7 +3041,7 @@ class VerifaliaRestClientFactory {
     build() {
         if (!this._cachedRestClient) {
             // Initial uris shuffling (see https://stackoverflow.com/a/12646864/904178)
-            let shuffledUris = [...this._baseUris];
+            const shuffledUris = [...this._baseUris];
             for (let i = shuffledUris.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [shuffledUris[i], shuffledUris[j]] = [shuffledUris[j], shuffledUris[i]];
@@ -3091,6 +3102,7 @@ class UsernamePasswordAuthenticator {
 class VerifaliaRestClient {
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified configuration.
+     *
      * @param config Contains the configuration for the Verifalia API client, including the credentials
      * to use while authenticating to the Verifalia service.
      */
@@ -3115,16 +3127,16 @@ class DateFilterPredicate extends FilterPredicate {
 }
 
 // Adapted from https://stackoverflow.com/a/23593099/904178
-function formatDateToIso8601(date) {
-    const month = '' + (date.getMonth() + 1);
-    const day = '' + date.getDate();
+const formatDateToIso8601 = (date) => {
+    const month = `${date.getMonth() + 1}`;
+    const day = `${date.getDate()}`;
     const year = date.getFullYear();
     return [
         year,
         month.length < 2 ? '0' + month : month,
         day.length < 2 ? '0' + day : day
     ].join('-');
-}
+};
 
 class DateEqualityPredicate extends DateFilterPredicate {
     constructor(date) {

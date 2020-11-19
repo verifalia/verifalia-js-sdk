@@ -17,6 +17,7 @@ export declare class VerifaliaRestClientFactory implements RestClientFactory {
     private _baseUris;
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
+     *
      * @param authenticator The authenticator used to invoke the Verifalia service.
      */
     constructor(authenticator: Authenticator);

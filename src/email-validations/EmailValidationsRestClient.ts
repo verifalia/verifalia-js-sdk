@@ -83,6 +83,7 @@ export class EmailValidationsRestClient {
      * ```
      * 
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
      * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -127,6 +128,7 @@ export class EmailValidationsRestClient {
      * ```
      * 
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param id The ID of the email validation job to retrieve.
      * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
      * validation.
@@ -147,6 +149,7 @@ export class EmailValidationsRestClient {
      * ```
      * 
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param id The ID of the email validation job to delete.
      */
     public async delete(id: string, cancellationToken?: CancellationToken): Promise<void> {
@@ -171,6 +174,7 @@ export class EmailValidationsRestClient {
      * ```
      * 
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param options The options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */

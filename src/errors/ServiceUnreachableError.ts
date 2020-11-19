@@ -9,7 +9,8 @@ export class ServiceUnreachableError extends VerifaliaError {
      *
      */
     constructor(innerErrors: any[]) {
-        super(`All the base URIs are unreachable: ${innerErrors.map(error => error).join(', ')}`);
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        super(`All the base URIs are unreachable: ${innerErrors.map(error => `${error}`).join(', ')}`);
 
         this.innerErrors = innerErrors;
     }

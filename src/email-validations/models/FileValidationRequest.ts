@@ -29,7 +29,7 @@ export interface FileValidationRequest extends ValidationSettings {
 /* @endif */
 
     contentType: string;
-    
+
     startingRow?: number;
     endingRow?: number;
     column?: number;

@@ -47,6 +47,7 @@ export class VerifaliaRestClient {
 
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified configuration.
+     *
      * @param config Contains the configuration for the Verifalia API client, including the credentials
      * to use while authenticating to the Verifalia service.
      */

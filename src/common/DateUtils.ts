@@ -1,8 +1,8 @@
 // Adapted from https://stackoverflow.com/a/23593099/904178
 
-export function formatDateToIso8601(date: Date) {
-    const month = '' + (date.getMonth() + 1);
-    const day = '' + date.getDate();
+export const formatDateToIso8601 = (date: Date): string => {
+    const month = `${date.getMonth() + 1}`;
+    const day = `${date.getDate()}`;
     const year = date.getFullYear();
 
     return [

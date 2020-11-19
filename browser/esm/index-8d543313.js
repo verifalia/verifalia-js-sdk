@@ -1,8 +1,6 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter, __asyncGenerator, __await } from 'tslib';
-import { ValidationStatus_Completed } from './email-validations/constants.mjs';
-import { ReadStream } from 'fs';
-import FormData from 'form-data';
+import { ValidationStatus_Completed } from './email-validations/constants.js';
 
 /**
  * Base error class for exceptions thrown by the Verifalia SDK for JavaScript.
@@ -28,6 +26,7 @@ class OperationCanceledError extends VerifaliaError {
     }
 }
 
+const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
 class WaitingStrategy {
     constructor(waitForCompletion, progress = null) {
         this.waitForCompletion = waitForCompletion;
@@ -42,10 +41,13 @@ class WaitingStrategy {
             // Observe the ETA if we have one, otherwise a delay given the formula: max(0.5, min(30, 2^(log(noOfEntries, 10) - 1)))
             let delay = Math.max(0.5, Math.min(30, Math.pow(2, Math.log10(validationOverview.noOfEntries) - 1)));
             if (validationOverview.progress && validationOverview.progress.estimatedTimeRemaining) {
-                const timespanMatch = validationOverview.progress.estimatedTimeRemaining.match(/^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/);
+                const timespanMatch = timeSpanMatchRegex.exec(validationOverview.progress.estimatedTimeRemaining);
                 if (timespanMatch) {
+                    // eslint-disable-next-line radix
                     const hours = parseInt(timespanMatch[2]);
+                    // eslint-disable-next-line radix
                     const minutes = parseInt(timespanMatch[3]);
+                    // eslint-disable-next-line radix
                     const seconds = parseInt(timespanMatch[4]);
                     // Calculate the delay (in seconds)
                     delay = seconds;
@@ -56,6 +58,7 @@ class WaitingStrategy {
                 }
             }
             return new Promise((resolve, reject) => {
+                // eslint-disable-next-line prefer-const
                 let timeout;
                 // Upon the eventual cancellation of the token, will clear the pending timeout and immediately reject the promise
                 // with an OperationCanceledError.
@@ -82,6 +85,7 @@ class WaitingStrategy {
  * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
  * until the job is completed) to request a different waiting behavior.
  * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with one or more email addresses to validate. Can be of type string, string[],
  * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -105,7 +109,7 @@ function submitEmailValidation(restClientFactory, request, waitingStrategy, canc
                 inputData: item
             }));
             data = {
-                entries: entries
+                entries
             };
         }
         else if (request.inputData) {
@@ -141,6 +145,7 @@ function submitEmailValidation(restClientFactory, request, waitingStrategy, canc
  * By default, this method does not wait for the completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with the file which includes the email addresses to validate and its processing
  * options. Must be of type `FileValidationRequest`.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -158,7 +163,7 @@ function submitEmailValidationFile(restClientFactory, request, waitingStrategy, 
             var _a, _b;
             formData.append('inputFile', request.file, {
                 contentType: request.contentType,
-                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /*ReadStream*/.filename) !== null && _b !== void 0 ? _b : 'file'
+                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
             });
             formData.append('settings', JSON.stringify({
                 name: request.name,
@@ -180,17 +185,11 @@ function submitEmailValidationFile(restClientFactory, request, waitingStrategy, 
             formData = new FormData(); // native
             fillFormData();
         }
-        else if ((typeof ReadStream !== 'undefined' && request.file instanceof ReadStream) || (typeof Buffer !== 'undefined' && request.file instanceof Buffer)) {
-            // Node
-            formData = new FormData(); // comes from the form-data package
-            fillFormData();
-            headers = Object.assign({}, formData.getHeaders());
-        }
         else {
             throw new Error('data type is unsupported.');
         }
         const response = yield restClient.invoke('POST', '/email-validations', undefined, formData, {
-            headers: headers
+            headers
         }, cancellationToken);
         return handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken);
     });
@@ -203,7 +202,7 @@ function handleSubmitResponse(restClientFactory, response, waitingStrategy, canc
         if (response.status === 200 || response.status === 202) {
             const partialValidation = yield response.deserialize();
             // Returns immediately if the validation has been completed or if we should not wait for it
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
                 return retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken);
             }
             return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken);
@@ -219,6 +218,7 @@ function handleSubmitResponse(restClientFactory, response, waitingStrategy, canc
  * not wait for the eventual completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param id The ID of the email validation job to retrieve.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
  * validation.
@@ -234,7 +234,7 @@ function getEmailValidation(restClientFactory, id, waitingStrategy, cancellation
             if (typeof waitingStrategy === 'boolean') {
                 waitingStrategy = new WaitingStrategy(waitingStrategy);
             }
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
                 return retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken);
             }
             return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken);
@@ -247,6 +247,7 @@ function getEmailValidation(restClientFactory, id, waitingStrategy, cancellation
 }
 /**
  * Deletes an email validation job previously submitted for processing.
+ *
  * @param id The ID of the email validation job to delete.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
@@ -334,6 +335,7 @@ function waitValidationForCompletion(restClientFactory, validationOverview, wait
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */

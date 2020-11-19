@@ -59,6 +59,7 @@ export declare class CreditsRestClient {
      * ```
      *
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     *
      * @param options A `DailyUsageListingOptions` with the options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */

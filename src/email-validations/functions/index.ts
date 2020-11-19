@@ -37,6 +37,7 @@ declare type PartialValidation = {
  * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
  * until the job is completed) to request a different waiting behavior.
  * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with one or more email addresses to validate. Can be of type string, string[],
  * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -59,18 +60,18 @@ export async function submitEmailValidation(restClientFactory: RestClientFactory
             }]
         } as ValidationRequest;
     } else if (Array.isArray(request) && (request as []).every((item: any) => typeof item === 'string')) {
-        const entries = (<string[]>request).map((item) => <ValidationRequestEntry>{
+        const entries = (request as string[]).map((item) => ({
             inputData: item
-        });
+        }) as ValidationRequestEntry);
 
         data = {
-            entries: entries
+            entries
         } as ValidationRequest;
-    } else if ((<any>request).inputData) {
+    } else if ((request as any).inputData) {
         // Single ValidationRequestEntry
 
         data = {
-            entries: [<ValidationRequestEntry>request]
+            entries: [request as ValidationRequestEntry]
         }
     } else if (Array.isArray(request) && (request as []).every((item: any) => item.inputData)) {
         // Array of ValidationRequestEntry
@@ -78,10 +79,10 @@ export async function submitEmailValidation(restClientFactory: RestClientFactory
         data = {
             entries: request
         } as ValidationRequest;
-    } else if ((<any>request).entries) {
+    } else if ((request as any).entries) {
         // ValidationRequest
 
-        data = <ValidationRequest>request;
+        data = request as ValidationRequest;
     } else {
         throw new Error('data type is unsupported.');
     }
@@ -112,6 +113,7 @@ export async function submitEmailValidation(restClientFactory: RestClientFactory
  * By default, this method does not wait for the completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with the file which includes the email addresses to validate and its processing
  * options. Must be of type `FileValidationRequest`.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -136,7 +138,7 @@ export async function submitEmailValidationFile(restClientFactory: RestClientFac
             {
                 contentType: request.contentType,
                 filename: (request.file as File).name ??
-                    (request.file as any /*ReadStream*/).filename
+                    (request.file as any /* ReadStream */).filename
                     // Default value - needed in Node, otherwise it won't include the file in the request :/
                     ?? 'file'
             } as any);
@@ -184,7 +186,7 @@ export async function submitEmailValidationFile(restClientFactory: RestClientFac
         undefined,
         formData,
         {
-            headers: headers
+            headers
         },
         cancellationToken
     );
@@ -206,7 +208,7 @@ async function handleSubmitResponse(restClientFactory: RestClientFactory,
 
         // Returns immediately if the validation has been completed or if we should not wait for it
 
-        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
             return retrieveValidationFromPartialValidation(restClientFactory,
                 partialValidation,
                 cancellationToken);
@@ -230,6 +232,7 @@ async function handleSubmitResponse(restClientFactory: RestClientFactory,
  * not wait for the eventual completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param id The ID of the email validation job to retrieve.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
  * validation.
@@ -259,7 +262,7 @@ export async function getEmailValidation(restClientFactory: RestClientFactory,
             waitingStrategy = new WaitingStrategy(waitingStrategy);
         }
 
-        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status == ValidationStatus_Completed) {
+        if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
             return retrieveValidationFromPartialValidation(restClientFactory,
                 partialValidation,
                 cancellationToken);
@@ -281,10 +284,11 @@ export async function getEmailValidation(restClientFactory: RestClientFactory,
 
 /**
  * Deletes an email validation job previously submitted for processing.
+ *
  * @param id The ID of the email validation job to delete.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-export async function deleteEmailValidation(restClientFactory: RestClientFactory, id: string, cancellationToken?: CancellationToken) {
+export async function deleteEmailValidation(restClientFactory: RestClientFactory, id: string, cancellationToken?: CancellationToken): Promise<void> {
     const restClient = restClientFactory.build();
     const response = await restClient.invoke<void>(
         'DELETE',
@@ -316,7 +320,7 @@ async function retrieveValidationFromPartialValidation(restClientFactory: RestCl
 
         currentSegment = await listEntriesSegmentedAsync(restClientFactory,
             partialValidation.overview.id,
-            <ListingCursor>{ cursor: currentSegment.meta.cursor },
+            { cursor: currentSegment.meta.cursor } as ListingCursor,
             cancellationToken);
     }
 
@@ -405,6 +409,7 @@ async function waitValidationForCompletion(restClientFactory: RestClientFactory,
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */

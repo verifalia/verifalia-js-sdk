@@ -12,6 +12,7 @@ import { ValidationOverviewListingOptions } from "../models/ValidationOverviewLi
  * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
  * until the job is completed) to request a different waiting behavior.
  * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with one or more email addresses to validate. Can be of type string, string[],
  * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -30,6 +31,7 @@ export declare function submitEmailValidation(restClientFactory: RestClientFacto
  * By default, this method does not wait for the completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param request An object with the file which includes the email addresses to validate and its processing
  * options. Must be of type `FileValidationRequest`.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the
@@ -43,6 +45,7 @@ export declare function submitEmailValidationFile(restClientFactory: RestClientF
  * not wait for the eventual completion of the email validation job: pass a
  * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param id The ID of the email validation job to retrieve.
  * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
  * validation.
@@ -51,6 +54,7 @@ export declare function submitEmailValidationFile(restClientFactory: RestClientF
 export declare function getEmailValidation(restClientFactory: RestClientFactory, id: string, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null>;
 /**
  * Deletes an email validation job previously submitted for processing.
+ *
  * @param id The ID of the email validation job to delete.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
@@ -59,6 +63,7 @@ export declare function deleteEmailValidation(restClientFactory: RestClientFacto
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
  * This method can be cancelled through a `CancellationToken`.
+ *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */

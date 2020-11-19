@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { Authenticator } from './security/Authenticator';
 import { ServiceUnreachableError } from '../errors/ServiceUnreachableError';
 import { EndpointServerError } from '../errors/EndpointServerError';
@@ -25,6 +28,7 @@ export class MultiplexedRestClient {
     private _authenticator: Authenticator;
     private _baseUris: string[];
     private _userAgent: string | undefined;
+    private _noOfInvocations: number;
 
     constructor(authenticator: Authenticator, baseUris: string[], userAgent: string | undefined = undefined) {
         if (!authenticator) throw new Error('authenticator is null');
@@ -33,6 +37,7 @@ export class MultiplexedRestClient {
         this._authenticator = authenticator;
         this._userAgent = userAgent;
         this._baseUris = baseUris;
+        this._noOfInvocations = 0;
     }
 
     public async invoke<T>(method: 'HEAD' | 'GET' | 'POST' | 'PUT' | 'DELETE',
@@ -51,8 +56,10 @@ export class MultiplexedRestClient {
         }
 
         try {
-            for (let idxUri = 0; idxUri < this._baseUris.length; idxUri++) {
-                const baseUri = this._baseUris[idxUri];
+            // We will attempt invoking the Verifalia API a maximum of once per endpoint
+
+            for (let idxAttempt = 0; idxAttempt < this._baseUris.length; idxAttempt++) {
+                const baseUri = this._baseUris[this._noOfInvocations++ % this._baseUris.length];
 
                 let requestInit:
                     /* @if TARGET='node' */
@@ -65,7 +72,7 @@ export class MultiplexedRestClient {
                     RequestInit
                     /* @endif */
                     = {
-                    method: method,
+                    method,
                     body: data && data instanceof FormData
                         ? data as any
                         : JSON.stringify(data),
@@ -109,6 +116,7 @@ export class MultiplexedRestClient {
                 const queryString = params
                     ? Object
                         .entries(params)
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                         .map(([key]) => `${key}=${encodeURIComponent(params[key])}`)
                         .join('&')
                     : null;
