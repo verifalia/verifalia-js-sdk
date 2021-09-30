@@ -15,7 +15,7 @@ export class UsernamePasswordAuthenticator implements Authenticator {
         }
 
         this._username = username;
-        this._password = password;
+        this._password = password || '';
     }
 
     public decorateRequest(restClient: MultiplexedRestClient, requestInit:

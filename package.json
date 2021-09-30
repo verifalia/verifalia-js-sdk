@@ -1,13 +1,13 @@
 {
     "name": "verifalia",
-    "version": "3.0.1",
-    "description": "Verifalia email validation library for Javascript",
+    "version": "3.0.2",
+    "description": "Verifalia email verification library for Javascript",
     "homepage": "https://verifalia.com",
     "main": "node/cjs/index.js",
     "module": "browser/esm/index.js",
     "scripts": {
         "build-genversion": "genversion --es6 src/version.ts",
-        "prebuild": "rimraf dist node browser",
+        "clean": "rimraf dist node browser",
         "build": "npm run build-genversion && npm run lint && rollup -c",
         "build:production": "cross-env NODE_ENV=production npm run build",
         "lint": "eslint -c .eslintrc.js --ext .ts ./src"
