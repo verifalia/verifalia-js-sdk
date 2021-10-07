@@ -133,29 +133,19 @@ export async function submitEmailValidationFile(restClientFactory: RestClientFac
     // Fills out the formData instance, for both Node and the browser
 
     const fillFormData = () => {
+        const { file, ...settings } = request;
+
         formData.append('inputFile',
-            request.file as any,
+            file as any,
             {
                 contentType: request.contentType,
-                filename: (request.file as File).name ??
-                    (request.file as any /* ReadStream */).filename
+                filename: (file as File).name ??
+                    (file as any /* ReadStream */).filename
                     // Default value - needed in Node, otherwise it won't include the file in the request :/
                     ?? 'file'
             } as any);
-        formData.append('settings', JSON.stringify({
-            name: request.name,
-            quality: request.quality,
-            deduplication: request.deduplication,
-            priority: request.priority,
-            retention: request.retention,
-            // File-specific
-            startingRow: request.startingRow,
-            endingRow: request.endingRow,
-            column: request.column,
-            sheet: request.sheet,
-            lineEnding: request.lineEnding,
-            delimiter: request.delimiter,
-        }));
+        
+        formData.append('settings', JSON.stringify(settings));
     };
 
     if ((typeof Blob !== 'undefined' && request.file instanceof Blob) || (typeof File !== 'undefined' && request.file instanceof File)) {

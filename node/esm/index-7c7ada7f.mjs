@@ -1,5 +1,5 @@
 // (c) Verifalia - email verification service - https://verifalia.com
-import { __awaiter, __asyncGenerator, __await } from 'tslib';
+import { __awaiter, __asyncGenerator, __await, __rest } from 'tslib';
 import { ValidationStatus_Completed } from './email-validations/constants.mjs';
 import { ReadStream } from 'fs';
 import FormData from 'form-data';
@@ -163,24 +163,12 @@ function submitEmailValidationFile(restClientFactory, request, waitingStrategy, 
         // Fills out the formData instance, for both Node and the browser
         const fillFormData = () => {
             var _a, _b;
-            formData.append('inputFile', request.file, {
+            const { file } = request, settings = __rest(request, ["file"]);
+            formData.append('inputFile', file, {
                 contentType: request.contentType,
-                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
+                filename: (_b = (_a = file.name) !== null && _a !== void 0 ? _a : file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
             });
-            formData.append('settings', JSON.stringify({
-                name: request.name,
-                quality: request.quality,
-                deduplication: request.deduplication,
-                priority: request.priority,
-                retention: request.retention,
-                // File-specific
-                startingRow: request.startingRow,
-                endingRow: request.endingRow,
-                column: request.column,
-                sheet: request.sheet,
-                lineEnding: request.lineEnding,
-                delimiter: request.delimiter,
-            }));
+            formData.append('settings', JSON.stringify(settings));
         };
         if ((typeof Blob !== 'undefined' && request.file instanceof Blob) || (typeof File !== 'undefined' && request.file instanceof File)) {
             // Browser

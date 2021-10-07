@@ -1,17 +1,6 @@
 // (c) Verifalia - email verification service - https://verifalia.com
-import { __awaiter, __asyncGenerator, __await } from 'tslib';
-import debug from 'debug';
+import { __awaiter, __asyncGenerator, __await, __rest } from 'tslib';
 import { ValidationStatus_Completed } from './email-validations/constants.js';
-
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-class Logger {
-    constructor(namespace) {
-        this._debugger = debug(namespace);
-    }
-    log(formatter, ...args) {
-        this._debugger.apply(this._debugger, [formatter, ...args]);
-    }
-}
 
 /**
  * Base error class for exceptions thrown by the Verifalia SDK for JavaScript.
@@ -37,7 +26,6 @@ class OperationCanceledError extends VerifaliaError {
     }
 }
 
-const logger = new Logger('verifalia');
 const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
 class WaitingStrategy {
     constructor(waitForCompletion, progress = null) {
@@ -69,7 +57,6 @@ class WaitingStrategy {
                     delay = Math.max(0.5, Math.min(30, delay));
                 }
             }
-            logger.log('waitForNextPoll delay (seconds)', delay);
             return new Promise((resolve, reject) => {
                 // eslint-disable-next-line prefer-const
                 let timeout;
@@ -93,7 +80,6 @@ class WaitingStrategy {
     }
 }
 
-const logger$1 = new Logger('verifalia');
 /**
  * Submits a new email validation for processing. By default, this method does not wait for
  * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
@@ -146,7 +132,6 @@ function submitEmailValidation(restClientFactory, request, waitingStrategy, canc
             throw new Error('data type is unsupported.');
         }
         const response = yield restClient.invoke('POST', '/email-validations', undefined, data, undefined, cancellationToken);
-        logger$1.log('handling submit response', response);
         return handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken);
     });
 }
@@ -176,24 +161,12 @@ function submitEmailValidationFile(restClientFactory, request, waitingStrategy, 
         // Fills out the formData instance, for both Node and the browser
         const fillFormData = () => {
             var _a, _b;
-            formData.append('inputFile', request.file, {
+            const { file } = request, settings = __rest(request, ["file"]);
+            formData.append('inputFile', file, {
                 contentType: request.contentType,
-                filename: (_b = (_a = request.file.name) !== null && _a !== void 0 ? _a : request.file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
+                filename: (_b = (_a = file.name) !== null && _a !== void 0 ? _a : file /* ReadStream */.filename) !== null && _b !== void 0 ? _b : 'file'
             });
-            formData.append('settings', JSON.stringify({
-                name: request.name,
-                quality: request.quality,
-                deduplication: request.deduplication,
-                priority: request.priority,
-                retention: request.retention,
-                // File-specific
-                startingRow: request.startingRow,
-                endingRow: request.endingRow,
-                column: request.column,
-                sheet: request.sheet,
-                lineEnding: request.lineEnding,
-                delimiter: request.delimiter,
-            }));
+            formData.append('settings', JSON.stringify(settings));
         };
         if ((typeof Blob !== 'undefined' && request.file instanceof Blob) || (typeof File !== 'undefined' && request.file instanceof File)) {
             // Browser
@@ -389,4 +362,4 @@ function listEmailValidations(restClientFactory, options, cancellationToken) {
     });
 }
 
-export { Logger as L, OperationCanceledError as O, VerifaliaError as V, WaitingStrategy as W, submitEmailValidationFile as a, deleteEmailValidation as d, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };
+export { OperationCanceledError as O, VerifaliaError as V, WaitingStrategy as W, submitEmailValidationFile as a, deleteEmailValidation as d, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };
