@@ -186,10 +186,12 @@ export class MultiplexedRestClient {
                 }
 
                 return {
+                    deserialize: async () => (await response.json()) as T,
+                    response,
+                    // Obsolete fields, for backward compatibility only
                     status: response.status,
                     statusText: response.statusText,
                     body: response.body,
-                    deserialize: async () => (await response.json()) as T
                 };
             }
 

@@ -30,7 +30,8 @@ module.exports = {
         "eslint-plugin-import",
         "eslint-plugin-jsdoc",
         "eslint-plugin-prefer-arrow",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "deprecation"
     ],
     "rules": {
         "@typescript-eslint/adjacent-overload-signatures": "error",
@@ -213,6 +214,7 @@ module.exports = {
             }
         ],
         "use-isnan": "error",
-        "valid-typeof": "off"
+        "valid-typeof": "off",
+        "deprecation/deprecation": ["warn"]        
     }
 };
