@@ -1,1 +1,0 @@
-{"version":3,"file":"ServiceUnreachableError.d.ts","sourceRoot":"","sources":["../src/errors/ServiceUnreachableError.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,MAAM,kBAAkB,CAAC;AAElD;;GAEG;AACH,qBAAa,uBAAwB,SAAQ,cAAc;IACvD,SAAgB,WAAW,EAAE,GAAG,EAAE,CAAC;IACnC;;OAEG;gBACS,WAAW,EAAE,GAAG,EAAE;CAMjC"}

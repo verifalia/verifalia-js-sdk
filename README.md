@@ -1,4 +1,4 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.2-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.3-green)
 [![NPM](https://img.shields.io/npm/v/verifalia.svg)](https://www.npmjs.com/package/verifalia)
 
 Verifalia REST API - SDK and helper library for Javascript

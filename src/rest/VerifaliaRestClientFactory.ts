@@ -13,27 +13,24 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
      */
-    public apiVersion = 'v2.2';
+    public apiVersion = 'v2.3';
 
     private _cachedRestClient: MultiplexedRestClient | undefined;
 
     private readonly _authenticator: Authenticator;
-    private _baseUris = [
-        'https://api-1.verifalia.com',
-        'https://api-2.verifalia.com',
-        'https://api-3.verifalia.com',
-    ];
+    private _baseUris: string[];
 
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
      *
      * @param authenticator The authenticator used to invoke the Verifalia service.
      */
-    constructor(authenticator: Authenticator) {
+    constructor(authenticator: Authenticator, baseUris: string[]) {
         if (!authenticator)
             throw new Error('authenticator is null');
 
         this._authenticator = authenticator;
+        this._baseUris = baseUris;
     }
 
     build(): MultiplexedRestClient {

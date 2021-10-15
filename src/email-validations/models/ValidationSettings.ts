@@ -49,4 +49,15 @@ export interface ValidationSettings {
      * days.
      */
     retention?: string;
+
+    /**
+     * An optional callback definition for a publicly-accessible endpoint which will be notified
+     * as soon as the validation job is completed. See https://verifalia.com/developers#email-validations-completion-callback
+     */
+    callback?: {
+        /**
+         * The URL of the endpoint which will receive the job completion notification callback.
+         */
+        url: string;
+    }
 }

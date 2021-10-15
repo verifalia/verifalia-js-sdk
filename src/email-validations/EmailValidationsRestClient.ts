@@ -5,7 +5,7 @@ import { ValidationRequest } from "./models/ValidationRequest";
 import { WaitingStrategy } from "./WaitingStrategy";
 import { CancellationToken } from "../common/CancellationToken";
 
-import { submitEmailValidation, deleteEmailValidation, getEmailValidation, submitEmailValidationFile, listEmailValidations } from './functions';
+import { submitEmailValidation, deleteEmailValidation, getEmailValidation, submitEmailValidationFile, listEmailValidations, exportEmailValidationEntries } from './functions';
 import { FileValidationRequest } from "./models/FileValidationRequest";
 import { ValidationOverviewListingOptions } from "./models/ValidationOverviewListingOptions";
 import { ValidationOverview } from "./models/ValidationOverview";
@@ -14,6 +14,7 @@ type NonFileValidationRequest = string | string[] | ValidationRequestEntry | Val
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "../diagnostics/Logger";
+import { Stream } from "stream";
 const logger = new Logger('verifalia');
 /* @endif */
 
@@ -180,5 +181,38 @@ export class EmailValidationsRestClient {
      */
     public list(options?: ValidationOverviewListingOptions, cancellationToken?: CancellationToken): AsyncGenerator<ValidationOverview> {
         return listEmailValidations(this._restClientFactory, options, cancellationToken);
-    }    
+    }
+
+    /**
+     * Returns a stream with an export of the specified completed email validation job, with the goal
+     * of generating a *human-readable representation* of the results according to the requested output
+     * file format. While the output schema (columns / labels / data format) is fairly complete, you
+     * should always consider it as subject to change.
+     * 
+     * Here is how to export a job in Microsoft Excel format and save it to a local file (Node.js only):
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     * 
+     * (
+     *     await verifalia
+     *         .emailValidations
+     *         .export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', 'application/vnd.ms-excel')
+     * )
+     * .pipe(fs.createWriteStream('my-list.xls'));
+     * ```
+     * 
+     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     * 
+     * @param id The ID of the email validation job to retrieve.
+     * @param contentType The MIME content-type of output file format. Acceptable values:
+     * - text/csv for comma-separated values files - CSV
+     * - application/vnd.ms-excel for Microsoft Excel 97-2003 Worksheet (.xls)
+     * - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet for Microsoft Excel workbook
+     * (.xslx).
+     * @param cancellationToken An optional token used to cancel the asynchronous request.
+     * @returns A stream with the exported data.
+     */
+    public export(id: string, contentType: string, cancellationToken?: CancellationToken): Promise<Stream> {
+        return exportEmailValidationEntries(this._restClientFactory, id, contentType, cancellationToken);
+    }
 }

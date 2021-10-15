@@ -8,7 +8,7 @@
     "scripts": {
         "build-genversion": "genversion --es6 src/version.ts",
         "clean": "rimraf dist node browser",
-        "build": "npm run build-genversion && npm run lint && rollup -c",
+        "build": "npm run clean && npm run build-genversion && npm run lint && rollup -c",
         "build:production": "cross-env NODE_ENV=production npm run build",
         "lint": "eslint -c .eslintrc.js --ext .ts ./src"
     },

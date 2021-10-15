@@ -24,6 +24,7 @@ import FormData from "form-data";
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "../../diagnostics/Logger";
+import { Stream } from "stream";
 const logger = new Logger('verifalia');
 /* @endif */
 
@@ -271,6 +272,48 @@ export async function getEmailValidation(restClientFactory: RestClientFactory,
     throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
 }
 
+
+/**
+ * Returns a stream with an export of the entries for the specified completed email validation job,
+ * with the goal of generating a human-readable representation of the results according to the
+ * requested output file format. While the output schema (columns / labels / data format) is fairly
+ * complete, you should always consider it as subject to change.
+ * This method can be cancelled through a `CancellationToken`.
+ * 
+ * @param id The ID of the email validation job to retrieve.
+ * @param contentType The MIME content-type of output file format. Acceptable values:
+ * - text/csv for comma-separated values files - CSV
+ * - application/vnd.ms-excel for Microsoft Excel 97-2003 Worksheet (.xls)
+ * - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet for Microsoft Excel workbook
+ * (.xslx).
+ * @param cancellationToken An optional token used to cancel the asynchronous request.
+ * @returns A stream with the exported data.
+ */
+export async function exportEmailValidationEntries(restClientFactory: RestClientFactory,
+    id: string,
+    contentType: string,
+    cancellationToken?: CancellationToken): Promise<Stream> {
+
+    const restClient = restClientFactory.build();
+    const response = await restClient.invoke<PartialValidation>(
+        'GET',
+        `/email-validations/${id}/entries`,
+        undefined,
+        undefined,
+        {
+            headers: {
+                'Accept': contentType
+            }                    
+        },
+        cancellationToken
+    );
+
+    if (response.status === 200) {
+        return response.response.body as Stream;
+    }
+
+    throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+}
 
 /**
  * Deletes an email validation job previously submitted for processing.

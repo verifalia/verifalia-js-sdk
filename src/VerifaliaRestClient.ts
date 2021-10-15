@@ -7,6 +7,8 @@ import { UsernamePasswordAuthenticator } from "./rest/security/UsernamePasswordA
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "./diagnostics/Logger";
+import { ClientCertificateAuthenticator } from "./rest/security/ClientCertificateAuthenticator";
+import { Authenticator } from "./rest/security/Authenticator";
 const logger = new Logger('verifalia');
 /* @endif */
 
@@ -33,6 +35,24 @@ const logger = new Logger('verifalia');
  * ```
  */
 export class VerifaliaRestClient {
+    /**
+     * Default Verifalia base URIs.
+     */
+    private _baseUris = [
+        'https://api-1.verifalia.com',
+        'https://api-2.verifalia.com',
+        'https://api-3.verifalia.com',
+    ];
+
+    /**
+     * Default Verifalia base URIs for client-certificate authentication.
+     */
+    private _baseCcaUris = [
+        'https://api-cca-1.verifalia.com',
+        'https://api-cca-2.verifalia.com',
+        'https://api-cca-3.verifalia.com',
+    ];
+
     private _restClientfactory: RestClientFactory;
 
     /**
@@ -53,18 +73,39 @@ export class VerifaliaRestClient {
      */
     constructor(config: VerifaliaRestClientConfiguration) {
         if (!config) throw new Error('config is null');
-        if (!config.username)
-            throw new Error('username is null');
 
         /* @if ENVIRONMENT!='production' */
         logger.log('Compilation', '/*@echo TARGET*/', '/*@echo FORMAT*/');
         /* @endif */
     
         // Builds the authenticator
-        // TODO: Support X.509 client certificate authentication (on Node)
 
-        const authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
-        this._restClientfactory = new VerifaliaRestClientFactory(authenticator);
+        let authenticator: Authenticator;
+        let baseUris: string[];
+
+        if (config.username) {
+            // User-name password authentication
+
+            authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
+            baseUris = config.baseUris ?? this._baseUris;
+        }
+        /* @if TARGET='node' */
+        else if (config.cert) {
+            // X.509 client certificate authentication (Node.js only)
+
+            authenticator = new ClientCertificateAuthenticator(config.cert, config.key, config.passphrase);
+            baseUris = config.baseUris ?? this._baseCcaUris;
+        }
+        /* @endif */
+        else {
+            /* @if TARGET='node' */
+            throw new Error('Invalid configuration: either specify your user credentials, your browser-app key or your client certificate.');
+            /* @else */
+            throw new Error('Invalid configuration: either specify your user credentials or your browser-app key.');
+            /* @endif */
+        }
+
+        this._restClientfactory = new VerifaliaRestClientFactory(authenticator, baseUris);
         
         this.credits = new CreditsRestClient(this._restClientfactory);
         this.emailValidations = new EmailValidationsRestClient(this._restClientfactory);
