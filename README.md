@@ -4,7 +4,7 @@
 Verifalia REST API - SDK and helper library for Javascript
 ==========================================================
 
-[Verifalia][0] provides a simple HTTPS-based API for validating email addresses in real-time and checking whether they are deliverable or not; this SDK library integrates with Verifalia and allows to [verify email addresses][0] on Node.js backends and in the browser. It includes artifacts for a wide range of module loaders, including CommonJS (suitable for Node.js) and native ES modules (ideal for modern front-end module bundlers like Webpack and Rollup, for front-end frameworks like Angular, React, Vue, etc. - and supported in Node.js v13+); it also comes with a turn-key single-file IIFE for browsers (compatible with ES5 or higher), with no external dependencies.
+[Verifalia][0] provides a fast and accurate API for verifying email addresses in real-time and checking whether they are deliverable, invalid, or otherwise risky: this SDK library integrates with Verifalia and allows to [verify email addresses][0] on Node.js backends and in the browser. It includes artifacts for a wide range of module loaders, including CommonJS (suitable for Node.js) and native ES modules (ideal for modern front-end module bundlers like Webpack and Rollup, for front-end frameworks like Angular, React, Vue, etc. - and supported in Node.js v13+); it also comes with a turn-key single-file IIFE for browsers (compatible with ES5 or higher), with no external dependencies.
 
 # Getting started #
 
@@ -131,7 +131,8 @@ While we always recommend using a module loader for a much better performance an
 
 ## Authentication ##
 
-First things first: authentication to the Verifalia API is performed by way of either the credentials of your root Verifalia account or of one of its users (previously known as sub-accounts): if you don't have a Verifalia account, just [register for a free one][4]. For security reasons, it is always advisable to [create and use a dedicated user][3] for accessing the API, as doing so will allow to assign only the specific needed permissions to it.
+First things first: authentication to the Verifalia API is performed by way of the username and password credentials of your root Verifalia account or
+those of a Verifalia user (previously known as sub-account): if you don't have a Verifalia account, just [register for a free one][4]. For security reasons, it is always advisable to [create and use a dedicated user][3] for accessing the API, as doing so will allow to assign only the specific needed permissions to it.
 
 Learn more about authenticating to the Verifalia API at [https://verifalia.com/developers#authentication][2]
 
@@ -153,6 +154,22 @@ A browser app key is essentially a username you can use while authenticating aga
 ```ts
 const verifalia = new VerifaliaRestClient({
 	username: 'YOUR-BROWSER-APP-KEY-HERE'
+});
+```
+
+### Authenticating via X.509 client certificate (Node-only) ###
+
+This authentication method uses a cryptographic X.509 client certificate to authenticate against the Verifalia API, through the TLS protocol. This method, also called mutual TLS authentication (mTLS) or two-way authentication, offers the highest degree of security, as only a cryptographically-derived key (and not the actual credentials) is sent over the wire on each request. To learn more about this option, please see https://verifalia.com/help/sub-accounts/what-is-x509-tls-client-certificate-authentication
+
+Note: this authentication method is only available in Node.js and not in the browser.
+
+To authenticate using an X.509 client certificate, specify its public key through the `cert` field and pass its private key via the `key` field. An optional
+passphrase can be set via with the `passphrase` field.
+
+```ts
+const verifalia = new VerifaliaRestClient({
+	cert: fs.readFileSync('/home/rmontagnani/my-client-certificate.pem'),
+    key: fs.readFileSync('/home/rmontagnani/my-client-certificate.key')
 });
 ```
 
@@ -245,6 +262,8 @@ verifalia
 		// 'Status InProgress'
 	});
 ```
+
+### Retrieving a job and its results
 
 Once you have an email validation job Id, which is always returned by `submit()` as part of the validation's `overview` property, you can retrieve the job data using the `get()` method. Similarly to the submission process, you can either wait for the completion of the job here - by either specifying `true` or a `WaitingStrategy` instance as the second parameter - or just retrieve the current job snapshot to get its progress. Only completed jobs have their `entries` filled with the email validation results, however.
 
@@ -350,6 +369,41 @@ const validation = await verifalia
     }, true);
 ```
 
+### How export a human-readable report of the verification result ###
+
+Once an email verification job is completed, it is also possible to retrieve a human-readable report of its results as either a comma-separated values (.csv) file or as a Microsoft Excel spreadsheet (.xls and .xlsx supported). While the output schema (columns / labels / data format) of the exported results is fairly mature and complete, you should consider it as subject to change: always [retrieve your results data using the `get()` method as explained above](#retrieving-a-job-and-its-results) if you need to deal with it in an unmanned way.
+
+Here is an example showing how to export a completed email verification job as a Microsoft Excel file, given its job ID, in Node.js:
+
+```ts
+// Import the MIME content type for Excel files (just a string, for our convenience)
+import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
+
+(
+	await verifalia
+    	.emailValidations
+    	.export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_ExcelXlsx)
+).pipe(fs.createWriteStream('/home/lbanfi/my-list.xls'))
+```
+
+And here is how to export the same completed email verification job as a comma-separated values (CSV) file in the browser, showing its content in an `iframe`:
+
+```html
+<!-- This is a the element which will hold the CSV export contents -->
+<div id="my-iframe"></div>
+```
+```ts
+// Import the MIME content type for CSV files (just a string, for our convenience)
+import { MimeContentType_TextCsv } from 'verifalia';
+
+const target = document.getElementByID('my-iframe');
+const exportedData = await verifalia
+	.emailValidations
+	.export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_TextCsv);
+
+target.src = exportedData.toBlobURL(MimeContentType_TextCsv);
+```
+
 ## Don't forget to clean up, when you are done ##
 
 Verifalia automatically deletes completed jobs after the data retention period eventually specified along with the submission options, falling back to the configured data retention period of the submitting user / browser app and, should it be unset, to the configured data retention period of the Verifalia account, with a default of 30 days.
@@ -409,7 +463,7 @@ const dailyUsages = verifalia
     .credits
     .listDailyUsages({
 		// from, to
-		dateFilter = new DateBetweenPredicate(new Date('2020-10-09'), new Date('2020-11-08'))
+		dateFilter = new DateBetweenPredicate(new Date('2021-10-09'), new Date('2021-11-08'))
 	});
 
 for await (const dailyUsage of dailyUsages) {
@@ -419,13 +473,13 @@ for await (const dailyUsage of dailyUsages) {
 }
 
 // Prints out something like:
-// Sat Oct 10 2020
+// Sat Oct 10 2021
 //     Credit packs 1965.68
 //     Free daily credits 200
-// Mon Oct 12 2020
+// Mon Oct 12 2021
 //     Credit packs 0
 //     Free daily credits 185.628
-// Tue Oct 13 2019
+// Tue Oct 13 2021
 //     Credit packs 15.32
 //     Free daily credits 200
 // ...
