@@ -1,0 +1,1 @@
+{"version":3,"file":"ValidationRequest.d.ts","sourceRoot":"","sources":["../../src/email-validations/models/ValidationRequest.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA8BG;AAEH,OAAO,EAAE,sBAAsB,EAAE,MAAM,0BAA0B,CAAC;AAClE,OAAO,EAAE,kBAAkB,EAAE,MAAM,sBAAsB,CAAC;AAE1D;;GAEG;AACH,MAAM,WAAW,iBAAkB,SAAQ,kBAAkB;IACzD;;;OAGG;IACH,OAAO,EAAE,sBAAsB,EAAE,CAAC;CACrC"}

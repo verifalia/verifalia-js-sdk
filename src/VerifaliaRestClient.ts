@@ -36,11 +36,11 @@ import { CreditsRestClient } from "./credits/CreditsRestClient";
 import { VerifaliaRestClientConfiguration } from "./VerifaliaRestClientConfiguration";
 import { VerifaliaRestClientFactory } from "./rest/VerifaliaRestClientFactory";
 import { UsernamePasswordAuthenticator } from "./rest/security/UsernamePasswordAuthenticator";
+import { ClientCertificateAuthenticator } from "./rest/security/ClientCertificateAuthenticator";
+import { Authenticator } from "./rest/security/Authenticator";
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "./diagnostics/Logger";
-import { ClientCertificateAuthenticator } from "./rest/security/ClientCertificateAuthenticator";
-import { Authenticator } from "./rest/security/Authenticator";
 const logger = new Logger('verifalia');
 /* @endif */
 

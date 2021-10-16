@@ -46,6 +46,7 @@ import { CancellationToken } from "../../common/CancellationToken";
 import { FileValidationRequest } from "../models/FileValidationRequest";
 import { ValidationOverviewListingOptions } from "../models/ValidationOverviewListingOptions";
 import { RestResponse } from "../../rest/RestResponse";
+import { Stream } from "stream";
 
 // Node-specific
 
@@ -56,7 +57,6 @@ import FormData from "form-data";
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "../../diagnostics/Logger";
-import { Stream } from "stream";
 const logger = new Logger('verifalia');
 /* @endif */
 

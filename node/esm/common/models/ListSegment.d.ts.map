@@ -1,0 +1,1 @@
+{"version":3,"file":"ListSegment.d.ts","sourceRoot":"","sources":["../../src/common/models/ListSegment.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA8BG;AAEH,OAAO,EAAE,eAAe,EAAE,MAAM,mBAAmB,CAAC;AAEpD,MAAM,WAAW,WAAW,CAAC,CAAC;IAC1B,IAAI,EAAE,eAAe,CAAC;IACtB,IAAI,EAAE,CAAC,EAAE,CAAC;CACb"}

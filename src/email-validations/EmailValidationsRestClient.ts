@@ -30,6 +30,7 @@
  * THE SOFTWARE.
  */
 
+import { Stream } from "stream";
 import { RestClientFactory } from "../rest/RestClientFactory";
 import { Validation } from "./models/Validation";
 import { ValidationRequestEntry } from "./models/ValidationRequestEntry";
@@ -46,7 +47,6 @@ type NonFileValidationRequest = string | string[] | ValidationRequestEntry | Val
 
 /* @if ENVIRONMENT!='production' */
 import { Logger } from "../diagnostics/Logger";
-import { Stream } from "stream";
 const logger = new Logger('verifalia');
 /* @endif */
 

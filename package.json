@@ -1,7 +1,7 @@
 {
     "name": "verifalia",
-    "version": "3.1.0",
-    "description": "Verifalia email verification library for Javascript",
+    "version": "3.2.0",
+    "description": "Verifalia email verification library for JavaScript: verify email addresses in real-time and check whether they are deliverable, invalid, or otherwise risky.",
     "homepage": "https://verifalia.com",
     "main": "node/cjs/index.js",
     "module": "browser/esm/index.js",
