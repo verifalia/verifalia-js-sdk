@@ -159,7 +159,7 @@ const verifalia = new VerifaliaRestClient({
 
 ### Authenticating via X.509 client certificate (Node-only) ###
 
-> **NOTE**: this authentication method is only available in Node.js and not in the browser.
+> :warning: This authentication method is only available in Node.js and not in the browser.
 
 This authentication method uses a cryptographic X.509 client certificate to authenticate against the Verifalia API, through the TLS protocol. This method, also called mutual TLS authentication (mTLS) or two-way authentication, offers the highest degree of security, as only a cryptographically-derived key (and not the actual credentials) is sent over the wire on each request. To learn more about this option, please see https://verifalia.com/help/sub-accounts/what-is-x509-tls-client-certificate-authentication
 
