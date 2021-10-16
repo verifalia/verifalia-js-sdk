@@ -83,11 +83,11 @@ Using this loading method you can use the features of this library through the `
 ```javascript
 define(["verifalia"], function (verifaliaModule) {
 	const verifalia = new verifaliaModule.VerifaliaRestClient({
-		username: 'samantha',
-		password: '42istheanswer'
-	});
+        username: 'samantha',
+        password: '42istheanswer'
+    });
 
-	return { };
+    return { };
 });
 ```
 
@@ -140,8 +140,8 @@ Once you have your Verifalia credentials at hand, use them while creating a new 
 
 ```ts
 const verifalia = new VerifaliaRestClient({
-	username: 'username',
-	password: 'password'
+    username: 'username',
+    password: 'password'
 });
 ```
 
@@ -153,7 +153,7 @@ A browser app key is essentially a username you can use while authenticating aga
 
 ```ts
 const verifalia = new VerifaliaRestClient({
-	username: 'YOUR-BROWSER-APP-KEY-HERE'
+    username: 'YOUR-BROWSER-APP-KEY-HERE'
 });
 ```
 
@@ -205,17 +205,17 @@ And here is the same example, using the promise callback syntax:
 ```ts
 verifalia
     .emailValidations
-	.submit('batman@gmail.com', true)
-	.then(validation => {
-		// At this point the address has been validated: let's print
-		// its email validation result to the console.
+    .submit('batman@gmail.com', true)
+    .then(validation => {
+        // At this point the address has been validated: let's print
+        // its email validation result to the console.
 
-		const entry = validation.entries[0];
-		console.log(entry.inputData, entry.classification, entry.status);
+        const entry = validation.entries[0];
+        console.log(entry.inputData, entry.classification, entry.status);
 
-		// Prints out something like:
-		// batman@gmail.com Deliverable Success
-	});
+        // Prints out something like:
+        // batman@gmail.com Deliverable Success
+    });
 ```
 
 ## How to validate a list of email addresses ##
@@ -230,10 +230,10 @@ Here is how to submit some email addresses for validation, without waiting for t
 const validation = await verifalia
     .emailValidations
     .submit([{
-		"batman@gmail.com",
-		"steve.vai@best.music",
-		"samantha42@yahoo.de"
-	}]);
+        "batman@gmail.com",
+        "steve.vai@best.music",
+        "samantha42@yahoo.de"
+    }]);
 
 console.log(`Job Id: ${validation.overview.id}`);
 console.log(`Status: ${validation.overview.status}`);
@@ -250,17 +250,17 @@ And here is the promise callback syntax:
 verifalia
     .emailValidations
     .submit([{
-		"batman@gmail.com",
-		"steve.vai@best.music",
-		"samantha42@yahoo.de"
-	}])
-	.then(validation => {
-		console.log(`Job Id: ${validation.overview.id}`);
-		console.log(`Status: ${validation.overview.status}`);
+        "batman@gmail.com",
+        "steve.vai@best.music",
+        "samantha42@yahoo.de"
+    }])
+    .then(validation => {
+        console.log(`Job Id: ${validation.overview.id}`);
+        console.log(`Status: ${validation.overview.status}`);
 
-		// 'Job Id: 290b5146-eeac-4a2b-a9c1-61c7e715f2e9'
-		// 'Status InProgress'
-	});
+        // 'Job Id: 290b5146-eeac-4a2b-a9c1-61c7e715f2e9'
+        // 'Status InProgress'
+    });
 ```
 
 
@@ -328,10 +328,10 @@ const validation = await verifalia
     .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9');
 
 if (validation.overview.status === ValidationStatus.Completed) {
-	// validation.entries will have the validation results!
+    // validation.entries will have the validation results!
 }
 else {
-	// What about having a coffee?
+    // What about having a coffee?
 }
 ```
 
@@ -340,15 +340,15 @@ And using the promise callback syntax:
 ```ts
 verifalia
     .emailValidations
-	.get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9')
-	.then(validation => {
+    .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9')
+    .then(validation => {
 		if (validation.overview.status === ValidationStatus.Completed) {
-			// validation.entries will have the validation results!
+            // validation.entries will have the validation results!
 		}
 		else {
-			// What about having a coffee?
-		}
-	});
+            // What about having a coffee?
+        }
+    });
 ```
 
 And here is how to request the same job, asking the library to automatically wait for us until the job is completed (that is, _joining_ the job). Here with the async/await syntax:
@@ -364,10 +364,10 @@ And here using the promise callback syntax:
 ```ts
 verifalia
     .emailValidations
-	.get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9', true)
-	.then(validation => {
-		// TODO: Let's party!
-	});
+    .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9', true)
+    .then(validation => {
+        // TODO: Let's party!
+    });
 ```
 
 ### How export a human-readable report of the verification result ###
@@ -381,9 +381,9 @@ Here is an example showing how to export a completed email verification job as a
 import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
 
 (
-	await verifalia
-    	.emailValidations
-    	.export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_ExcelXlsx)
+    await verifalia
+        .emailValidations
+        .export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_ExcelXlsx)
 ).pipe(fs.createWriteStream('/home/lbanfi/my-list.xls'))
 ```
 
@@ -399,8 +399,8 @@ import { MimeContentType_TextCsv } from 'verifalia';
 
 const target = document.getElementByID('my-iframe');
 const exportedData = await verifalia
-	.emailValidations
-	.export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_TextCsv);
+    .emailValidations
+    .export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_TextCsv);
 
 target.src = exportedData.toBlobURL(MimeContentType_TextCsv);
 ```
@@ -421,10 +421,10 @@ And here is the same example using the promise callback syntax:
 ```ts
 verifalia
     .emailValidations
-	.delete(validation.id)
-	.then(() => {
-		// ...
-	});
+    .delete(validation.id)
+    .then(() => {
+        // ...
+    });
 ```
 
 Once deleted, a job is gone and there is no way to retrieve its email validation(s).
@@ -463,14 +463,14 @@ Here is how to retrieve the daily credits consumption for a certain period:
 const dailyUsages = verifalia
     .credits
     .listDailyUsages({
-		// from, to
-		dateFilter = new DateBetweenPredicate(new Date('2021-10-09'), new Date('2021-11-08'))
-	});
+        // from, to
+        dateFilter = new DateBetweenPredicate(new Date('2021-10-09'), new Date('2021-11-08'))
+    });
 
 for await (const dailyUsage of dailyUsages) {
-	console.log(dailyUsage.date);
-	console.log('\tCredit packs', dailyUsage.creditPacks);
-	console.log('\tFree daily credits', dailyUsage.freeCredits);
+    console.log(dailyUsage.date);
+    console.log('\tCredit packs', dailyUsage.creditPacks);
+    console.log('\tFree daily credits', dailyUsage.freeCredits);
 }
 
 // Prints out something like:
