@@ -159,9 +159,9 @@ const verifalia = new VerifaliaRestClient({
 
 ### Authenticating via X.509 client certificate (Node-only) ###
 
-This authentication method uses a cryptographic X.509 client certificate to authenticate against the Verifalia API, through the TLS protocol. This method, also called mutual TLS authentication (mTLS) or two-way authentication, offers the highest degree of security, as only a cryptographically-derived key (and not the actual credentials) is sent over the wire on each request. To learn more about this option, please see https://verifalia.com/help/sub-accounts/what-is-x509-tls-client-certificate-authentication
+> **NOTE**: this authentication method is only available in Node.js and not in the browser.
 
-Note: this authentication method is only available in Node.js and not in the browser.
+This authentication method uses a cryptographic X.509 client certificate to authenticate against the Verifalia API, through the TLS protocol. This method, also called mutual TLS authentication (mTLS) or two-way authentication, offers the highest degree of security, as only a cryptographically-derived key (and not the actual credentials) is sent over the wire on each request. To learn more about this option, please see https://verifalia.com/help/sub-accounts/what-is-x509-tls-client-certificate-authentication
 
 To authenticate using an X.509 client certificate, specify its public key through the `cert` field and pass its private key via the `key` field. An optional
 passphrase can be set via with the `passphrase` field.
@@ -263,7 +263,59 @@ verifalia
 	});
 ```
 
-### Retrieving a job and its results
+
+### How to submit a file for validation ###
+
+This library includes support for submitting and validating files with email addresses, including:
+- plain text files (.txt), with one email address per line;
+- comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files;
+- Microsoft Excel spreadsheets (.xls and .xlsx).
+
+To submit and validate files, one can still use the `submit()` method mentioned above, passing an object with a `file` field set to, respectively, either a `ReadStream` or a `Buffer` for Node.js and a `Blob` or a `File` for the browser. Along with that field, it is also possible to specify the eventual starting and ending rows to process, the column, the sheet index, the line ending and the delimiter - depending of course on the nature of the submitted file (see `FileValidationRequest` in the source to learn more).
+
+Here is how to validate the email address of an Excel file in Node.js, for example:
+
+```ts
+// Import the MIME content type for Excel files (just a string, for our convenience)
+import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
+
+const file = fs.createReadStream('/home/john/sample.xlsx');
+
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        file: file,
+        contentType: MimeContentType_ExcelXlsx,
+        startingRow: 1,
+        quality: 'high',
+        deduplication: 'safe'
+    }, true);
+```
+
+Validating the email addresses of an Excel file in the browser follows a similar approach:
+
+```html
+<!-- This is the file input field in the HTML document -->
+<input id="file" type="file" placeholder="Upload a file to validate" />
+```
+```ts
+// Import the MIME content type for Excel files (just a string, for our convenience)
+import { MimeContentType_ExcelXlsx } from 'verifalia';
+
+const file = document.getElementById('file').files[0];
+
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        file: file,
+        contentType: MimeContentType_ExcelXlsx,
+        startingRow: 1,
+        quality: 'high',
+        deduplication: 'safe'
+    }, true);
+```
+
+## Retrieving a job and its results
 
 Once you have an email validation job Id, which is always returned by `submit()` as part of the validation's `overview` property, you can retrieve the job data using the `get()` method. Similarly to the submission process, you can either wait for the completion of the job here - by either specifying `true` or a `WaitingStrategy` instance as the second parameter - or just retrieve the current job snapshot to get its progress. Only completed jobs have their `entries` filled with the email validation results, however.
 
@@ -316,57 +368,6 @@ verifalia
 	.then(validation => {
 		// TODO: Let's party!
 	});
-```
-
-### How to submit a file for validation ###
-
-This library includes support for submitting and validating files with email addresses, including:
-- plain text files (.txt), with one email address per line;
-- comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files;
-- Microsoft Excel spreadsheets (.xls and .xlsx).
-
-To submit and validate files, one can still use the `submit()` method mentioned above, passing an object with a `file` field set to, respectively, either a `ReadStream` or a `Buffer` for Node.js and a `Blob` or a `File` for the browser. Along with that field, it is also possible to specify the eventual starting and ending rows to process, the column, the sheet index, the line ending and the delimiter - depending of course on the nature of the submitted file (see `FileValidationRequest` in the source to learn more).
-
-Here is how to validate the email address of an Excel file in Node.js, for example:
-
-```ts
-// Import the MIME content type for Excel files (just a string, for our convenience)
-import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
-
-const file = fs.createReadStream('/home/john/sample.xlsx');
-
-const validation = await verifalia
-    .emailValidations
-    .submit({
-        file: file,
-        contentType: MimeContentType_ExcelXlsx,
-        startingRow: 1,
-        quality: 'high',
-        deduplication: 'safe'
-    }, true);
-```
-
-Validating the email addresses of an Excel file in the browser follows a similar approach:
-
-```html
-<!-- This is the file input field in the HTML document -->
-<input id="file" type="file" placeholder="Upload a file to validate" />
-```
-```ts
-// Import the MIME content type for Excel files (just a string, for our convenience)
-import { MimeContentType_ExcelXlsx } from 'verifalia';
-
-const file = document.getElementById('file').files[0];
-
-const validation = await verifalia
-    .emailValidations
-    .submit({
-        file: file,
-        contentType: MimeContentType_ExcelXlsx,
-        startingRow: 1,
-        quality: 'high',
-        deduplication: 'safe'
-    }, true);
 ```
 
 ### How export a human-readable report of the verification result ###
