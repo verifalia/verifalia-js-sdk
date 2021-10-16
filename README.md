@@ -168,7 +168,7 @@ passphrase can be set via with the `passphrase` field.
 
 ```ts
 const verifalia = new VerifaliaRestClient({
-	cert: fs.readFileSync('/home/rmontagnani/my-client-certificate.pem'),
+    cert: fs.readFileSync('/home/rmontagnani/my-client-certificate.pem'),
     key: fs.readFileSync('/home/rmontagnani/my-client-certificate.key')
 });
 ```
