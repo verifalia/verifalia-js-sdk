@@ -1,3 +1,35 @@
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ * 
+ * Copyright (c) 2005-2021 Cobisi Research
+ * 
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 import { Authenticator } from "./security/Authenticator";
 import { RestClientFactory } from "./RestClientFactory";
 import { MultiplexedRestClient } from "./MultiplexedRestClient";
@@ -18,16 +50,19 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
     private _cachedRestClient: MultiplexedRestClient | undefined;
 
     private readonly _authenticator: Authenticator;
-    private _baseUris: string[];
+    private readonly _baseUris: string[];
 
     /**
      * Initializes a new HTTPS-based REST client for Verifalia with the specified authenticator.
      *
      * @param authenticator The authenticator used to invoke the Verifalia service.
+     * @param baseUris The base Verifalia API endpoints used to invoke the Verifalia service.
      */
     constructor(authenticator: Authenticator, baseUris: string[]) {
         if (!authenticator)
             throw new Error('authenticator is null');
+        if (!baseUris || baseUris.length < 1)
+            throw new Error('baseUris is null or has no items');
 
         this._authenticator = authenticator;
         this._baseUris = baseUris;

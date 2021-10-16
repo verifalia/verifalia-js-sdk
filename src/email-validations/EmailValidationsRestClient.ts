@@ -1,3 +1,35 @@
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ * 
+ * Copyright (c) 2005-2021 Cobisi Research
+ * 
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 import { RestClientFactory } from "../rest/RestClientFactory";
 import { Validation } from "./models/Validation";
 import { ValidationRequestEntry } from "./models/ValidationRequestEntry";
@@ -189,16 +221,23 @@ export class EmailValidationsRestClient {
      * file format. While the output schema (columns / labels / data format) is fairly complete, you
      * should always consider it as subject to change.
      * 
-     * Here is how to export a job in Microsoft Excel format and save it to a local file (Node.js only):
+     * Here is how to export a job in Microsoft Excel format:
      * ```ts
      * const verifalia = new VerifaliaRestClient(...);
      * 
-     * (
-     *     await verifalia
-     *         .emailValidations
-     *         .export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', 'application/vnd.ms-excel')
-     * )
-     * .pipe(fs.createWriteStream('my-list.xls'));
+     * const exportedData = await verifalia
+     *     .emailValidations
+     *     .export('dc21630a-6773-4bd0-b248-15e8b50c0d3e', MimeContentType_ExcelXlsx);
+     * 
+     * // Either save the spreadsheet to file (Node.js-only):
+     * 
+     * exportedData.pipe(fs.createWriteStream('/home/lbanfi/my-list.xls'));
+     * 
+     * // Or display it in an iframe (browser only):
+     * 
+     * document
+     *     .getElementByID('my-iframe')
+     *     .src = exportedData.toBlobURL(MimeContentType_ExcelXlsx);
      * ```
      * 
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
