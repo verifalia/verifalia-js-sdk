@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "description": "Verifalia email verification library for JavaScript: verify email addresses in real-time and check whether they are deliverable, invalid, or otherwise risky.",
     "homepage": "https://verifalia.com",
     "main": "node/cjs/index.js",
@@ -47,10 +47,8 @@
     "dependencies": {
         "abort-controller": "^3.0.0",
         "node-fetch": "^2.6.1",
-        "tslib": "^2.0.3"
-    },
-    "peerDependencies": {
-        "debug": "^4.1.1"
+        "tslib": "^2.0.3",
+        "form-data": "^3.0.0"
     },
     "bugs": {
         "url": "https://github.com/verifalia/verifalia-js-sdk/issues"
@@ -60,6 +58,7 @@
         "node": ">= 0.8.0"
     },
     "devDependencies": {
+        "debug": "^4.1.1",
         "@rollup/plugin-commonjs": "^11.0.2",
         "@rollup/plugin-json": "^4.0.2",
         "@rollup/plugin-node-resolve": "^7.1.1",
@@ -76,7 +75,6 @@
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jsdoc": "^30.7.8",
         "eslint-plugin-prefer-arrow": "^1.2.2",
-        "form-data": "^3.0.0",
         "genversion": "^2.2.0",
         "preprocess": "^3.2.0",
         "rimraf": "^3.0.2",
