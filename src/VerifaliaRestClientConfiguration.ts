@@ -56,7 +56,7 @@ export interface VerifaliaRestClientConfiguration {
      * The base API endpoints for the Verifalia service: do NOT set these unless you are instructed
      * to do so by the Verifalia support team.
      */
-    baseUris: string[];
+    baseUris?: string[];
 
     /* @if TARGET='node' */
 
@@ -69,7 +69,7 @@ export interface VerifaliaRestClientConfiguration {
      * same order as their private keys in key. If the intermediate certificates are not provided, the peer
      * will not be able to validate the certificate, and the handshake will fail.
      */
-    cert: string | Buffer | (string | Buffer)[];
+    cert?: string | Buffer | (string | Buffer)[];
 
     /**
      * This field is used only for client-certificate authentication.
@@ -79,13 +79,13 @@ export interface VerifaliaRestClientConfiguration {
      * The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be
      * decrypted with object.passphrase if provided, or options.passphrase if it is not.
      */
-    key: string | Buffer | (Buffer | KeyObject)[];
+    key?: string | Buffer | (Buffer | KeyObject)[];
 
     /**
      * This field is used only for client-certificate authentication.
      * Shared passphrase used for a single private key and/or a PFX.
      */
-    passphrase: string
+    passphrase?: string
     
     /* @endif */
 }
