@@ -78,6 +78,7 @@ export default [
             'url',
             'https',
             'zlib',
+            'whatwg-url', // Bogus dependency, used in node v0.x (but node-fetch v2.x does not support that old node version, as per its package.json!)
             ...isProduction
                 ? []
                 : ['debug']
@@ -173,6 +174,7 @@ export default [
             'url',
             'https',
             'zlib',
+            'whatwg-url', // Bogus dependency, used in node v0.x (but node-fetch v2.x does not support that old node version, as per its package.json!)
             ...isProduction
                 ? []
                 : ['debug']

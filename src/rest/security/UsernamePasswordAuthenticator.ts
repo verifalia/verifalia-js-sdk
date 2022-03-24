@@ -45,7 +45,7 @@ export class UsernamePasswordAuthenticator implements Authenticator {
     private _username: string;
     private _password: string;
 
-    constructor(username: string, password: string) {
+    constructor(username: string, password?: string) {
         if (!username && username.length === 0) {
             throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
         }
