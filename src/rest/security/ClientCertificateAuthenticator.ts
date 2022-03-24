@@ -45,7 +45,7 @@ import { KeyObject } from "tls";
 export class ClientCertificateAuthenticator implements Authenticator {
     private _agent: Agent;
 
-    constructor(cert: string | Buffer | (string | Buffer)[], key: string | Buffer | (Buffer | KeyObject)[], passphrase: string) {
+    constructor(cert: string | Buffer | (string | Buffer)[], key: string | Buffer | (Buffer | KeyObject)[], passphrase?: string) {
         if (!cert) {
             throw Error('Invalid client certificate chain.');
         }

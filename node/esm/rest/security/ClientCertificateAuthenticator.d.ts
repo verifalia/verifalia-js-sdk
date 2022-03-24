@@ -40,7 +40,7 @@ import { KeyObject } from "tls";
  */
 export declare class ClientCertificateAuthenticator implements Authenticator {
     private _agent;
-    constructor(cert: string | Buffer | (string | Buffer)[], key: string | Buffer | (Buffer | KeyObject)[], passphrase: string);
+    constructor(cert: string | Buffer | (string | Buffer)[], key: string | Buffer | (Buffer | KeyObject)[], passphrase?: string);
     decorateRequest(restClient: MultiplexedRestClient, requestInit: NodeRequestInit): Promise<void>;
 }
 //# sourceMappingURL=ClientCertificateAuthenticator.d.ts.map

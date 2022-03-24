@@ -46,12 +46,12 @@ export interface VerifaliaRestClientConfiguration {
      * (formerly known as sub-accounts) with just the required permissions, for improved security.
      * To create a new user or manage existing ones, please visit https://verifalia.com/client-area#/users
      */
-    password: string;
+    password?: string;
     /**
      * The base API endpoints for the Verifalia service: do NOT set these unless you are instructed
      * to do so by the Verifalia support team.
      */
-    baseUris: string[];
+    baseUris?: string[];
     /**
      * This field is used only for client-certificate authentication.
      * Cert chains in PEM format. One cert chain should be provided per private key. Each cert chain should
@@ -61,7 +61,7 @@ export interface VerifaliaRestClientConfiguration {
      * same order as their private keys in key. If the intermediate certificates are not provided, the peer
      * will not be able to validate the certificate, and the handshake will fail.
      */
-    cert: string | Buffer | (string | Buffer)[];
+    cert?: string | Buffer | (string | Buffer)[];
     /**
      * This field is used only for client-certificate authentication.
      * Private keys in PEM format. PEM allows the option of private keys being encrypted. Encrypted keys will
@@ -70,11 +70,11 @@ export interface VerifaliaRestClientConfiguration {
      * The object form can only occur in an array. object.passphrase is optional. Encrypted keys will be
      * decrypted with object.passphrase if provided, or options.passphrase if it is not.
      */
-    key: string | Buffer | (Buffer | KeyObject)[];
+    key?: string | Buffer | (Buffer | KeyObject)[];
     /**
      * This field is used only for client-certificate authentication.
      * Shared passphrase used for a single private key and/or a PFX.
      */
-    passphrase: string;
+    passphrase?: string;
 }
 //# sourceMappingURL=VerifaliaRestClientConfiguration.d.ts.map

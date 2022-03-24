@@ -143,7 +143,7 @@ export class VerifaliaRestClient {
             baseUris = config.baseUris ?? this._baseUris;
         }
         /* @if TARGET='node' */
-        else if (config.cert) {
+        else if (config.cert && config.key) {
             // X.509 client certificate authentication (Node.js only)
 
             authenticator = new ClientCertificateAuthenticator(config.cert, config.key, config.passphrase);

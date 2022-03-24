@@ -50,7 +50,7 @@ export interface VerifaliaRestClientConfiguration {
      * (formerly known as sub-accounts) with just the required permissions, for improved security.
      * To create a new user or manage existing ones, please visit https://verifalia.com/client-area#/users
      */
-    password: string;
+    password?: string;
 
     /**
      * The base API endpoints for the Verifalia service: do NOT set these unless you are instructed
