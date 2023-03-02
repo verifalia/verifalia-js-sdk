@@ -1,10 +1,50 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.3-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.4-green)
 [![NPM](https://img.shields.io/npm/v/verifalia.svg)](https://www.npmjs.com/package/verifalia)
 
 Verifalia REST API - SDK and helper library for Javascript
 ==========================================================
 
-[Verifalia][0] provides a fast and accurate API for verifying email addresses in real-time and checking whether they are deliverable, invalid, or otherwise risky: this SDK library integrates with Verifalia and allows to [verify email addresses][0] on Node.js backends and in the browser. It includes artifacts for a wide range of module loaders, including CommonJS (suitable for Node.js) and native ES modules (ideal for modern front-end module bundlers like Webpack and Rollup, for front-end frameworks like Angular, React, Vue, etc. - and supported in Node.js v13+); it also comes with a turn-key single-file IIFE for browsers (compatible with ES5 or higher), with no external dependencies.
+[Verifalia][0] provides a fast and accurate API for verifying email addresses in real-time and checking whether they are deliverable, invalid, or otherwise risky: this SDK library integrates with Verifalia and allows to [verify email addresses][0] on both Node.js backends and in the browser. 
+
+It includes artifacts for a wide range of module loaders, including CommonJS (suitable for Node.js) and native ES modules (ideal for modern front-end module bundlers like Webpack and Rollup, for front-end frameworks like Angular, React, Vue, etc. - and supported in Node.js v13+); it also comes with a turn-key single-file IIFE for browsers (compatible with ES5 or higher), with no external dependencies.
+
+To learn more about Verifalia please see [https://verifalia.com][0]
+
+## Table of contents
+
+- [Getting started](#getting-started)
+  * [Install the package](#install-the-package)
+  * [Using Verifalia in Node.js](#using-verifalia-in-nodejs)
+    + [CommonJS (default in Node.js)](#commonjs--default-in-nodejs-)
+    + [ES modules (available in Node.js v13 and higher)](#es-modules--available-in-nodejs-v13-and-higher-)
+  * [Using Verifalia in the browser](#using-verifalia-in-the-browser)
+    + [ES modules (ideal for: Webpack, Rollup, ..., Angular, React, Vue, ...)](#es-modules--ideal-for--webpack--rollup----angular--react--vue---)
+    + [CommonJS](#commonjs)
+    + [AMD](#amd)
+    + [IIFE (single-file, which can be directly included in web-pages as is)](#iife--single-file--which-can-be-directly-included-in-web-pages-as-is-)
+  * [Authentication](#authentication)
+    + [Browser apps' keys](#browser-apps--keys)
+    + [Authenticating via X.509 client certificate (Node-only)](#authenticating-via-x509-client-certificate--node-only-)
+- [Validating email addresses](#validating-email-addresses)
+  * [How to validate an email address](#how-to-validate-an-email-address)
+  * [How to validate a list of email addresses](#how-to-validate-a-list-of-email-addresses)
+  * [How to import and submit a file for validation](#how-to-import-and-submit-a-file-for-validation)
+  * [Processing options](#processing-options)
+    + [Quality level](#quality-level)
+    + [Deduplication mode](#deduplication-mode)
+    + [Data retention](#data-retention)
+    + [Wait options](#wait-options)
+      - [Avoid waiting](#avoid-waiting)
+      - [Progress tracking](#progress-tracking)
+    + [Completion callbacks](#completion-callbacks)
+  * [Retrieving a job and its results](#retrieving-a-job-and-its-results)
+  * [Exporting email verification results in different output formats](#exporting-email-verification-results-in-different-output-formats)
+  * [Don't forget to clean up, when you are done](#don-t-forget-to-clean-up--when-you-are-done)
+- [Managing credits](#managing-credits)
+  * [Getting the credits balance](#getting-the-credits-balance)
+  * [Retrieving credits usage statistics](#retrieving-credits-usage-statistics)
+- [Changelog / What's new](#changelog---what-s-new)
+  * [v4.0](#v40)
 
 # Getting started #
 
@@ -117,7 +157,7 @@ While we always recommend using a module loader for a much better performance an
 
 			verifalia
 				.emailValidations
-				.submit('batman@gmail.com', true)
+				.submit('batman@gmail.com')
 				.then(result => {
 					console.log('Here is the validation result', result);
 				});
@@ -175,74 +215,81 @@ const verifalia = new VerifaliaRestClient({
 
 # Validating email addresses #
 
-Every operation related to verifying / validating email addresses is performed through the `emailValidations` property exposed by the `VerifaliaRestClient` instance you created above. The property contains references to methods which can be used to verify email addresses and manage past validation jobs, as explained below.
+Every operation related to verifying / validating email addresses is performed through the `emailValidations` property exposed by the `VerifaliaRestClient` instance you created above. The property contains references to methods which can be used to verify email addresses and manage past emaiil validation jobs, as explained below.
+
+**The library automatically waits for the completion of email verification jobs**: if needed, it is possible to adjust the wait options and have more control over the entire underlying polling process. Please refer to the [Wait options](#wait-options) section below for additional details.
 
 ## How to validate an email address ##
 
 To validate an email address you can invoke the `submit()` method: it accepts one or more email addresses and any eventual verification options you wish to pass to Verifalia, including the expected results quality, deduplication preferences and processing priority.
 
-In the next example, you can see how to verify a single email address using this library: we automatically wait for the validation completion by passing a `true` value as the second parameter. For more advanced waiting scenarios and progress notifications, you can also pass an instance of the `WaitingStrategy` class.
+> **Note**
+> In the event you need to verify a list of email addresses, it is advisable to submit them all at once through an
+> array of strings or through a `ValidationRequest` / `FileValidationRequest` object (see the next sections), instead of iterating over the
+> source set and submitting the addresses one by one. Not only the all-at-once method would be faster, it would
+> also allow to detect and mark duplicated items - a feature which is unavailable while verifying the email addresses
+> one by one.
 
-Here is the example, using the async/await syntax:
+In the next example, you can see how to verify an email address using the default options, with the async/await pattern;
+for more advanced waiting scenarios and progress tracking, you can also pass an instance of the `WaitOptions` class.
 
 ```ts
-const validation = await verifalia
+const result = await verifalia
     .emailValidations
-    .submit('batman@gmail.com', true);
+    .submit('batman@gmail.com');
 
 // At this point the address has been validated: let's print
 // its email validation result to the console.
 
-const entry = validation.entries[0];
-console.log(entry.inputData, entry.classification, entry.status);
+const entry = result.entries[0];
+console.log(`${entry.classification} (${entry.status})`);
 
 // Prints out something like:
-// batman@gmail.com Deliverable Success
+// Deliverable (Success)
 ```
 
-And here is the same example, using the promise callback syntax:
+Of course, you can use the promise callback pattern if your platform does not support the async/await pattern:
 
 ```ts
 verifalia
     .emailValidations
-    .submit('batman@gmail.com', true)
-    .then(validation => {
+    .submit('batman@gmail.com')
+    .then(result => {
         // At this point the address has been validated: let's print
         // its email validation result to the console.
 
-        const entry = validation.entries[0];
-        console.log(entry.inputData, entry.classification, entry.status);
+        const entry = result.entries[0];
+        console.log(`${entry.classification} (${entry.status})`);
 
         // Prints out something like:
-        // batman@gmail.com Deliverable Success
+        // Deliverable (Success)
     });
 ```
 
 ## How to validate a list of email addresses ##
 
-As an alternative to method above you can avoid automatically waiting and, instead, poll and retrieve the email validation results at a later time; this is preferred in the event you are verifying a list of email addresses, which could take minutes or even hours to complete. Note that the same `submit()` method is used to submit a single email address as well as multiple email addresses for validation, based on the type of the parameter.
+To verify a list of email addresses - instead of a single address - it is possible to pass an array of strings
+to `submit()`; if the email addresses to be verified are originally stored
+in a file, it is also possible to simply upload the file and have Verifalia automatically import and verify
+it (see the next section for the details).
 
-Here is how to submit some email addresses for validation, without waiting for the actual job completion, using the async/await syntax:
+Here is an example showing how to verify an array with some email addresses, using the async/await pattern:
 
 ```ts
-// Submit the list first
-
-const validation = await verifalia
+const result = await verifalia
     .emailValidations
     .submit([{
-        "batman@gmail.com",
-        "steve.vai@best.music",
-        "samantha42@yahoo.de"
+        'batman@gmail.com',
+        'steve.vai@best.music',
+        'samantha42@yahoo.de'
     }]);
 
-console.log(`Job Id: ${validation.overview.id}`);
-console.log(`Status: ${validation.overview.status}`);
-
-// 'Job Id: 290b5146-eeac-4a2b-a9c1-61c7e715f2e9'
-// 'Status InProgress'
+result.entries.forEach((item) => {
+    console.log(`${item.inputData}: ${item.classification}`);
+});
 ```
 
-And here is the promise callback syntax:
+And here, of course, the promise callback syntax version of the same:
 
 ```ts
 // Submit the list first
@@ -250,21 +297,18 @@ And here is the promise callback syntax:
 verifalia
     .emailValidations
     .submit([{
-        "batman@gmail.com",
-        "steve.vai@best.music",
-        "samantha42@yahoo.de"
+        'batman@gmail.com',
+        'steve.vai@best.music',
+        'samantha42@yahoo.de'
     }])
-    .then(validation => {
-        console.log(`Job Id: ${validation.overview.id}`);
-        console.log(`Status: ${validation.overview.status}`);
-
-        // 'Job Id: 290b5146-eeac-4a2b-a9c1-61c7e715f2e9'
-        // 'Status InProgress'
+    .then(result => {
+        result.entries.forEach((item) => {
+            console.log(`${item.inputData}: ${item.classification}`);
+        });
     });
 ```
 
-
-### How to submit a file for validation ###
+## How to import and submit a file for validation
 
 This library includes support for submitting and validating files with email addresses, including:
 - plain text files (.txt), with one email address per line;
@@ -281,7 +325,7 @@ import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
 
 const file = fs.createReadStream('/home/john/sample.xlsx');
 
-const validation = await verifalia
+const result = await verifalia
     .emailValidations
     .submit({
         file: file,
@@ -289,7 +333,7 @@ const validation = await verifalia
         startingRow: 1,
         quality: 'high',
         deduplication: 'safe'
-    }, true);
+    });
 ```
 
 Validating the email addresses of an Excel file in the browser follows a similar approach:
@@ -304,7 +348,7 @@ import { MimeContentType_ExcelXlsx } from 'verifalia';
 
 const file = document.getElementById('file').files[0];
 
-const validation = await verifalia
+const result = await verifalia
     .emailValidations
     .submit({
         file: file,
@@ -312,65 +356,203 @@ const validation = await verifalia
         startingRow: 1,
         quality: 'high',
         deduplication: 'safe'
-    }, true);
+    });
 ```
+
+## Processing options
+
+While submitting one or more email addresses for verification, it is possible to specify several
+options which affect the behavior of the Verifalia processing engine as well as the verification flow
+from the API consumer standpoint.
+
+### Quality level
+
+Verifalia offers three distinct quality levels - namely, _Standard_, _High_ and _Extreme_  - which rule out how the email verification engine should
+deal with temporary undeliverability issues, with slower mail exchangers and other potentially transient
+problems which can affect the quality of the verification results. The `submit()` method accepts a `ValidationRequest` (or
+a `FileValidationRequest`, for file imports), where the `quality` field allows
+to specify the desired quality level; here is an example showing how to verify an email address using
+the _High_ quality level:
+
+```ts
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        entries: [
+            {
+                inputData: 'batman@gmail.com'
+            }
+        ],
+        quality: 'high'
+    });
+```
+
+### Deduplication mode
+
+`ValidationRequest` (or `FileValidationRequest`, for file imports) also allows to specify how to
+deal with duplicated entries pertaining to the same input set; Verifalia supports a _Safe_ deduplication
+mode, which strongly adheres to the old IETF standards, and a _Relaxed_ mode which is more in line with
+what can be found in the majority of today's mail exchangers configurations.
+
+In the next example, we show how to import and verify a list of email addresses in Node.js and mark duplicated
+entries using the _Relaxed_ deduplication mode:
+
+```ts
+import { MimeContentType_ExcelXlsx } from 'verifalia/node/esm/index.mjs';
+
+const file = fs.createReadStream('/home/john/sample.xlsx');
+
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        file: file,
+        contentType: MimeContentType_ExcelXlsx,
+        startingRow: 1,
+        quality: 'high',
+        deduplication: 'relaxed'
+    });
+```
+
+### Data retention
+
+Verifalia automatically deletes completed email verification jobs according to the data retention
+policy defined at the account level, which can be eventually overriden at the user level: one can
+use the [Verifalia clients area](https://verifalia.com/client-area) to configure these settings.
+
+It is also possible to specify a per-job data retention policy which govern the time to live of a submitted
+email verification job; to do that, specify a `retention` value through the passed `ValidationRequest` (or `FileValidationRequest`, for file imports) instance.
+
+Here is how, for example, one can set a data retention policy of 10 minutes while verifying
+an email address:
+
+```ts
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        entries: [
+            {
+                inputData: 'batman@gmail.com'
+            }
+        ],
+        retention: '0:10:0' // 10 minutes
+    });
+```
+
+### Wait options
+
+By default, the `submit()` method submits an email verification job to Verifalia and waits
+for its completion; the entire process may require some time to complete depending on the plan of the
+Verifalia account, the number of email addresses the submission contains, the specified quality level
+and other network factors including the latency of the mail exchangers under test. 
+
+In waiting for the completion of a given email verification job, the library automatically polls the
+underlying Verifalia API until the results are ready; by default, it tries to take advantage of the long
+polling mode introduced with the Verifalia API v2.4, which allows to minimize the number of requests
+and get the verification results faster.
+
+#### Avoid waiting
+
+In certain scenarios (in a microservice architecture, for example), however, it may preferable to avoid
+waiting for a job completion and ask the Verifalia API, instead, to just queue it: in that case, the library
+would just return the job overview (and not its verification results) and it will be necessary to retrieve
+the verification results using the `get()` method.
+
+To do that, it is possible to specify the `WaitOptions.noWait` as the value for the `waitOptions` field
+of the passed `ValidationRequest` (or `FileValidationRequest`, for file imports) instance, as shown in
+the next example:
+
+```ts
+const job = await verifalia
+    .emailValidations
+    .submit('batman@gmail.com', WaitOptions.noWait);
+
+console.log(`Status: ${job.Overview.Status}`);
+// Status: InProgress
+```
+
+#### Progress tracking
+
+For jobs with a large number of email addresses, it could be useful to track progress as they are processed
+by the Verifalia email verification engine; to do that, it is possible to create an instance of the
+`WaitOptions` class and provide an handler which eventually receives progress notifications through the
+`progress` field.
+
+Here is how to define a progress notification handler which displays the progress percentage of a submitted
+job to the console window:
+
+```ts
+const result = await verifalia
+    .emailValidations
+    .submit([{
+        'batman@gmail.com',
+        'steve.vai@best.music',
+        'samantha42@yahoo.de'
+    }], {
+        ...new WaitOptions(),
+        progress: jobOverview => {
+            console.log(`% completed: ${jobOverview.progress?.percentage * 100}`);
+        }
+    });
+```
+
+### Completion callbacks
+
+Along with each email validation job, it is possible to specify an URL which
+Verifalia will invoke (POST) once the job completes: this URL must use the HTTPS or HTTP
+scheme and be publicly accessible over the Internet.
+To learn more about completion callbacks, please see https://verifalia.com/developers#email-validations-completion-callback
+
+To specify a completion callback URL, pass either a `ValidationRequest` or a `FileValidationRequest`
+to the `submit()` method and set its `callback.url` field accordingly, as shown
+in the example below:
+
+```ts
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        entries: [
+            {
+                inputData: 'batman@gmail.com'
+            }
+        ],
+        callback: {
+            url: 'https://your-website-here/foo/bar'
+        }
+    });
+```
+
+Note that completion callbacks are invoked asynchronously and it could take up to
+several seconds for your callback URL to get invoked.
+
 
 ## Retrieving a job and its results
 
-Once you have an email validation job Id, which is always returned by `submit()` as part of the validation's `overview` property, you can retrieve the job data using the `get()` method. Similarly to the submission process, you can either wait for the completion of the job here - by either specifying `true` or a `WaitingStrategy` instance as the second parameter - or just retrieve the current job snapshot to get its progress. Only completed jobs have their `entries` filled with the email validation results, however.
+It is possible to retrieve a job through the `get()` method, passing the required email verification job identifer.
+While doing that, the library automatically waits for the completion of
+the job, and it is possible to adjust this behavior by passing to the aforementioned methods
+a `waitOptions` parameter, in the exactly same fashion as described for the `submit()` method; please see
+the [Wait options](#wait-options) section for additional details.
 
-In the following example, we are requesting the current snapshot of a given email validation job from Verifalia.
-Async/await syntax:
+In the next example, you can see how to retrieve an email verification job using the default options, with the async/await pattern:
 
 ```ts
 const validation = await verifalia
     .emailValidations
     .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9');
-
-if (validation.overview.status === ValidationStatus.Completed) {
-    // validation.entries will have the validation results!
-}
-else {
-    // What about having a coffee?
-}
 ```
 
-And using the promise callback syntax:
+And here is the same code, using the promise callback syntax:
 
 ```ts
 verifalia
     .emailValidations
     .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9')
     .then(validation => {
-		if (validation.overview.status === ValidationStatus.Completed) {
-            // validation.entries will have the validation results!
-		}
-		else {
-            // What about having a coffee?
-        }
+        // ...
     });
 ```
 
-And here is how to request the same job, asking the library to automatically wait for us until the job is completed (that is, _joining_ the job). Here with the async/await syntax:
-
-```ts
-const validation = await verifalia
-    .emailValidations
-    .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9', true);
-```
-
-And here using the promise callback syntax:
-
-```ts
-verifalia
-    .emailValidations
-    .get('290b5146-eeac-4a2b-a9c1-61c7e715f2e9', true)
-    .then(validation => {
-        // TODO: Let's party!
-    });
-```
-
-### How export a human-readable report of the verification result ###
+## Exporting email verification results in different output formats
 
 Once an email verification job is completed, it is also possible to retrieve a human-readable report of its results as either a comma-separated values (.csv) file or as a Microsoft Excel spreadsheet (.xls and .xlsx supported). While the output schema (columns / labels / data format) of the exported results is fairly mature and complete, you should consider it as subject to change: always [retrieve your results data using the `get()` method as explained above](#retrieving-a-job-and-its-results) if you need to deal with it in an unmanned way.
 
@@ -405,10 +587,12 @@ const exportedData = await verifalia
 target.src = exportedData.toBlobURL(MimeContentType_TextCsv);
 ```
 
-## Don't forget to clean up, when you are done ##
+## Don't forget to clean up, when you are done
 
 Verifalia automatically deletes completed jobs after the data retention period eventually specified along with the submission options, falling back to the configured data retention period of the submitting user / browser app and, should it be unset, to the configured data retention period of the Verifalia account, with a default of 30 days.
-It is always possible to delete completed jobs at any time, however, and deleting completed jobs is a best practice, for privacy and security reasons. To delete a completed email validation job, you can invoke the `delete()` method passing the job Id you wish to get rid of. Here is an example showing how to do that using the async/await syntax:
+It is always possible to delete completed jobs at any time, however, and deleting completed jobs is a best practice, for privacy and security reasons.
+
+To delete a completed email validation job, you can invoke the `delete()` method passing the job Id you wish to get rid of. Here is an example showing how to do that using the async/await syntax:
 
 ```ts
 await verifalia
@@ -427,7 +611,7 @@ verifalia
     });
 ```
 
-Once deleted, a job is gone and there is no way to retrieve its email validation(s).
+Once deleted, a job is gone and there is no way to retrieve its email validation results.
 
 # Managing credits #
 
@@ -442,9 +626,9 @@ const balance = await verifalia
     .credits
     .getBalance();
 
-console.log('Credit packs', balance.creditPacks);
-console.log('Free daily credits', balance.freeCredits);
-console.log('Free daily credits will reset in', balance.freeCreditsResetIn);
+console.log(`Credit packs ${balance.creditPacks}`);
+console.log(`Free daily credits ${balance.freeCredits}`);
+console.log(`Free daily credits will reset in ${balance.freeCreditsResetIn}`);
 
 // Credit packs 956.332
 // Free daily credits 128.66
@@ -464,7 +648,7 @@ const dailyUsages = verifalia
     .credits
     .listDailyUsages({
         // from, to
-        dateFilter = new DateBetweenPredicate(new Date('2021-10-09'), new Date('2021-11-08'))
+        dateFilter = new DateBetweenPredicate(new Date('2023-01-09'), new Date('2023-03-01'))
     });
 
 for await (const dailyUsage of dailyUsages) {
@@ -474,17 +658,36 @@ for await (const dailyUsage of dailyUsages) {
 }
 
 // Prints out something like:
-// Sat Oct 10 2021
+// Sat Jan 10 2023
 //     Credit packs 1965.68
 //     Free daily credits 200
-// Mon Oct 12 2021
+// Mon Jan 12 2023
 //     Credit packs 0
 //     Free daily credits 185.628
-// Tue Oct 13 2021
+// Tue Jan 13 2023
 //     Credit packs 15.32
 //     Free daily credits 200
 // ...
 ```
+
+# Changelog / What's new
+
+This section lists the changelog for the current major version of the library: for older versions,
+please see the [project releases](https://github.com/verifalia/verifalia-js-sdk/releases).
+
+## v4.0
+
+Released on March 3<sup>rd</sup>, 2023
+
+- Added support for API v2.4
+- Added support for new completion callback options
+- Added support for parked mail exchangers detection
+- Added support for specifying a custom wait time while submitting and retrieving email verification jobs
+- Breaking change: renamed `WaitingStrategy` into `WaitOptions` and refactored the latter so that it now allows to
+adjust the underlying polling wait times
+- Breaking change: the default job submission and retrieval behavior is now to wait for the completion
+of jobs (but it is possible to change that through the new `WaitOptions` class)
+- Improved documentation
 
 [0]: https://verifalia.com
 [2]: https://verifalia.com/developers#authentication

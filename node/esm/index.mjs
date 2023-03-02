@@ -3844,18 +3844,27 @@ const formatDateToIso8601 = (date) => {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-class DateEqualityPredicate extends DateFilterPredicate {
-    constructor(date) {
+class DateBetweenPredicate extends DateFilterPredicate {
+    constructor(since, until) {
         super();
-        this.date = date;
+        this.since = since;
+        this.until = until;
     }
     serialize(fieldName) {
-        return [
-            {
-                key: fieldName,
-                value: `${formatDateToIso8601(this.date)}`
-            }
-        ];
+        const fragments = [];
+        if (this.since) {
+            fragments.push({
+                key: `${fieldName}:since`,
+                value: formatDateToIso8601(this.since)
+            });
+        }
+        if (this.until) {
+            fragments.push({
+                key: `${fieldName}:until`,
+                value: formatDateToIso8601(this.until)
+            });
+        }
+        return fragments;
     }
 }
 
@@ -3890,27 +3899,18 @@ class DateEqualityPredicate extends DateFilterPredicate {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-class DateBetweenPredicate extends DateFilterPredicate {
-    constructor(since, until) {
+class DateEqualityPredicate extends DateFilterPredicate {
+    constructor(date) {
         super();
-        this.since = since;
-        this.until = until;
+        this.date = date;
     }
     serialize(fieldName) {
-        const fragments = [];
-        if (this.since) {
-            fragments.push({
-                key: `${fieldName}:since`,
-                value: formatDateToIso8601(this.since)
-            });
-        }
-        if (this.until) {
-            fragments.push({
-                key: `${fieldName}:until`,
-                value: formatDateToIso8601(this.until)
-            });
-        }
-        return fragments;
+        return [
+            {
+                key: fieldName,
+                value: `${formatDateToIso8601(this.date)}`
+            }
+        ];
     }
 }
 

@@ -67,6 +67,7 @@ declare type PartialValidation = {
 
 /**
  * Submits a new email validation for processing.
+ * 
  * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
  * to request a different waiting behavior.
  * This function returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
@@ -252,6 +253,7 @@ async function handleSubmitResponse(restClientFactory: RestClientFactory,
 
 /**
  * Returns an email validation job previously submitted for processing.
+ * 
  * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
  * to request a different waiting behavior.
  * This function can be cancelled through a `CancellationToken`.
@@ -309,6 +311,7 @@ export async function getEmailValidation(restClientFactory: RestClientFactory,
  * with the goal of generating a human-readable representation of the results according to the
  * requested output file format. While the output schema (columns / labels / data format) is fairly
  * complete, you should always consider it as subject to change.
+ * 
  * This function can be cancelled through a `CancellationToken`.
  * 
  * @param id The ID of the email validation job to retrieve.
@@ -477,6 +480,7 @@ async function waitValidationForCompletion(restClientFactory: RestClientFactory,
 /**
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
+ * 
  * This function can be cancelled through a `CancellationToken`.
  *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.

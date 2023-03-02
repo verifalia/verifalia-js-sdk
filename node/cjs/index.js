@@ -5009,22 +5009,31 @@ var formatDateToIso8601 = function (date) {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var DateEqualityPredicate = /** @class */ (function (_super) {
-    tslib.__extends(DateEqualityPredicate, _super);
-    function DateEqualityPredicate(date) {
+var DateBetweenPredicate = /** @class */ (function (_super) {
+    tslib.__extends(DateBetweenPredicate, _super);
+    function DateBetweenPredicate(since, until) {
         var _this = _super.call(this) || this;
-        _this.date = date;
+        _this.since = since;
+        _this.until = until;
         return _this;
     }
-    DateEqualityPredicate.prototype.serialize = function (fieldName) {
-        return [
-            {
-                key: fieldName,
-                value: "" + formatDateToIso8601(this.date)
-            }
-        ];
+    DateBetweenPredicate.prototype.serialize = function (fieldName) {
+        var fragments = [];
+        if (this.since) {
+            fragments.push({
+                key: fieldName + ":since",
+                value: formatDateToIso8601(this.since)
+            });
+        }
+        if (this.until) {
+            fragments.push({
+                key: fieldName + ":until",
+                value: formatDateToIso8601(this.until)
+            });
+        }
+        return fragments;
     };
-    return DateEqualityPredicate;
+    return DateBetweenPredicate;
 }(DateFilterPredicate));
 
 /**
@@ -5058,31 +5067,22 @@ var DateEqualityPredicate = /** @class */ (function (_super) {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var DateBetweenPredicate = /** @class */ (function (_super) {
-    tslib.__extends(DateBetweenPredicate, _super);
-    function DateBetweenPredicate(since, until) {
+var DateEqualityPredicate = /** @class */ (function (_super) {
+    tslib.__extends(DateEqualityPredicate, _super);
+    function DateEqualityPredicate(date) {
         var _this = _super.call(this) || this;
-        _this.since = since;
-        _this.until = until;
+        _this.date = date;
         return _this;
     }
-    DateBetweenPredicate.prototype.serialize = function (fieldName) {
-        var fragments = [];
-        if (this.since) {
-            fragments.push({
-                key: fieldName + ":since",
-                value: formatDateToIso8601(this.since)
-            });
-        }
-        if (this.until) {
-            fragments.push({
-                key: fieldName + ":until",
-                value: formatDateToIso8601(this.until)
-            });
-        }
-        return fragments;
+    DateEqualityPredicate.prototype.serialize = function (fieldName) {
+        return [
+            {
+                key: fieldName,
+                value: "" + formatDateToIso8601(this.date)
+            }
+        ];
     };
-    return DateBetweenPredicate;
+    return DateEqualityPredicate;
 }(DateFilterPredicate));
 
 /**
