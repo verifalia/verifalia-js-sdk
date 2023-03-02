@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -33,7 +33,7 @@
 import { VerifaliaError } from "./VerifaliaError";
 
 /**
- * Thrown whenever an async method is canceled.
+ * Thrown whenever an async function is canceled.
  */
 export class OperationCanceledError extends VerifaliaError {
     /**

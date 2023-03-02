@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -41,17 +41,48 @@ const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?
 type ProgressCallback = (value: ValidationOverview) => void;
 
 /**
- * Defines a strategy used to wait for the completion of an email verification job in Verifalia.
+ * Provides optional configuration settings for waiting on the completion of an email validation job.
  */
-export class WaitingStrategy {
-    public waitForCompletion: boolean;
-    public progress: ProgressCallback | null;
+export class WaitOptions {
+    /**
+     * Indicates that the library should automatically wait for the email validation to complete, using
+     * the default wait times.
+     */
+    public static default: WaitOptions = new WaitOptions();
 
-    constructor(waitForCompletion: boolean, progress: ProgressCallback | null = null) {
-        this.waitForCompletion = waitForCompletion;
-        this.progress = progress;
-    }
+    /**
+     * Indicates that the library should not wait for the email validation to complete.
+     */
+    public static noWait: WaitOptions = (() => {
+        const result = new WaitOptions();
+        result.submissionWaitTime = 0;
+        result.pollWaitTime = 0;
+        return result;
+    })();
 
+    /**
+     * If set, defines a function which receives completion progress updates for an email validation job.
+     */
+    public progress: ProgressCallback | null = null;
+
+    /**
+     * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+     * during the initial job submission request. Expressed in milliseconds, with a default of 30 seconds.
+     */
+    public submissionWaitTime: number = 30 * 1000;
+
+    /**
+     * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+     * during any of the polling requests. Expressed in milliseconds, with a default of 30 seconds.
+     */
+    public pollWaitTime: number = 30 * 1000;
+
+    /**
+     * Waits for the next polling interval of the specified validationOverview.
+     * 
+     * @param validationOverview The validation overview to wait against.
+     * @param cancellationToken The eventual cancellation token for the waiting.
+     */
     public async waitForNextPoll(validationOverview: ValidationOverview, cancellationToken?: CancellationToken): Promise<void> {
         // Throws in the event the user requested to cancel a pending waiting
 

@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -84,6 +84,21 @@ export interface ValidationSettings {
          * The URL of the endpoint which will receive the job completion notification callback.
          */
         url: string;
+        /**
+         * An optional string which defines the callback schema our dispatcher must obey when invoking
+         * the provided callback URL. Valid values are:
+         * - `1.0` the callback includes the completed job ID
+         * - `1.1` everything included with `1.0` plus the job name
+         * If not specified, Verifalia will use the most recent schema available at the time the used API
+         * version was released.
+         */
+        version?: string;
+        /**
+         * An optional boolean which allows to skip the server certificate validation for the external
+         * callback server, useful for testing purposes at development time when the callback server is
+         * using a self-signed certificate.
+         */
+        skipServerCertificateValidation?: boolean;
     };
 }
 //# sourceMappingURL=ValidationSettings.d.ts.map

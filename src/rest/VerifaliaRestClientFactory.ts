@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -45,7 +45,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
      */
-    public apiVersion = 'v2.3';
+    public apiVersion = 'v2.4';
 
     private _cachedRestClient: MultiplexedRestClient | undefined;
 

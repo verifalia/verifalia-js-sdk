@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -34,26 +34,26 @@ import { RestClientFactory } from "../../rest/RestClientFactory";
 import { Validation } from "../models/Validation";
 import { ValidationRequestEntry } from "../models/ValidationRequestEntry";
 import { ValidationRequest } from "../models/ValidationRequest";
-import { WaitingStrategy } from "../WaitingStrategy";
+import { WaitOptions } from "../WaitOptions";
 import { ValidationOverview } from "../models/ValidationOverview";
 import { CancellationToken } from "../../common/CancellationToken";
 import { FileValidationRequest } from "../models/FileValidationRequest";
 import { ValidationOverviewListingOptions } from "../models/ValidationOverviewListingOptions";
 import { Stream } from "stream";
 /**
- * Submits a new email validation for processing. By default, this method does not wait for
- * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
- * until the job is completed) to request a different waiting behavior.
- * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+ * Submits a new email validation for processing.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
  *
  * @param request An object with one or more email addresses to validate. Can be of type string, string[],
  * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the
- * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
- * advanced scenarios and progress tracking.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-export declare function submitEmailValidation(restClientFactory: RestClientFactory, request: string | string[] | ValidationRequestEntry | ValidationRequestEntry[] | ValidationRequest, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null>;
+export declare function submitEmailValidation(restClientFactory: RestClientFactory, request: string | string[] | ValidationRequestEntry | ValidationRequestEntry[] | ValidationRequest, waitOptions?: WaitOptions | null, cancellationToken?: CancellationToken): Promise<Validation | null>;
 /**
  * Submits a new email validation for processing through a file, with support for the following
  * formats:
@@ -61,36 +61,37 @@ export declare function submitEmailValidation(restClientFactory: RestClientFacto
  * - comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files
  * - Microsoft Excel spreadsheets (.xls and .xlsx)
  *
- * By default, this method does not wait for the completion of the email validation job: pass a
- * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
- * This method can be cancelled through a `CancellationToken`.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param request An object with the file which includes the email addresses to validate and its processing
  * options. Must be of type `FileValidationRequest`.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the
- * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
- * advanced scenarios and progress tracking.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-export declare function submitEmailValidationFile(restClientFactory: RestClientFactory, request: FileValidationRequest, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null>;
+export declare function submitEmailValidationFile(restClientFactory: RestClientFactory, request: FileValidationRequest, waitOptions?: WaitOptions | null, cancellationToken?: CancellationToken): Promise<Validation | null>;
 /**
- * Returns an email validation job previously submitted for processing. By default, this method does
- * not wait for the eventual completion of the email validation job: pass a
- * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
- * This method can be cancelled through a `CancellationToken`.
+ * Returns an email validation job previously submitted for processing.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param id The ID of the email validation job to retrieve.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
- * validation.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-export declare function getEmailValidation(restClientFactory: RestClientFactory, id: string, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null>;
+export declare function getEmailValidation(restClientFactory: RestClientFactory, id: string, waitOptions?: WaitOptions | null, cancellationToken?: CancellationToken): Promise<Validation | null>;
 /**
  * Returns a stream with an export of the entries for the specified completed email validation job,
  * with the goal of generating a human-readable representation of the results according to the
  * requested output file format. While the output schema (columns / labels / data format) is fairly
  * complete, you should always consider it as subject to change.
- * This method can be cancelled through a `CancellationToken`.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param id The ID of the email validation job to retrieve.
  * @param contentType The MIME content-type of output file format. Acceptable values:
@@ -112,7 +113,7 @@ export declare function deleteEmailValidation(restClientFactory: RestClientFacto
 /**
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
- * This method can be cancelled through a `CancellationToken`.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.

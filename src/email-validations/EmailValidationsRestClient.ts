@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -35,7 +35,7 @@ import { RestClientFactory } from "../rest/RestClientFactory";
 import { Validation } from "./models/Validation";
 import { ValidationRequestEntry } from "./models/ValidationRequestEntry";
 import { ValidationRequest } from "./models/ValidationRequest";
-import { WaitingStrategy } from "./WaitingStrategy";
+import { WaitOptions } from "./WaitOptions";
 import { CancellationToken } from "../common/CancellationToken";
 
 import { submitEmailValidation, deleteEmailValidation, getEmailValidation, submitEmailValidationFile, listEmailValidations, exportEmailValidationEntries } from './functions';
@@ -58,23 +58,23 @@ export class EmailValidationsRestClient {
     }
 
     /**
-     * Submits one or more email addresses for validation. By default, this method does not wait for
-     * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
-     * until the job is completed) to request a different waiting behavior.
+     * Submits one or more email addresses for validation.
+     * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+     * to request a different waiting behavior.
      * This method accepts a wide range of input types, including:
      * - `string` and `string[]`
      * - `ValidationRequestEntry` and `ValidationRequestEntry[]`
      * - `ValidationRequest`
      * - `FileValidationRequest`
      * 
-     * Here is the simplest case, showing how to validate one email address:
+     * Here is the simplest case, showing how to verify an email address:
      * ```ts
      * // Option 1 - async/await
      * 
      * const verifalia = new VerifaliaRestClient(...);
      * const result = await verifalia
      *     .emailValidations
-     *     .submit('batman@gmail.com', true);
+     *     .submit('batman@gmail.com');
      * 
      * console.log(result.entries[0].classification); // 'Deliverable'
      * 
@@ -83,7 +83,7 @@ export class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * verifalia
      *     .emailValidations
-     *     .submit('batman@gmail.com', true)
+     *     .submit('batman@gmail.com')
      *     .then(result => {
      *         console.log(result.entries[0].classification); // 'Deliverable'
      *     });
@@ -96,7 +96,7 @@ export class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * const result = await verifalia
      *     .emailValidations
-     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
      * 
      * result.entries.forEach((item) => {
      *     console.log(`${item.inputData}: ${item.classification}`);
@@ -107,7 +107,7 @@ export class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * verifalia
      *     .emailValidations
-     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
      *     .then(result => {
      *         result.entries.forEach((item) => {
      *             console.log(`${item.inputData}: ${item.classification}`);
@@ -119,16 +119,16 @@ export class EmailValidationsRestClient {
      *
      * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
      * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
-     * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-     * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
-     * advanced scenarios and progress tracking.
+     * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+     * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+     * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
      */
     public async submit(request: FileValidationRequest | NonFileValidationRequest,
-        waitingStrategy?: WaitingStrategy | boolean,
+        waitOptions?: WaitOptions | null,
         cancellationToken?: CancellationToken): Promise<Validation | null> {
 
         /* @if ENVIRONMENT!='production' */
-        logger.log('submitting', request, waitingStrategy);
+        logger.log('submitting', request, waitOptions);
         /* @endif */
             
         // Use the "file" field as a discriminator to detect whether the argument is a FileValidationRequest
@@ -137,20 +137,20 @@ export class EmailValidationsRestClient {
         if ((request as FileValidationRequest).file) {
             return submitEmailValidationFile(this._restClientFactory,
                 request as FileValidationRequest,
-                waitingStrategy,
+                waitOptions,
                 cancellationToken);
         }
 
         return submitEmailValidation(this._restClientFactory,
             request as NonFileValidationRequest,
-            waitingStrategy,
+            waitOptions,
             cancellationToken);
     }
 
     /**
-     * Returns an email validation job previously submitted for processing. By default, this method does
-     * not wait for the eventual completion of the email validation job: pass a `WaitingStrategy` (or `true`,
-     * to wait until the job is completed) to request a different waiting behavior.
+     * Returns an email validation job previously submitted for processing.
+     * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+     * to request a different waiting behavior.
      * 
      * Here is how to retrieve an email validation job, given its ID:
      * ```ts
@@ -163,11 +163,15 @@ export class EmailValidationsRestClient {
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param id The ID of the email validation job to retrieve.
-     * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
-     * validation.
+     * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+     * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+     * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
      */
-    public async get(id: string, waitingStrategy?: WaitingStrategy | boolean, cancellationToken?: CancellationToken): Promise<Validation | null> {
-        return getEmailValidation(this._restClientFactory, id, waitingStrategy, cancellationToken);
+    public async get(id: string,
+        waitOptions?: WaitOptions | null,
+        cancellationToken?: CancellationToken): Promise<Validation | null> {
+
+        return getEmailValidation(this._restClientFactory, id, waitOptions, cancellationToken);
     }
 
     /**

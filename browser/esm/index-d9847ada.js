@@ -1,5 +1,6 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter, __asyncGenerator, __await, __rest } from 'tslib';
+import debug from 'debug';
 import { ValidationStatus_Completed } from './email-validations/constants.js';
 
 /**
@@ -8,7 +9,47 @@ import { ValidationStatus_Completed } from './email-validations/constants.js';
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+class Logger {
+    constructor(namespace) {
+        this._debugger = debug(namespace);
+    }
+    log(formatter, ...args) {
+        this._debugger.apply(this._debugger, [formatter, ...args]);
+    }
+}
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -51,7 +92,7 @@ class VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -77,7 +118,7 @@ class VerifaliaError {
  * THE SOFTWARE.
  */
 /**
- * Thrown whenever an async method is canceled.
+ * Thrown whenever an async function is canceled.
  */
 class OperationCanceledError extends VerifaliaError {
     /**
@@ -94,7 +135,7 @@ class OperationCanceledError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -119,15 +160,34 @@ class OperationCanceledError extends VerifaliaError {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const logger = new Logger('verifalia');
 const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
 /**
- * Defines a strategy used to wait for the completion of an email verification job in Verifalia.
+ * Provides optional configuration settings for waiting on the completion of an email validation job.
  */
-class WaitingStrategy {
-    constructor(waitForCompletion, progress = null) {
-        this.waitForCompletion = waitForCompletion;
-        this.progress = progress;
+class WaitOptions {
+    constructor() {
+        /**
+         * If set, defines a function which receives completion progress updates for an email validation job.
+         */
+        this.progress = null;
+        /**
+         * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+         * during the initial job submission request. Expressed in milliseconds, with a default of 30 seconds.
+         */
+        this.submissionWaitTime = 30 * 1000;
+        /**
+         * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+         * during any of the polling requests. Expressed in milliseconds, with a default of 30 seconds.
+         */
+        this.pollWaitTime = 30 * 1000;
     }
+    /**
+     * Waits for the next polling interval of the specified validationOverview.
+     *
+     * @param validationOverview The validation overview to wait against.
+     * @param cancellationToken The eventual cancellation token for the waiting.
+     */
     waitForNextPoll(validationOverview, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
             // Throws in the event the user requested to cancel a pending waiting
@@ -153,6 +213,7 @@ class WaitingStrategy {
                     delay = Math.max(0.5, Math.min(30, delay));
                 }
             }
+            logger.log('waitForNextPoll delay (seconds)', delay);
             return new Promise((resolve, reject) => {
                 // eslint-disable-next-line prefer-const
                 let timeout;
@@ -175,6 +236,20 @@ class WaitingStrategy {
         });
     }
 }
+/**
+ * Indicates that the library should automatically wait for the email validation to complete, using
+ * the default wait times.
+ */
+WaitOptions.default = new WaitOptions();
+/**
+ * Indicates that the library should not wait for the email validation to complete.
+ */
+WaitOptions.noWait = (() => {
+    const result = new WaitOptions();
+    result.submissionWaitTime = 0;
+    result.pollWaitTime = 0;
+    return result;
+})();
 
 /**
  * @license
@@ -182,7 +257,7 @@ class WaitingStrategy {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -207,20 +282,21 @@ class WaitingStrategy {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const logger$1 = new Logger('verifalia');
 /**
- * Submits a new email validation for processing. By default, this method does not wait for
- * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
- * until the job is completed) to request a different waiting behavior.
- * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+ * Submits a new email validation for processing.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
  *
  * @param request An object with one or more email addresses to validate. Can be of type string, string[],
  * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the
- * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
- * advanced scenarios and progress tracking.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-function submitEmailValidation(restClientFactory, request, waitingStrategy, cancellationToken) {
+function submitEmailValidation(restClientFactory, request, waitOptions, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const restClient = restClientFactory.build();
         let data;
@@ -258,8 +334,10 @@ function submitEmailValidation(restClientFactory, request, waitingStrategy, canc
         else {
             throw new Error('data type is unsupported.');
         }
-        const response = yield restClient.invoke('POST', '/email-validations', undefined, data, undefined, cancellationToken);
-        return handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken);
+        const waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
+        const response = yield restClient.invoke('POST', `/email-validations?waitTime=${waitOptionsOrDefault.submissionWaitTime}`, undefined, data, undefined, cancellationToken);
+        logger$1.log('handling submit response', response);
+        return handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken);
     });
 }
 /**
@@ -269,18 +347,18 @@ function submitEmailValidation(restClientFactory, request, waitingStrategy, canc
  * - comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files
  * - Microsoft Excel spreadsheets (.xls and .xlsx)
  *
- * By default, this method does not wait for the completion of the email validation job: pass a
- * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
- * This method can be cancelled through a `CancellationToken`.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param request An object with the file which includes the email addresses to validate and its processing
  * options. Must be of type `FileValidationRequest`.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the
- * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
- * advanced scenarios and progress tracking.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-function submitEmailValidationFile(restClientFactory, request, waitingStrategy, cancellationToken) {
+function submitEmailValidationFile(restClientFactory, request, waitOptions, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const restClient = restClientFactory.build();
         let formData;
@@ -303,61 +381,58 @@ function submitEmailValidationFile(restClientFactory, request, waitingStrategy, 
         else {
             throw new Error('data type is unsupported.');
         }
-        const response = yield restClient.invoke('POST', '/email-validations', undefined, formData, {
+        const waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
+        const response = yield restClient.invoke('POST', `/email-validations?waitTime=${waitOptionsOrDefault.submissionWaitTime}`, undefined, formData, {
             headers
         }, cancellationToken);
-        return handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken);
+        return handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken);
     });
 }
-function handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken) {
+function handleSubmitResponse(restClientFactory, restResponse, waitOptions, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (typeof waitingStrategy === 'boolean') {
-            waitingStrategy = new WaitingStrategy(waitingStrategy);
-        }
-        if (response.status === 200 || response.status === 202) {
-            const partialValidation = yield response.deserialize();
+        if (restResponse.response.status === 200 || restResponse.response.status === 202) {
+            const partialValidation = yield restResponse.deserialize();
             // Returns immediately if the validation has been completed or if we should not wait for it
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
+            if (waitOptions === WaitOptions.default || partialValidation.overview.status === ValidationStatus_Completed) {
                 return retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken);
             }
-            return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken);
+            return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitOptions, cancellationToken);
         }
-        if (response.status === 404 || response.status === 410) {
+        if (restResponse.response.status === 404 || restResponse.response.status === 410) {
             return null;
         }
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        throw new VerifaliaError(`Unexpected HTTP response: ${restResponse.response.status} ${restResponse.response.statusText}`);
     });
 }
 /**
- * Returns an email validation job previously submitted for processing. By default, this method does
- * not wait for the eventual completion of the email validation job: pass a
- * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
- * This method can be cancelled through a `CancellationToken`.
+ * Returns an email validation job previously submitted for processing.
+ * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+ * to request a different waiting behavior.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param id The ID of the email validation job to retrieve.
- * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
- * validation.
+ * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+ * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+ * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
  */
-function getEmailValidation(restClientFactory, id, waitingStrategy, cancellationToken) {
+function getEmailValidation(restClientFactory, id, waitOptions, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
+        const waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
         const restClient = restClientFactory.build();
-        const response = yield restClient.invoke('GET', `/email-validations/${id}`, undefined, undefined, undefined, cancellationToken);
-        if (response.status === 200 || response.status === 202) {
-            const partialValidation = yield response.deserialize();
+        const restResponse = yield restClient.invoke('GET', `/email-validations/${id}?waitTime=${waitOptionsOrDefault.pollWaitTime}`, undefined, undefined, undefined, cancellationToken);
+        if (restResponse.response.status === 200 || restResponse.response.status === 202) {
+            const partialValidation = yield restResponse.deserialize();
             // Returns immediately if the validation has been completed or if we should not wait for it
-            if (typeof waitingStrategy === 'boolean') {
-                waitingStrategy = new WaitingStrategy(waitingStrategy);
-            }
-            if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
+            if (waitOptionsOrDefault === WaitOptions.default || partialValidation.overview.status === ValidationStatus_Completed) {
                 return retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken);
             }
-            return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken);
+            return waitValidationForCompletion(restClientFactory, partialValidation.overview, waitOptionsOrDefault, cancellationToken);
         }
-        if (response.status === 404 || response.status === 410) {
+        if (restResponse.response.status === 404 || restResponse.response.status === 410) {
             return null;
         }
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        throw new VerifaliaError(`Unexpected HTTP response: ${restResponse.response.status} ${restResponse.response.statusText}`);
     });
 }
 /**
@@ -365,7 +440,7 @@ function getEmailValidation(restClientFactory, id, waitingStrategy, cancellation
  * with the goal of generating a human-readable representation of the results according to the
  * requested output file format. While the output schema (columns / labels / data format) is fairly
  * complete, you should always consider it as subject to change.
- * This method can be cancelled through a `CancellationToken`.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param id The ID of the email validation job to retrieve.
  * @param contentType The MIME content-type of output file format. Acceptable values:
@@ -379,15 +454,15 @@ function getEmailValidation(restClientFactory, id, waitingStrategy, cancellation
 function exportEmailValidationEntries(restClientFactory, id, contentType, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const restClient = restClientFactory.build();
-        const response = yield restClient.invoke('GET', `/email-validations/${id}/entries`, undefined, undefined, {
+        const restResponse = yield restClient.invoke('GET', `/email-validations/${id}/entries`, undefined, undefined, {
             headers: {
                 'Accept': contentType
             }
         }, cancellationToken);
-        if (response.status === 200) {
-            return response.response.body;
+        if (restResponse.response.status === 200) {
+            return restResponse.response.body;
         }
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        throw new VerifaliaError(`Unexpected HTTP response: ${restResponse.response.status} ${restResponse.response.statusText}`);
     });
 }
 /**
@@ -399,11 +474,11 @@ function exportEmailValidationEntries(restClientFactory, id, contentType, cancel
 function deleteEmailValidation(restClientFactory, id, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const restClient = restClientFactory.build();
-        const response = yield restClient.invoke('DELETE', `/email-validations/${id}`, undefined, undefined, undefined, cancellationToken);
-        if (response.status === 200 || response.status === 410) {
+        const restResponse = yield restClient.invoke('DELETE', `/email-validations/${id}`, undefined, undefined, undefined, cancellationToken);
+        if (restResponse.response.status === 200 || restResponse.response.status === 410) {
             return;
         }
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        throw new VerifaliaError(`Unexpected HTTP response: ${restResponse.response.status} ${restResponse.response.statusText}`);
     });
 }
 function retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken) {
@@ -441,29 +516,29 @@ function listEntriesSegmentedAsync(restClientFactory, validationId, cursor, canc
         if (cursor.limit > 0) {
             queryParams["limit"] = cursor.limit.toString();
         }
-        const response = yield restClient.invoke('GET', `/email-validations/${validationId}/entries`, queryParams, undefined, undefined, cancellationToken);
-        if (response.status === 200) {
-            return yield response.deserialize();
+        const restResponse = yield restClient.invoke('GET', `/email-validations/${validationId}/entries`, queryParams, undefined, undefined, cancellationToken);
+        if (restResponse.response.status === 200) {
+            return yield restResponse.deserialize();
         }
-        throw new VerifaliaError(`Unexpected HTTP response: ${response.status} ${response.statusText}`);
+        throw new VerifaliaError(`Unexpected HTTP response: ${restResponse.response.status} ${restResponse.response.statusText}`);
     });
 }
-function waitValidationForCompletion(restClientFactory, validationOverview, waitingStrategy, cancellationToken) {
+function waitValidationForCompletion(restClientFactory, validationOverview, waitOptions, cancellationToken) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!validationOverview)
-            throw new Error('validationOverview is null');
-        if (!waitingStrategy)
-            throw new Error('waitingStrategy is null');
+            throw new Error('validationOverview is null or undefined.');
+        if (!waitOptions)
+            throw new Error('waitOptions is null or undefined.');
         let resultOverview = validationOverview;
         do {
             // Fires a progress, since we are not yet completed
-            if (waitingStrategy.progress) {
-                waitingStrategy.progress(resultOverview);
+            if (waitOptions.progress) {
+                waitOptions.progress(resultOverview);
             }
             // Wait for the next polling schedule
-            yield waitingStrategy.waitForNextPoll(resultOverview, cancellationToken);
+            yield waitOptions.waitForNextPoll(resultOverview, cancellationToken);
             // Fetch the job from the API
-            const result = yield getEmailValidation(restClientFactory, validationOverview.id);
+            const result = yield getEmailValidation(restClientFactory, validationOverview.id, waitOptions);
             if (!result) {
                 // A null result means the validation has been deleted (or is expired) between a poll and the next one
                 return null;
@@ -479,7 +554,7 @@ function waitValidationForCompletion(restClientFactory, validationOverview, wait
 /**
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
- * This method can be cancelled through a `CancellationToken`.
+ * This function can be cancelled through a `CancellationToken`.
  *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
  * @param cancellationToken An optional token used to cancel the asynchronous request.
@@ -519,4 +594,4 @@ function listEmailValidations(restClientFactory, options, cancellationToken) {
     });
 }
 
-export { OperationCanceledError as O, VerifaliaError as V, WaitingStrategy as W, submitEmailValidationFile as a, deleteEmailValidation as d, exportEmailValidationEntries as e, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };
+export { Logger as L, OperationCanceledError as O, VerifaliaError as V, WaitOptions as W, submitEmailValidationFile as a, deleteEmailValidation as d, exportEmailValidationEntries as e, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };

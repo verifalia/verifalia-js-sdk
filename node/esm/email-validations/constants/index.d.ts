@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -232,6 +232,10 @@ export declare const ValidationEntryStatus_UnacceptableDomainLiteral = "Unaccept
  * instance which exposes this status code</remarks>
  */
 export declare const ValidationEntryStatus_Duplicate = "Duplicate";
+/**
+ * The mail exchanger responsible for the email address is parked / inactive.
+ */
+export declare const ValidationEntryStatus_MailExchangerIsParked = "MailExchangerIsParked";
 /**
  * The lowest possible processing priority (speed) for a validation job.
  */

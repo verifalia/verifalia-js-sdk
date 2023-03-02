@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -59,6 +59,7 @@ import {
     ValidationEntryStatus_MailboxTemporarilyUnavailable,
     ValidationEntryStatus_MailboxValidationTimeout,
     ValidationEntryStatus_MailExchangerIsHoneypot,
+    ValidationEntryStatus_MailExchangerIsParked,
     ValidationEntryStatus_MailExchangerIsWellKnownDea,
     ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes,
     ValidationEntryStatus_ServerIsCatchAll,
@@ -245,5 +246,10 @@ export const ValidationEntryStatus = {
     * To find out the entry this item is a duplicate of; check the duplicateOf property for the ValidationEntry
     * instance which exposes this status code</remarks>
     */
-    Duplicate: ValidationEntryStatus_Duplicate
+    Duplicate: ValidationEntryStatus_Duplicate,
+
+    /**
+     * The mail exchanger responsible for the email address is parked / inactive.
+     */
+    MailExchangerIsParked: ValidationEntryStatus_MailExchangerIsParked
 }

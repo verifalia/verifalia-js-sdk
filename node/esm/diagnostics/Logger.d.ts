@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -30,6 +30,7 @@
  * THE SOFTWARE.
  */
 export declare class Logger {
+    private _debugger;
     constructor(namespace: string);
     log(formatter: any, ...args: any[]): void;
 }

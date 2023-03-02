@@ -1,8 +1,9 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter } from 'tslib';
-import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-21617865.mjs';
-export { O as OperationCanceledError, W as WaitingStrategy, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-21617865.mjs';
-export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.mjs';
+import 'debug';
+import { L as Logger, a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-d4fafb39.mjs';
+export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-d4fafb39.mjs';
+export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.mjs';
 import 'fs';
 import FormData from 'form-data';
 import { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.mjs';
@@ -20,7 +21,7 @@ import zlib from 'zlib';
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -45,28 +46,29 @@ import zlib from 'zlib';
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const logger = new Logger('verifalia');
 class EmailValidationsRestClient {
     constructor(restClientFactory) {
         this._restClientFactory = restClientFactory;
     }
     /**
-     * Submits one or more email addresses for validation. By default, this method does not wait for
-     * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
-     * until the job is completed) to request a different waiting behavior.
+     * Submits one or more email addresses for validation.
+     * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+     * to request a different waiting behavior.
      * This method accepts a wide range of input types, including:
      * - `string` and `string[]`
      * - `ValidationRequestEntry` and `ValidationRequestEntry[]`
      * - `ValidationRequest`
      * - `FileValidationRequest`
      *
-     * Here is the simplest case, showing how to validate one email address:
+     * Here is the simplest case, showing how to verify an email address:
      * ```ts
      * // Option 1 - async/await
      *
      * const verifalia = new VerifaliaRestClient(...);
      * const result = await verifalia
      *     .emailValidations
-     *     .submit('batman@gmail.com', true);
+     *     .submit('batman@gmail.com');
      *
      * console.log(result.entries[0].classification); // 'Deliverable'
      *
@@ -75,7 +77,7 @@ class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * verifalia
      *     .emailValidations
-     *     .submit('batman@gmail.com', true)
+     *     .submit('batman@gmail.com')
      *     .then(result => {
      *         console.log(result.entries[0].classification); // 'Deliverable'
      *     });
@@ -88,7 +90,7 @@ class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * const result = await verifalia
      *     .emailValidations
-     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
      *
      * result.entries.forEach((item) => {
      *     console.log(`${item.inputData}: ${item.classification}`);
@@ -99,7 +101,7 @@ class EmailValidationsRestClient {
      * const verifalia = new VerifaliaRestClient(...);
      * verifalia
      *     .emailValidations
-     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
      *     .then(result => {
      *         result.entries.forEach((item) => {
      *             console.log(`${item.inputData}: ${item.classification}`);
@@ -111,24 +113,25 @@ class EmailValidationsRestClient {
      *
      * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
      * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
-     * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-     * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
-     * advanced scenarios and progress tracking.
+     * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+     * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+     * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
      */
-    submit(request, waitingStrategy, cancellationToken) {
+    submit(request, waitOptions, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
+            logger.log('submitting', request, waitOptions);
             // Use the "file" field as a discriminator to detect whether the argument is a FileValidationRequest
             // or not.
             if (request.file) {
-                return submitEmailValidationFile(this._restClientFactory, request, waitingStrategy, cancellationToken);
+                return submitEmailValidationFile(this._restClientFactory, request, waitOptions, cancellationToken);
             }
-            return submitEmailValidation(this._restClientFactory, request, waitingStrategy, cancellationToken);
+            return submitEmailValidation(this._restClientFactory, request, waitOptions, cancellationToken);
         });
     }
     /**
-     * Returns an email validation job previously submitted for processing. By default, this method does
-     * not wait for the eventual completion of the email validation job: pass a `WaitingStrategy` (or `true`,
-     * to wait until the job is completed) to request a different waiting behavior.
+     * Returns an email validation job previously submitted for processing.
+     * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+     * to request a different waiting behavior.
      *
      * Here is how to retrieve an email validation job, given its ID:
      * ```ts
@@ -141,12 +144,13 @@ class EmailValidationsRestClient {
      * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param id The ID of the email validation job to retrieve.
-     * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
-     * validation.
+     * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+     * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+     * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
      */
-    get(id, waitingStrategy, cancellationToken) {
+    get(id, waitOptions, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            return getEmailValidation(this._restClientFactory, id, waitingStrategy, cancellationToken);
+            return getEmailValidation(this._restClientFactory, id, waitOptions, cancellationToken);
         });
     }
     /**
@@ -241,7 +245,7 @@ class EmailValidationsRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -340,7 +344,7 @@ class CreditsRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -385,7 +389,7 @@ class ServiceUnreachableError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -422,7 +426,7 @@ class EndpointServerError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -459,7 +463,7 @@ class AuthorizationError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -500,7 +504,7 @@ class RequestThrottledError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -543,7 +547,7 @@ class InsufficientCreditError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3249,7 +3253,7 @@ fetch.Promise = global.Promise;
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3274,6 +3278,7 @@ fetch.Promise = global.Promise;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const logger$1 = new Logger('verifalia');
 class MultiplexedRestClient {
     constructor(authenticator, baseUris, userAgent = undefined) {
         if (!authenticator)
@@ -3332,6 +3337,11 @@ class MultiplexedRestClient {
                         : null;
                     const url = `${baseUri}${resource}${queryString ? '?' + queryString : ''}`;
                     // Display outgoing requests to the API on the console (debug build only)
+                    logger$1.log('RequestInit', requestInit);
+                    logger$1.log('invoking URL', url);
+                    logger$1.log('params', JSON.stringify(params));
+                    logger$1.log('data', JSON.stringify(data));
+                    logger$1.log('headers', JSON.stringify(requestInit.headers));
                     let response;
                     try {
                         response = yield fetch(url, requestInit);
@@ -3382,7 +3392,7 @@ class MultiplexedRestClient {
 }
 
 // generated by genversion
-const version = '3.2.2';
+const version = '4.0.0-alpha';
 
 /**
  * @license
@@ -3390,7 +3400,7 @@ const version = '3.2.2';
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3432,7 +3442,7 @@ class VerifaliaRestClientFactory {
          * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
          * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
          */
-        this.apiVersion = 'v2.3';
+        this.apiVersion = 'v2.4';
         if (!authenticator)
             throw new Error('authenticator is null');
         if (!baseUris || baseUris.length < 1)
@@ -3470,7 +3480,7 @@ class VerifaliaRestClientFactory {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3520,7 +3530,7 @@ class UsernamePasswordAuthenticator {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3573,7 +3583,7 @@ class ClientCertificateAuthenticator {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3598,6 +3608,7 @@ class ClientCertificateAuthenticator {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+const logger$2 = new Logger('verifalia');
 /**
  * HTTPS-based REST client for Verifalia. This is the starting point to every other operation against
  * the Verifalia API, it allows to easily verify email addresses, manage submitted email validation
@@ -3668,6 +3679,7 @@ class VerifaliaRestClient {
         ];
         if (!config)
             throw new Error('config is null');
+        logger$2.log('Compilation', 'node', 'es');
         // Builds the authenticator
         let authenticator;
         let baseUris;
@@ -3696,7 +3708,7 @@ class VerifaliaRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3730,7 +3742,7 @@ class FilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3764,7 +3776,7 @@ class DateFilterPredicate extends FilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3807,7 +3819,7 @@ const formatDateToIso8601 = (date) => {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3853,7 +3865,7 @@ class DateEqualityPredicate extends DateFilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -3908,7 +3920,7 @@ class DateBetweenPredicate extends DateFilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31

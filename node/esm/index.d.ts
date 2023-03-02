@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2021 Cobisi Research
+ * Copyright (c) 2005-2023 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -34,7 +34,7 @@ export { VerifaliaRestClientFactory } from './rest/VerifaliaRestClientFactory';
 export { UsernamePasswordAuthenticator } from './rest/security/UsernamePasswordAuthenticator';
 export { ClientCertificateAuthenticator } from './rest/security/ClientCertificateAuthenticator';
 export { EmailValidationsRestClient } from './email-validations/EmailValidationsRestClient';
-export { WaitingStrategy } from './email-validations/WaitingStrategy';
+export { WaitOptions } from './email-validations/WaitOptions';
 export { ValidationRequest } from './email-validations/models/ValidationRequest';
 export { ValidationRequestEntry } from './email-validations/models/ValidationRequestEntry';
 export { Validation } from './email-validations/models/Validation';

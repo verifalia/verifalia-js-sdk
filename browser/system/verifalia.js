@@ -1,9 +1,10 @@
 // (c) Verifalia - email verification service - https://verifalia.com
-System.register('verifalia', ['tslib'], function (exports) {
+System.register('verifalia', ['tslib', 'debug'], function (exports) {
     'use strict';
-    var __extends, __awaiter, __generator, __asyncGenerator, __await, __rest, __assign, __spreadArrays;
+    var __spreadArrays, __extends, __awaiter, __generator, __asyncGenerator, __await, __rest, __assign, debug;
     return {
         setters: [function (module) {
+            __spreadArrays = module.__spreadArrays;
             __extends = module.__extends;
             __awaiter = module.__awaiter;
             __generator = module.__generator;
@@ -11,7 +12,8 @@ System.register('verifalia', ['tslib'], function (exports) {
             __await = module.__await;
             __rest = module.__rest;
             __assign = module.__assign;
-            __spreadArrays = module.__spreadArrays;
+        }, function (module) {
+            debug = module.default;
         }],
         execute: function () {
 
@@ -31,7 +33,52 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
+             *
+             * Cobisi Research
+             * Via Della Costituzione, 31
+             * 35010 Vigonza
+             * Italy - European Union
+             *
+             * Permission is hereby granted, free of charge, to any person obtaining a copy
+             * of this software and associated documentation files (the "Software"), to deal
+             * in the Software without restriction, including without limitation the rights
+             * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+             * copies of the Software, and to permit persons to whom the Software is
+             * furnished to do so, subject to the following conditions:
+             *
+             * The above copyright notice and this permission notice shall be included in
+             * all copies or substantial portions of the Software.
+             *
+             * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+             * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+             * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+             * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+             * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+             * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+             * THE SOFTWARE.
+             */
+            var Logger = /** @class */ (function () {
+                function Logger(namespace) {
+                    this._debugger = debug(namespace);
+                }
+                Logger.prototype.log = function (formatter) {
+                    var args = [];
+                    for (var _i = 1; _i < arguments.length; _i++) {
+                        args[_i - 1] = arguments[_i];
+                    }
+                    this._debugger.apply(this._debugger, __spreadArrays([formatter], args));
+                };
+                return Logger;
+            }());
+
+            /**
+             * @license
+             * Verifalia - Email list cleaning and real-time email verification service
+             * https://verifalia.com/
+             * support@verifalia.com
+             *
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -76,7 +123,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -102,7 +149,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * THE SOFTWARE.
              */
             /**
-             * Thrown whenever an async method is canceled.
+             * Thrown whenever an async function is canceled.
              */
             var OperationCanceledError = exports('OperationCanceledError', /** @class */ (function (_super) {
                 __extends(OperationCanceledError, _super);
@@ -121,7 +168,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -146,17 +193,35 @@ System.register('verifalia', ['tslib'], function (exports) {
              * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
              * THE SOFTWARE.
              */
+            var logger = new Logger('verifalia');
             var timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
             /**
-             * Defines a strategy used to wait for the completion of an email verification job in Verifalia.
+             * Provides optional configuration settings for waiting on the completion of an email validation job.
              */
-            var WaitingStrategy = exports('WaitingStrategy', /** @class */ (function () {
-                function WaitingStrategy(waitForCompletion, progress) {
-                    if (progress === void 0) { progress = null; }
-                    this.waitForCompletion = waitForCompletion;
-                    this.progress = progress;
+            var WaitOptions = exports('WaitOptions', /** @class */ (function () {
+                function WaitOptions() {
+                    /**
+                     * If set, defines a function which receives completion progress updates for an email validation job.
+                     */
+                    this.progress = null;
+                    /**
+                     * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+                     * during the initial job submission request. Expressed in milliseconds, with a default of 30 seconds.
+                     */
+                    this.submissionWaitTime = 30 * 1000;
+                    /**
+                     * Defines how much time to ask the Verifalia API to wait for the completion of the job on the server side,
+                     * during any of the polling requests. Expressed in milliseconds, with a default of 30 seconds.
+                     */
+                    this.pollWaitTime = 30 * 1000;
                 }
-                WaitingStrategy.prototype.waitForNextPoll = function (validationOverview, cancellationToken) {
+                /**
+                 * Waits for the next polling interval of the specified validationOverview.
+                 *
+                 * @param validationOverview The validation overview to wait against.
+                 * @param cancellationToken The eventual cancellation token for the waiting.
+                 */
+                WaitOptions.prototype.waitForNextPoll = function (validationOverview, cancellationToken) {
                     return __awaiter(this, void 0, void 0, function () {
                         var delay, timespanMatch, hours, minutes, seconds;
                         return __generator(this, function (_a) {
@@ -179,6 +244,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                                     delay = Math.max(0.5, Math.min(30, delay));
                                 }
                             }
+                            logger.log('waitForNextPoll delay (seconds)', delay);
                             return [2 /*return*/, new Promise(function (resolve, reject) {
                                     // eslint-disable-next-line prefer-const
                                     var timeout;
@@ -201,7 +267,21 @@ System.register('verifalia', ['tslib'], function (exports) {
                         });
                     });
                 };
-                return WaitingStrategy;
+                /**
+                 * Indicates that the library should automatically wait for the email validation to complete, using
+                 * the default wait times.
+                 */
+                WaitOptions.default = new WaitOptions();
+                /**
+                 * Indicates that the library should not wait for the email validation to complete.
+                 */
+                WaitOptions.noWait = (function () {
+                    var result = new WaitOptions();
+                    result.submissionWaitTime = 0;
+                    result.pollWaitTime = 0;
+                    return result;
+                })();
+                return WaitOptions;
             }()));
 
             /**
@@ -210,7 +290,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -439,6 +519,10 @@ System.register('verifalia', ['tslib'], function (exports) {
              */
             var ValidationEntryStatus_Duplicate = exports('ValidationEntryStatus_Duplicate', 'Duplicate');
             /**
+             * The mail exchanger responsible for the email address is parked / inactive.
+             */
+            var ValidationEntryStatus_MailExchangerIsParked = exports('ValidationEntryStatus_MailExchangerIsParked', 'MailExchangerIsParked');
+            /**
              * The lowest possible processing priority (speed) for a validation job.
              */
             var ValidationPriority_Lowest = exports('ValidationPriority_Lowest', 0);
@@ -457,7 +541,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -482,22 +566,23 @@ System.register('verifalia', ['tslib'], function (exports) {
              * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
              * THE SOFTWARE.
              */
+            var logger$1 = new Logger('verifalia');
             /**
-             * Submits a new email validation for processing. By default, this method does not wait for
-             * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
-             * until the job is completed) to request a different waiting behavior.
-             * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+             * Submits a new email validation for processing.
+             * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+             * to request a different waiting behavior.
+             * This function returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
              *
              * @param request An object with one or more email addresses to validate. Can be of type string, string[],
              * ValidationRequestEntry, ValidationRequestEntry[], ValidationRequest.
-             * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-             * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
-             * advanced scenarios and progress tracking.
+             * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+             * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+             * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
              * @param cancellationToken An optional token used to cancel the asynchronous request.
              */
-            function submitEmailValidation(restClientFactory, request, waitingStrategy, cancellationToken) {
+            function submitEmailValidation(restClientFactory, request, waitOptions, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, data, entries, response;
+                    var restClient, data, entries, waitOptionsOrDefault, response;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -536,10 +621,12 @@ System.register('verifalia', ['tslib'], function (exports) {
                                 else {
                                     throw new Error('data type is unsupported.');
                                 }
-                                return [4 /*yield*/, restClient.invoke('POST', '/email-validations', undefined, data, undefined, cancellationToken)];
+                                waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
+                                return [4 /*yield*/, restClient.invoke('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, data, undefined, cancellationToken)];
                             case 1:
                                 response = _a.sent();
-                                return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken)];
+                                logger$1.log('handling submit response', response);
+                                return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken)];
                         }
                     });
                 });
@@ -551,20 +638,20 @@ System.register('verifalia', ['tslib'], function (exports) {
              * - comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files
              * - Microsoft Excel spreadsheets (.xls and .xlsx)
              *
-             * By default, this method does not wait for the completion of the email validation job: pass a
-             * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
-             * This method can be cancelled through a `CancellationToken`.
+             * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+             * to request a different waiting behavior.
+             * This function can be cancelled through a `CancellationToken`.
              *
              * @param request An object with the file which includes the email addresses to validate and its processing
              * options. Must be of type `FileValidationRequest`.
-             * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-             * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
-             * advanced scenarios and progress tracking.
+             * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+             * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+             * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
              * @param cancellationToken An optional token used to cancel the asynchronous request.
              */
-            function submitEmailValidationFile(restClientFactory, request, waitingStrategy, cancellationToken) {
+            function submitEmailValidationFile(restClientFactory, request, waitOptions, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, formData, headers, fillFormData, response;
+                    var restClient, formData, headers, fillFormData, waitOptionsOrDefault, response;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -587,81 +674,78 @@ System.register('verifalia', ['tslib'], function (exports) {
                                 else {
                                     throw new Error('data type is unsupported.');
                                 }
-                                return [4 /*yield*/, restClient.invoke('POST', '/email-validations', undefined, formData, {
+                                waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
+                                return [4 /*yield*/, restClient.invoke('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, formData, {
                                         headers: headers
                                     }, cancellationToken)];
                             case 1:
                                 response = _a.sent();
-                                return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken)];
+                                return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken)];
                         }
                     });
                 });
             }
-            function handleSubmitResponse(restClientFactory, response, waitingStrategy, cancellationToken) {
+            function handleSubmitResponse(restClientFactory, restResponse, waitOptions, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
                     var partialValidation;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                if (typeof waitingStrategy === 'boolean') {
-                                    waitingStrategy = new WaitingStrategy(waitingStrategy);
-                                }
-                                if (!(response.status === 200 || response.status === 202)) return [3 /*break*/, 2];
-                                return [4 /*yield*/, response.deserialize()];
+                                if (!(restResponse.response.status === 200 || restResponse.response.status === 202)) return [3 /*break*/, 2];
+                                return [4 /*yield*/, restResponse.deserialize()];
                             case 1:
                                 partialValidation = _a.sent();
                                 // Returns immediately if the validation has been completed or if we should not wait for it
-                                if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
+                                if (waitOptions === WaitOptions.default || partialValidation.overview.status === ValidationStatus_Completed) {
                                     return [2 /*return*/, retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken)];
                                 }
-                                return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken)];
+                                return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitOptions, cancellationToken)];
                             case 2:
-                                if (response.status === 404 || response.status === 410) {
+                                if (restResponse.response.status === 404 || restResponse.response.status === 410) {
                                     return [2 /*return*/, null];
                                 }
-                                throw new VerifaliaError("Unexpected HTTP response: " + response.status + " " + response.statusText);
+                                throw new VerifaliaError("Unexpected HTTP response: " + restResponse.response.status + " " + restResponse.response.statusText);
                         }
                     });
                 });
             }
             /**
-             * Returns an email validation job previously submitted for processing. By default, this method does
-             * not wait for the eventual completion of the email validation job: pass a
-             * waitingStrategy (or `true`, to wait until the job is completed) to request a different waiting behavior.
-             * This method can be cancelled through a `CancellationToken`.
+             * Returns an email validation job previously submitted for processing.
+             * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
+             * to request a different waiting behavior.
+             * This function can be cancelled through a `CancellationToken`.
              *
              * @param id The ID of the email validation job to retrieve.
-             * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
-             * validation.
+             * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+             * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+             * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
              * @param cancellationToken An optional token used to cancel the asynchronous request.
              */
-            function getEmailValidation(restClientFactory, id, waitingStrategy, cancellationToken) {
+            function getEmailValidation(restClientFactory, id, waitOptions, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, response, partialValidation;
+                    var waitOptionsOrDefault, restClient, restResponse, partialValidation;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
+                                waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
                                 restClient = restClientFactory.build();
-                                return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + id, undefined, undefined, undefined, cancellationToken)];
+                                return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + id + "?waitTime=" + waitOptionsOrDefault.pollWaitTime, undefined, undefined, undefined, cancellationToken)];
                             case 1:
-                                response = _a.sent();
-                                if (!(response.status === 200 || response.status === 202)) return [3 /*break*/, 3];
-                                return [4 /*yield*/, response.deserialize()];
+                                restResponse = _a.sent();
+                                if (!(restResponse.response.status === 200 || restResponse.response.status === 202)) return [3 /*break*/, 3];
+                                return [4 /*yield*/, restResponse.deserialize()];
                             case 2:
                                 partialValidation = _a.sent();
                                 // Returns immediately if the validation has been completed or if we should not wait for it
-                                if (typeof waitingStrategy === 'boolean') {
-                                    waitingStrategy = new WaitingStrategy(waitingStrategy);
-                                }
-                                if (!waitingStrategy || !waitingStrategy.waitForCompletion || partialValidation.overview.status === ValidationStatus_Completed) {
+                                if (waitOptionsOrDefault === WaitOptions.default || partialValidation.overview.status === ValidationStatus_Completed) {
                                     return [2 /*return*/, retrieveValidationFromPartialValidation(restClientFactory, partialValidation, cancellationToken)];
                                 }
-                                return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitingStrategy, cancellationToken)];
+                                return [2 /*return*/, waitValidationForCompletion(restClientFactory, partialValidation.overview, waitOptionsOrDefault, cancellationToken)];
                             case 3:
-                                if (response.status === 404 || response.status === 410) {
+                                if (restResponse.response.status === 404 || restResponse.response.status === 410) {
                                     return [2 /*return*/, null];
                                 }
-                                throw new VerifaliaError("Unexpected HTTP response: " + response.status + " " + response.statusText);
+                                throw new VerifaliaError("Unexpected HTTP response: " + restResponse.response.status + " " + restResponse.response.statusText);
                         }
                     });
                 });
@@ -671,7 +755,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * with the goal of generating a human-readable representation of the results according to the
              * requested output file format. While the output schema (columns / labels / data format) is fairly
              * complete, you should always consider it as subject to change.
-             * This method can be cancelled through a `CancellationToken`.
+             * This function can be cancelled through a `CancellationToken`.
              *
              * @param id The ID of the email validation job to retrieve.
              * @param contentType The MIME content-type of output file format. Acceptable values:
@@ -684,7 +768,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              */
             function exportEmailValidationEntries(restClientFactory, id, contentType, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, response;
+                    var restClient, restResponse;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -695,11 +779,11 @@ System.register('verifalia', ['tslib'], function (exports) {
                                         }
                                     }, cancellationToken)];
                             case 1:
-                                response = _a.sent();
-                                if (response.status === 200) {
-                                    return [2 /*return*/, response.response.body];
+                                restResponse = _a.sent();
+                                if (restResponse.response.status === 200) {
+                                    return [2 /*return*/, restResponse.response.body];
                                 }
-                                throw new VerifaliaError("Unexpected HTTP response: " + response.status + " " + response.statusText);
+                                throw new VerifaliaError("Unexpected HTTP response: " + restResponse.response.status + " " + restResponse.response.statusText);
                         }
                     });
                 });
@@ -712,18 +796,18 @@ System.register('verifalia', ['tslib'], function (exports) {
              */
             function deleteEmailValidation(restClientFactory, id, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, response;
+                    var restClient, restResponse;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
                                 restClient = restClientFactory.build();
                                 return [4 /*yield*/, restClient.invoke('DELETE', "/email-validations/" + id, undefined, undefined, undefined, cancellationToken)];
                             case 1:
-                                response = _a.sent();
-                                if (response.status === 200 || response.status === 410) {
+                                restResponse = _a.sent();
+                                if (restResponse.response.status === 200 || restResponse.response.status === 410) {
                                     return [2 /*return*/];
                                 }
-                                throw new VerifaliaError("Unexpected HTTP response: " + response.status + " " + response.statusText);
+                                throw new VerifaliaError("Unexpected HTTP response: " + restResponse.response.status + " " + restResponse.response.statusText);
                         }
                     });
                 });
@@ -757,7 +841,7 @@ System.register('verifalia', ['tslib'], function (exports) {
             }
             function listEntriesSegmentedAsync(restClientFactory, validationId, cursor, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
-                    var restClient, cursorParamName, queryParams, response;
+                    var restClient, cursorParamName, queryParams, restResponse;
                     var _a;
                     return __generator(this, function (_b) {
                         switch (_b.label) {
@@ -778,38 +862,38 @@ System.register('verifalia', ['tslib'], function (exports) {
                                 }
                                 return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + validationId + "/entries", queryParams, undefined, undefined, cancellationToken)];
                             case 1:
-                                response = _b.sent();
-                                if (!(response.status === 200)) return [3 /*break*/, 3];
-                                return [4 /*yield*/, response.deserialize()];
+                                restResponse = _b.sent();
+                                if (!(restResponse.response.status === 200)) return [3 /*break*/, 3];
+                                return [4 /*yield*/, restResponse.deserialize()];
                             case 2: return [2 /*return*/, _b.sent()];
-                            case 3: throw new VerifaliaError("Unexpected HTTP response: " + response.status + " " + response.statusText);
+                            case 3: throw new VerifaliaError("Unexpected HTTP response: " + restResponse.response.status + " " + restResponse.response.statusText);
                         }
                     });
                 });
             }
-            function waitValidationForCompletion(restClientFactory, validationOverview, waitingStrategy, cancellationToken) {
+            function waitValidationForCompletion(restClientFactory, validationOverview, waitOptions, cancellationToken) {
                 return __awaiter(this, void 0, void 0, function () {
                     var resultOverview, result;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
                                 if (!validationOverview)
-                                    throw new Error('validationOverview is null');
-                                if (!waitingStrategy)
-                                    throw new Error('waitingStrategy is null');
+                                    throw new Error('validationOverview is null or undefined.');
+                                if (!waitOptions)
+                                    throw new Error('waitOptions is null or undefined.');
                                 resultOverview = validationOverview;
                                 _a.label = 1;
                             case 1:
                                 // Fires a progress, since we are not yet completed
-                                if (waitingStrategy.progress) {
-                                    waitingStrategy.progress(resultOverview);
+                                if (waitOptions.progress) {
+                                    waitOptions.progress(resultOverview);
                                 }
                                 // Wait for the next polling schedule
-                                return [4 /*yield*/, waitingStrategy.waitForNextPoll(resultOverview, cancellationToken)];
+                                return [4 /*yield*/, waitOptions.waitForNextPoll(resultOverview, cancellationToken)];
                             case 2:
                                 // Wait for the next polling schedule
                                 _a.sent();
-                                return [4 /*yield*/, getEmailValidation(restClientFactory, validationOverview.id)];
+                                return [4 /*yield*/, getEmailValidation(restClientFactory, validationOverview.id, waitOptions)];
                             case 3:
                                 result = _a.sent();
                                 if (!result) {
@@ -832,7 +916,7 @@ System.register('verifalia', ['tslib'], function (exports) {
             /**
              * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
              * to specify filters and a different sorting.
-             * This method can be cancelled through a `CancellationToken`.
+             * This function can be cancelled through a `CancellationToken`.
              *
              * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
              * @param cancellationToken An optional token used to cancel the asynchronous request.
@@ -903,7 +987,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -928,28 +1012,29 @@ System.register('verifalia', ['tslib'], function (exports) {
              * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
              * THE SOFTWARE.
              */
+            var logger$2 = new Logger('verifalia');
             var EmailValidationsRestClient = exports('EmailValidationsRestClient', /** @class */ (function () {
                 function EmailValidationsRestClient(restClientFactory) {
                     this._restClientFactory = restClientFactory;
                 }
                 /**
-                 * Submits one or more email addresses for validation. By default, this method does not wait for
-                 * the completion of the email validation job: pass a `WaitingStrategy` (or `true`, to wait
-                 * until the job is completed) to request a different waiting behavior.
+                 * Submits one or more email addresses for validation.
+                 * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+                 * to request a different waiting behavior.
                  * This method accepts a wide range of input types, including:
                  * - `string` and `string[]`
                  * - `ValidationRequestEntry` and `ValidationRequestEntry[]`
                  * - `ValidationRequest`
                  * - `FileValidationRequest`
                  *
-                 * Here is the simplest case, showing how to validate one email address:
+                 * Here is the simplest case, showing how to verify an email address:
                  * ```ts
                  * // Option 1 - async/await
                  *
                  * const verifalia = new VerifaliaRestClient(...);
                  * const result = await verifalia
                  *     .emailValidations
-                 *     .submit('batman@gmail.com', true);
+                 *     .submit('batman@gmail.com');
                  *
                  * console.log(result.entries[0].classification); // 'Deliverable'
                  *
@@ -958,7 +1043,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                  * const verifalia = new VerifaliaRestClient(...);
                  * verifalia
                  *     .emailValidations
-                 *     .submit('batman@gmail.com', true)
+                 *     .submit('batman@gmail.com')
                  *     .then(result => {
                  *         console.log(result.entries[0].classification); // 'Deliverable'
                  *     });
@@ -971,7 +1056,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                  * const verifalia = new VerifaliaRestClient(...);
                  * const result = await verifalia
                  *     .emailValidations
-                 *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+                 *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
                  *
                  * result.entries.forEach((item) => {
                  *     console.log(`${item.inputData}: ${item.classification}`);
@@ -982,7 +1067,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                  * const verifalia = new VerifaliaRestClient(...);
                  * verifalia
                  *     .emailValidations
-                 *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ], true);
+                 *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
                  *     .then(result => {
                  *         result.entries.forEach((item) => {
                  *             console.log(`${item.inputData}: ${item.classification}`);
@@ -994,26 +1079,27 @@ System.register('verifalia', ['tslib'], function (exports) {
                  *
                  * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
                  * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
-                 * @param waitingStrategy The strategy which rules out how to wait for the completion of the
-                 * email validation. Can be `true` to wait for the completion or an instance of `WaitingStrategy` for
-                 * advanced scenarios and progress tracking.
+                 * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+                 * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+                 * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
                  */
-                EmailValidationsRestClient.prototype.submit = function (request, waitingStrategy, cancellationToken) {
+                EmailValidationsRestClient.prototype.submit = function (request, waitOptions, cancellationToken) {
                     return __awaiter(this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
+                            logger$2.log('submitting', request, waitOptions);
                             // Use the "file" field as a discriminator to detect whether the argument is a FileValidationRequest
                             // or not.
                             if (request.file) {
-                                return [2 /*return*/, submitEmailValidationFile(this._restClientFactory, request, waitingStrategy, cancellationToken)];
+                                return [2 /*return*/, submitEmailValidationFile(this._restClientFactory, request, waitOptions, cancellationToken)];
                             }
-                            return [2 /*return*/, submitEmailValidation(this._restClientFactory, request, waitingStrategy, cancellationToken)];
+                            return [2 /*return*/, submitEmailValidation(this._restClientFactory, request, waitOptions, cancellationToken)];
                         });
                     });
                 };
                 /**
-                 * Returns an email validation job previously submitted for processing. By default, this method does
-                 * not wait for the eventual completion of the email validation job: pass a `WaitingStrategy` (or `true`,
-                 * to wait until the job is completed) to request a different waiting behavior.
+                 * Returns an email validation job previously submitted for processing.
+                 * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
+                 * to request a different waiting behavior.
                  *
                  * Here is how to retrieve an email validation job, given its ID:
                  * ```ts
@@ -1026,13 +1112,14 @@ System.register('verifalia', ['tslib'], function (exports) {
                  * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
                  *
                  * @param id The ID of the email validation job to retrieve.
-                 * @param waitingStrategy The strategy which rules out how to wait for the completion of the email
-                 * validation.
+                 * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
+                 * Can be `undefined` (or `null`) to wait for the completion using the default settings, `WaitOptions.noWait` to
+                 * avoid waiting or an instance of `WaitOptions` for advanced scenarios and progress tracking.
                  */
-                EmailValidationsRestClient.prototype.get = function (id, waitingStrategy, cancellationToken) {
+                EmailValidationsRestClient.prototype.get = function (id, waitOptions, cancellationToken) {
                     return __awaiter(this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            return [2 /*return*/, getEmailValidation(this._restClientFactory, id, waitingStrategy, cancellationToken)];
+                            return [2 /*return*/, getEmailValidation(this._restClientFactory, id, waitOptions, cancellationToken)];
                         });
                     });
                 };
@@ -1131,7 +1218,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1248,7 +1335,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1348,7 +1435,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1397,7 +1484,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1439,7 +1526,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1481,7 +1568,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1524,7 +1611,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1569,7 +1656,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1625,7 +1712,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1650,6 +1737,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
              * THE SOFTWARE.
              */
+            var logger$3 = new Logger('verifalia');
             var MultiplexedRestClient = /** @class */ (function () {
                 function MultiplexedRestClient(authenticator, baseUris, userAgent) {
                     if (userAgent === void 0) { userAgent = undefined; }
@@ -1723,6 +1811,12 @@ System.register('verifalia', ['tslib'], function (exports) {
                                                             .join('&')
                                                         : null;
                                                     url = "" + baseUri + resource + (queryString ? '?' + queryString : '');
+                                                    // Display outgoing requests to the API on the console (debug build only)
+                                                    logger$3.log('RequestInit', requestInit);
+                                                    logger$3.log('invoking URL', url);
+                                                    logger$3.log('params', JSON.stringify(params));
+                                                    logger$3.log('data', JSON.stringify(data));
+                                                    logger$3.log('headers', JSON.stringify(requestInit.headers));
                                                     _c.label = 2;
                                                 case 2:
                                                     _c.trys.push([2, 4, , 5]);
@@ -1803,7 +1897,7 @@ System.register('verifalia', ['tslib'], function (exports) {
             }());
 
             // generated by genversion
-            var version = '3.2.2';
+            var version = '4.0.0-alpha';
 
             /**
              * @license
@@ -1811,7 +1905,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1853,7 +1947,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
                      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
                      */
-                    this.apiVersion = 'v2.3';
+                    this.apiVersion = 'v2.4';
                     if (!authenticator)
                         throw new Error('authenticator is null');
                     if (!baseUris || baseUris.length < 1)
@@ -1894,7 +1988,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1945,7 +2039,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1970,6 +2064,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
              * THE SOFTWARE.
              */
+            var logger$4 = new Logger('verifalia');
             /**
              * HTTPS-based REST client for Verifalia. This is the starting point to every other operation against
              * the Verifalia API, it allows to easily verify email addresses, manage submitted email validation
@@ -2040,6 +2135,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                     ];
                     if (!config)
                         throw new Error('config is null');
+                    logger$4.log('Compilation', 'browser', 'system');
                     // Builds the authenticator
                     var authenticator;
                     var baseUris;
@@ -2064,7 +2160,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2101,7 +2197,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2140,7 +2236,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2183,7 +2279,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2232,7 +2328,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2290,7 +2386,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2021 Cobisi Research
+             * Copyright (c) 2005-2023 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
