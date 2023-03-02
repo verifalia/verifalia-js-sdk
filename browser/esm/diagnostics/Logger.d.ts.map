@@ -1,1 +1,1 @@
-{"version":3,"file":"Logger.d.ts","sourceRoot":"","sources":["../src/diagnostics/Logger.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA8BG;AAOH,qBAAa,MAAM;IACf,OAAO,CAAC,SAAS,CAAW;gBAEhB,SAAS,EAAE,MAAM;IAI7B,GAAG,CAAC,SAAS,EAAE,GAAG,EAAE,GAAG,IAAI,EAAE,GAAG,EAAE,GAAG,IAAI;CAG5C"}
+{"version":3,"file":"Logger.d.ts","sourceRoot":"","sources":["../src/diagnostics/Logger.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA8BG;AAMH,qBAAa,MAAM;gBAEH,SAAS,EAAE,MAAM;IAG7B,GAAG,CAAC,SAAS,EAAE,GAAG,EAAE,GAAG,IAAI,EAAE,GAAG,EAAE,GAAG,IAAI;CAE5C"}

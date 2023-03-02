@@ -1,47 +1,8 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter, __asyncGenerator, __await, __rest } from 'tslib';
-import debug from 'debug';
-import { ValidationStatus_Completed } from './email-validations/constants.js';
-
-/**
- * @license
- * Verifalia - Email list cleaning and real-time email verification service
- * https://verifalia.com/
- * support@verifalia.com
- *
- * Copyright (c) 2005-2023 Cobisi Research
- *
- * Cobisi Research
- * Via Della Costituzione, 31
- * 35010 Vigonza
- * Italy - European Union
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-class Logger {
-    constructor(namespace) {
-        this._debugger = debug(namespace);
-    }
-    log(formatter, ...args) {
-        this._debugger.apply(this._debugger, [formatter, ...args]);
-    }
-}
+import { ValidationStatus_Completed } from './email-validations/constants.mjs';
+import { ReadStream } from 'fs';
+import FormData from 'form-data';
 
 /**
  * @license
@@ -160,7 +121,6 @@ class OperationCanceledError extends VerifaliaError {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const logger = new Logger('verifalia');
 const timeSpanMatchRegex = /^(?:(\d*?)\.)?(\d{2})\:(\d{2})\:(\d{2})(?:\.(\d*?))?$/;
 /**
  * Provides optional configuration settings for waiting on the completion of an email validation job.
@@ -213,7 +173,6 @@ class WaitOptions {
                     delay = Math.max(0.5, Math.min(30, delay));
                 }
             }
-            logger.log('waitForNextPoll delay (seconds)', delay);
             return new Promise((resolve, reject) => {
                 // eslint-disable-next-line prefer-const
                 let timeout;
@@ -282,9 +241,9 @@ WaitOptions.noWait = (() => {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const logger$1 = new Logger('verifalia');
 /**
  * Submits a new email validation for processing.
+ *
  * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
  * to request a different waiting behavior.
  * This function returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
@@ -336,7 +295,6 @@ function submitEmailValidation(restClientFactory, request, waitOptions, cancella
         }
         const waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
         const response = yield restClient.invoke('POST', `/email-validations?waitTime=${waitOptionsOrDefault.submissionWaitTime}`, undefined, data, undefined, cancellationToken);
-        logger$1.log('handling submit response', response);
         return handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken);
     });
 }
@@ -378,6 +336,12 @@ function submitEmailValidationFile(restClientFactory, request, waitOptions, canc
             formData = new FormData(); // native
             fillFormData();
         }
+        else if ((typeof ReadStream !== 'undefined' && request.file instanceof ReadStream) || (typeof Buffer !== 'undefined' && request.file instanceof Buffer)) {
+            // Node
+            formData = new FormData(); // comes from the form-data package
+            fillFormData();
+            headers = Object.assign({}, formData.getHeaders());
+        }
         else {
             throw new Error('data type is unsupported.');
         }
@@ -406,6 +370,7 @@ function handleSubmitResponse(restClientFactory, restResponse, waitOptions, canc
 }
 /**
  * Returns an email validation job previously submitted for processing.
+ *
  * By default, this function waits for the completion of the email validation job: pass a `WaitOptions`
  * to request a different waiting behavior.
  * This function can be cancelled through a `CancellationToken`.
@@ -440,6 +405,7 @@ function getEmailValidation(restClientFactory, id, waitOptions, cancellationToke
  * with the goal of generating a human-readable representation of the results according to the
  * requested output file format. While the output schema (columns / labels / data format) is fairly
  * complete, you should always consider it as subject to change.
+ *
  * This function can be cancelled through a `CancellationToken`.
  *
  * @param id The ID of the email validation job to retrieve.
@@ -554,6 +520,7 @@ function waitValidationForCompletion(restClientFactory, validationOverview, wait
 /**
  * Lists all the email validation jobs, from the oldest to the newest. Pass a `ValidationOverviewListingOptions`
  * to specify filters and a different sorting.
+ *
  * This function can be cancelled through a `CancellationToken`.
  *
  * @param options A `ValidationOverviewListingOptions` representing the options for the listing operation.
@@ -594,4 +561,4 @@ function listEmailValidations(restClientFactory, options, cancellationToken) {
     });
 }
 
-export { Logger as L, OperationCanceledError as O, VerifaliaError as V, WaitOptions as W, submitEmailValidationFile as a, deleteEmailValidation as d, exportEmailValidationEntries as e, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };
+export { OperationCanceledError as O, VerifaliaError as V, WaitOptions as W, submitEmailValidationFile as a, deleteEmailValidation as d, exportEmailValidationEntries as e, getEmailValidation as g, listEmailValidations as l, submitEmailValidation as s };

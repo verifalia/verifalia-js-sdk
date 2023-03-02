@@ -1,6 +1,6 @@
 {
     "name": "verifalia",
-    "version": "4.0.0-alpha",
+    "version": "4.0.0",
     "description": "Verifalia email verification library for JavaScript: verify email addresses in real-time and check whether they are deliverable, invalid, or otherwise risky.",
     "homepage": "https://verifalia.com",
     "main": "node/cjs/index.js",
@@ -42,7 +42,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/verifalia/verifalia-js-sdk"
+        "url": "https://github.com/verifalia/verifalia-js-sdk.git"
     },
     "dependencies": {
         "abort-controller": "^3.0.0",

@@ -30,7 +30,6 @@
  * THE SOFTWARE.
  */
 export declare class Logger {
-    private _debugger;
     constructor(namespace: string);
     log(formatter: any, ...args: any[]): void;
 }

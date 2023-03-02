@@ -677,7 +677,7 @@ please see the [project releases](https://github.com/verifalia/verifalia-js-sdk/
 
 ## v4.0
 
-Released on March 3<sup>rd</sup>, 2023
+Released on March 2<sup>nd</sup>, 2023
 
 - Added support for API v2.4
 - Added support for new completion callback options

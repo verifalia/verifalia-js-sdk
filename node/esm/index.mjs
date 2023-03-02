@@ -1,8 +1,7 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter } from 'tslib';
-import 'debug';
-import { L as Logger, a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-d4fafb39.mjs';
-export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-d4fafb39.mjs';
+import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-997a8d8d.mjs';
+export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-997a8d8d.mjs';
 export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.mjs';
 import 'fs';
 import FormData from 'form-data';
@@ -46,48 +45,69 @@ import zlib from 'zlib';
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const logger = new Logger('verifalia');
 class EmailValidationsRestClient {
     constructor(restClientFactory) {
         this._restClientFactory = restClientFactory;
     }
     /**
      * Submits one or more email addresses for validation.
+     *
+     * This method accepts a wide range of input types, including:
+     * - `string` and `string[]`, useful to submit only the email address(es) to verify, using the default
+     * processing options;
+     * - `ValidationRequestEntry` and `ValidationRequestEntry[]`, allowing to specify an optional custom
+     * string (such as a customer ID) along with each email address under test;
+     * - `ValidationRequest`, used to fully customize the email verification process;
+     * - `FileValidationRequest`, used to import and verify files containing lists of email addresses.
+     *
      * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
      * to request a different waiting behavior.
-     * This method accepts a wide range of input types, including:
-     * - `string` and `string[]`
-     * - `ValidationRequestEntry` and `ValidationRequestEntry[]`
-     * - `ValidationRequest`
-     * - `FileValidationRequest`
      *
-     * Here is the simplest case, showing how to verify an email address:
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
+     *
+     * ## How to verify an email address
+     *
+     * Here is the simplest case, showing how to verify a single email address, using the default processing
+     * options:
+     *
      * ```ts
-     * // Option 1 - async/await
-     *
      * const verifalia = new VerifaliaRestClient(...);
+     *
      * const result = await verifalia
      *     .emailValidations
      *     .submit('batman@gmail.com');
      *
      * console.log(result.entries[0].classification); // 'Deliverable'
-     *
-     * // Option 2 - callback
-     *
-     * const verifalia = new VerifaliaRestClient(...);
-     * verifalia
-     *     .emailValidations
-     *     .submit('batman@gmail.com')
-     *     .then(result => {
-     *         console.log(result.entries[0].classification); // 'Deliverable'
-     *     });
      * ```
+     * It is also possible to pass a `ValidationRequest` to specify any supported processing option, including the
+     * desired result quality level and data retention policy:
+     *
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     *
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit({
+     *         entries: [
+     *             {
+     *                 inputData: 'scottgu@gmail.com',
+     *                 // custom: 'foobar123'
+     *             }
+     *         ],
+     *         quality: 'High',
+     *         retention: '0:5:0' // 5 minutes
+     *     });
+     *
+     * console.log(result.entries[0].classification); // 'Deliverable'
+     * ```
+     *
+     * ## How to verify multiple email addresses at once
      *
      * To validate multiple email addresses at once, just submit an array of strings:
      * ```ts
-     * // Option 1 - async/await
-     *
      * const verifalia = new VerifaliaRestClient(...);
+     *
      * const result = await verifalia
      *     .emailValidations
      *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
@@ -95,21 +115,125 @@ class EmailValidationsRestClient {
      * result.entries.forEach((item) => {
      *     console.log(`${item.inputData}: ${item.classification}`);
      * }); // 'batman@gmail.com: Deliverable' 'robin1940@yahoo.com: Undeliverable'
-     *
-     * // Option 2 - callback
-     *
-     * const verifalia = new VerifaliaRestClient(...);
-     * verifalia
-     *     .emailValidations
-     *     .submit([ 'batman@gmail.com', 'robin1940@yahoo.com' ]);
-     *     .then(result => {
-     *         result.entries.forEach((item) => {
-     *             console.log(`${item.inputData}: ${item.classification}`);
-     *         }); // 'batman@gmail.com: Deliverable' 'robin1940@yahoo.com: Undeliverable'
-     *     });
      * ```
      *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
+     * As seen in the section above, it is also possible to pass a `ValidationRequest` to specify
+     * any supported processing option, including the desired result quality level and data retention
+     * policy:
+     *
+     * ```ts
+     * const verifalia = new VerifaliaRestClient(...);
+     *
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit({
+     *         entries: [
+     *             {
+     *                 inputData: 'scottgu@gmail.com',
+     *                 // custom: 'foobar'
+     *             },
+     *             {
+     *                 inputData: 'robin1940@yahoo.com',
+     *                 // custom: '42'
+     *             },
+     *         ],
+     *         quality: 'Extreme',
+     *         retention: '1:30:0' // 1 hour and 30 minutes
+     *     });
+     *
+     * result.entries.forEach((item) => {
+     *     console.log(`${item.inputData}: ${item.classification}`);
+     * }); // 'batman@gmail.com: Deliverable' 'robin1940@yahoo.com: Undeliverable'
+     * ```
+     *
+     * ## Import and verify a list of email addresses
+     *
+     * To import and submit a file with the email addresses to verify, pass a `FileValidationRequest`
+     * to this method, with the `file` field assigned to an instance of one of these supported types:
+     * - `ReadStream` or a `Buffer` (Node.js), or;
+     * - `Blob` or a `File` (browser).
+     *
+     * Here is how to import and verify a list in the CSV file format, in Node.js, using a `ReadStream`:
+     * ```ts
+     * const fs = require('fs');
+     *
+     * const verifalia = new VerifaliaRestClient(...);
+     * const fileStream = fs.createReadStream('./my-list.csv');
+     *
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit({
+     *         file: fileStream,
+     *         contentType: 'text/csv',
+     *         column: 0,
+     *         startingRow: 1
+     *     });
+     *
+     * result.entries.forEach((item) => {
+     *     console.log(`${item.inputData}: ${item.classification}`);
+     * });
+     * ```
+     *
+     * While importing and submitting a file for email verification, it is possible to specify any processing
+     * option through the passed `FileValidationRequest` instance, similarly to how one can do that with the
+     * `ValidationRequest` class.
+     *
+     * ```ts
+     * const fs = require('fs');
+     *
+     * const verifalia = new VerifaliaRestClient(...);
+     * const fileStream = fs.createReadStream('./my-list.csv');
+     *
+     * const result = await verifalia
+     *     .emailValidations
+     *     .submit({
+     *         file: fileStream,
+     *         contentType: 'text/csv',
+     *         column: 0,
+     *         startingRow: 1,
+     *         quality: 'High',
+     *         retention: '0:10:0', // 10 minutes
+     *         callback: {
+     *             url: 'https://your-website-here/foo/bar'
+     *         }
+     *     });
+     *
+     * result.entries.forEach((item) => {
+     *     console.log(`${item.inputData}: ${item.classification}`);
+     * });
+     * ```
+     *
+     * ## Custom waiting
+     *
+     * As mentioned, `submit()` automatically waits for the completion of the submitted email
+     * verification job. It is however possible, through the `waitOptions` parameter, to customize
+     * the waiting behavior of the method.
+     *
+     * Here is how, for instance, one can enqueue a possibly large email verification job, **without**
+     * waiting for its completion:
+     *
+     * ```ts
+     * const job = await verifalia
+     *     .emailValidations
+     *     .submit(TODO, WaitOptions.noWait);
+     *
+     * console.log(`${job.overview.status}`); // InProgress
+     * ```
+     *
+     * And here is how to **track the progress** of an email verification job through a custom `WaitOptions` and
+     * a `progress` function lambda:
+     *
+     * ```ts
+     * const job = await verifalia
+     *     .emailValidations
+     *     .submit(TODO,
+     *         {
+     *             ...new WaitOptions(),
+     *             progress: jobOverview => {
+     *                 console.log(`% completed: ${jobOverview.progress?.percentage * 100}`);
+     *             }
+     *         });
+     * ```
      *
      * @param request An object with one or more email addresses to validate. Can be of type `string`, `string[]`,
      * `ValidationRequestEntry`, `ValidationRequestEntry[]`, `ValidationRequest`, `FileValidationRequest`.
@@ -119,7 +243,6 @@ class EmailValidationsRestClient {
      */
     submit(request, waitOptions, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            logger.log('submitting', request, waitOptions);
             // Use the "file" field as a discriminator to detect whether the argument is a FileValidationRequest
             // or not.
             if (request.file) {
@@ -130,8 +253,12 @@ class EmailValidationsRestClient {
     }
     /**
      * Returns an email validation job previously submitted for processing.
+     *
      * By default, this method waits for the completion of the email validation job: pass a `WaitOptions`
      * to request a different waiting behavior.
+     *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
      *
      * Here is how to retrieve an email validation job, given its ID:
      * ```ts
@@ -140,8 +267,6 @@ class EmailValidationsRestClient {
      *     .emailValidations
      *     .get('JOB-ID-HERE'); // validation.id (returned by submit() or list())
      * ```
-     *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param id The ID of the email validation job to retrieve.
      * @param waitOptions Optional configuration settings for waiting on the completion of an email validation job.
@@ -156,6 +281,9 @@ class EmailValidationsRestClient {
     /**
      * Deletes an email validation job previously submitted for processing.
      *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
+     *
      * Here is how to delete an email validation job:
      * ```ts
      * const verifalia = new VerifaliaRestClient(...);
@@ -163,8 +291,6 @@ class EmailValidationsRestClient {
      *     .emailValidations
      *     .delete('JOB-ID-HERE'); // validation.id (returned by submit(), get() or list())
      * ```
-     *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param id The ID of the email validation job to delete.
      */
@@ -175,6 +301,9 @@ class EmailValidationsRestClient {
     }
     /**
      * Lists all the email validation jobs, according to the specified listing options.
+     *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
      *
      * Here is how to list all the jobs submitted on a specific date:
      * ```ts
@@ -190,8 +319,6 @@ class EmailValidationsRestClient {
      * }
      * ```
      *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
-     *
      * @param options The options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
      */
@@ -203,6 +330,9 @@ class EmailValidationsRestClient {
      * of generating a *human-readable representation* of the results according to the requested output
      * file format. While the output schema (columns / labels / data format) is fairly complete, you
      * should always consider it as subject to change.
+     *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
      *
      * Here is how to export a job in Microsoft Excel format:
      * ```ts
@@ -222,8 +352,6 @@ class EmailValidationsRestClient {
      *     .getElementByID('my-iframe')
      *     .src = exportedData.toBlobURL(MimeContentType_ExcelXlsx);
      * ```
-     *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param id The ID of the email validation job to retrieve.
      * @param contentType The MIME content-type of output file format. Acceptable values:
@@ -277,28 +405,19 @@ class CreditsRestClient {
     /**
      * Returns the current credits balance for the Verifalia account.
      *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
+     *
      * Here is an example:
      * ```ts
-     * // Option 1 - async/await
-     *
      * const verifalia = new VerifaliaRestClient(...);
+     *
      * const balance = await verifalia
      *     .credits
      *     .getBalance();
      *
      * console.log(`Credit packs: ${balance.creditPacks}, free credits: ${balance.freeCredits}`);
      * // 'Credit packs: 507.23, free credits: 10.86'
-     *
-     * // Option 2 - callback
-     *
-     * const verifalia = new VerifaliaRestClient(...);
-     * verifalia
-     *     .credits
-     *     .getBalance()
-     *     .then(balance => {
-     *         console.log(`Credit packs: ${balance.creditPacks}, free credits: ${balance.freeCredits}`);
-     *         // 'Credit packs: 507.23, free credits: 10.86'
-     *     });
      * ```
      *
      * @param cancellationToken An optional token used to cancel the asynchronous request.
@@ -310,25 +429,26 @@ class CreditsRestClient {
      * Lists the daily usages of the credits for the Verifalia account, according to the specified
      * listing options.
      *
+     * This method returns a `Promise` which can be consumed using the async/await pattern (or through the
+     * classic `then()` / `catch()` functions) and can be cancelled through a `CancellationToken`.
+     *
      * Here is how to list the credit daily usages between two dates:
      * ```ts
      * const verifalia = new VerifaliaRestClient(...);
      * const dailyUsages = verifalia
      *     .credits
      *     .listDailyUsages({
-     *         dateFilter: new DateBetweenPredicate(new Date(2020, 10, 15), new Date(2020, 10, 23))
+     *         dateFilter: new DateBetweenPredicate(new Date(2023, 2, 15), new Date(2023, 3, 1))
      *     });
      *
      * for await (const dailyUsage of dailyUsages) {
      *     console.log(`Date: ${dailyUsage.date}, credit packs: ${dailyUsage.creditPacks}, free credits: ${dailyUsage.freeCredits}`);
-     *     // 'Date: 2020-10-15, credit packs: 98.85, free credits: 50'
-     *     // 'Date: 2020-10-16, credit packs: 0, free credits: 19.26'
+     *     // 'Date: 2023-02-15, credit packs: 98.85, free credits: 50'
+     *     // 'Date: 2023-02-16, credit packs: 0, free credits: 19.26'
      *     // ...
-     *     // 'Date: 2020-10-23, credit packs: 1.565, free credits: 50'
+     *     // 'Date: 2023-03-01, credit packs: 1.565, free credits: 50'
      * }
      * ```
-     *
-     * This method returns a `Promise` which can be awaited and can be cancelled through a `CancellationToken`.
      *
      * @param options A `DailyUsageListingOptions` with the options for the listing operation.
      * @param cancellationToken An optional token used to cancel the asynchronous request.
@@ -3278,7 +3398,6 @@ fetch.Promise = global.Promise;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const logger$1 = new Logger('verifalia');
 class MultiplexedRestClient {
     constructor(authenticator, baseUris, userAgent = undefined) {
         if (!authenticator)
@@ -3337,11 +3456,6 @@ class MultiplexedRestClient {
                         : null;
                     const url = `${baseUri}${resource}${queryString ? '?' + queryString : ''}`;
                     // Display outgoing requests to the API on the console (debug build only)
-                    logger$1.log('RequestInit', requestInit);
-                    logger$1.log('invoking URL', url);
-                    logger$1.log('params', JSON.stringify(params));
-                    logger$1.log('data', JSON.stringify(data));
-                    logger$1.log('headers', JSON.stringify(requestInit.headers));
                     let response;
                     try {
                         response = yield fetch(url, requestInit);
@@ -3392,7 +3506,7 @@ class MultiplexedRestClient {
 }
 
 // generated by genversion
-const version = '4.0.0-alpha';
+const version = '4.0.0';
 
 /**
  * @license
@@ -3608,7 +3722,6 @@ class ClientCertificateAuthenticator {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-const logger$2 = new Logger('verifalia');
 /**
  * HTTPS-based REST client for Verifalia. This is the starting point to every other operation against
  * the Verifalia API, it allows to easily verify email addresses, manage submitted email validation
@@ -3679,7 +3792,6 @@ class VerifaliaRestClient {
         ];
         if (!config)
             throw new Error('config is null');
-        logger$2.log('Compilation', 'node', 'es');
         // Builds the authenticator
         let authenticator;
         let baseUris;
