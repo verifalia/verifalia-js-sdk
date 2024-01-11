@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  * 
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  * 
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -134,4 +134,10 @@ export interface ValidationEntry {
      * not expose any result detail apart from this and the eventual custom values.
      */
     duplicateOf?: number;
+
+    /**
+     * The potential corrections for the input data, in the event Verifalia identified
+     * potential typos during the verification process.
+     */
+    suggestions?: string[];
 }

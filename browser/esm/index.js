@@ -1,8 +1,8 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter } from 'tslib';
-import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-08f19523.js';
-export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-08f19523.js';
-export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.js';
+import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-80a5094a.js';
+export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-80a5094a.js';
+export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_OverrideMatch, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.js';
 import { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.js';
 export { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.js';
 
@@ -12,7 +12,7 @@ export { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.j
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -365,7 +365,7 @@ class EmailValidationsRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -456,7 +456,7 @@ class CreditsRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -501,7 +501,7 @@ class ServiceUnreachableError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -538,7 +538,7 @@ class EndpointServerError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -575,7 +575,7 @@ class AuthorizationError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -616,7 +616,7 @@ class RequestThrottledError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -659,7 +659,7 @@ class InsufficientCreditError extends VerifaliaError {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -715,7 +715,7 @@ const MimeContentType_ExcelXlsx = 'application/vnd.openxmlformats-officedocument
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -848,7 +848,7 @@ class MultiplexedRestClient {
 }
 
 // generated by genversion
-const version = '4.0.0';
+const version = '4.1.0';
 
 /**
  * @license
@@ -856,7 +856,7 @@ const version = '4.0.0';
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -898,7 +898,7 @@ class VerifaliaRestClientFactory {
          * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
          * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
          */
-        this.apiVersion = 'v2.4';
+        this.apiVersion = 'v2.5';
         if (!authenticator)
             throw new Error('authenticator is null');
         if (!baseUris || baseUris.length < 1)
@@ -936,7 +936,7 @@ class VerifaliaRestClientFactory {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -986,7 +986,7 @@ class UsernamePasswordAuthenticator {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1104,7 +1104,7 @@ class VerifaliaRestClient {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1138,7 +1138,7 @@ class FilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1172,7 +1172,7 @@ class DateFilterPredicate extends FilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1215,7 +1215,7 @@ const formatDateToIso8601 = (date) => {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1270,7 +1270,7 @@ class DateBetweenPredicate extends DateFilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -1316,7 +1316,7 @@ class DateEqualityPredicate extends DateFilterPredicate {
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31

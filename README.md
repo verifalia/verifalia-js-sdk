@@ -1,4 +1,4 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.4-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.5-green)
 [![NPM](https://img.shields.io/npm/v/verifalia.svg)](https://www.npmjs.com/package/verifalia)
 
 Verifalia REST API - SDK and helper library for Javascript
@@ -266,6 +266,57 @@ verifalia
     });
 ```
 
+As you may expect, each entry may include various additional details about the verified email address:
+
+| Field                         | Description                                                                                                                                                                                                                                                  |
+|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `asciiEmailAddressDomainPart` | Gets the domain part of the email address, converted to ASCII if needed and with comments and folding white spaces stripped off.                                                                                                                             |
+| `classification`              | The classification value for this entry; values known at the time this SDK is released are available through the `ValidationEntryClassification_*` constants.                                                                                                |
+| `completedOn`                 | The date this entry has been completed, if available.                                                                                                                                                                                                        |
+| `custom`                      | A custom, optional string which is passed back upon completing the validation. To pass back and forth a custom value, use the `custom` field of the specific submitted entry.                                                                                |
+| `duplicateOf`                 | The zero-based index of the first occurrence of this email address in the parent validation job, in the event the `status` for this entry is `Duplicate`; duplicated items do not expose any result detail apart from this and the eventual `custom` values. |
+| `index`                       | The index of this entry within its validation job; this property is mostly useful in the event the API returns a filtered view of the items.                                                                                                                 |
+| `inputData`                   | The input string being validated.                                                                                                                                                                                                                            |
+| `emailAddress`                | Gets the email address, without any eventual comment or folding white space. Returns null if the input data is not a syntactically invalid e-mail address.                                                                                                   |
+| `emailAddressDomainPart`      | Gets the domain part of the email address, without comments and folding white spaces.                                                                                                                                                                        |
+| `emailAddressLocalPart`       | Gets the local part of the email address, without comments and folding white spaces.                                                                                                                                                                         |
+| `hasInternationalDomainName`  | If true, the email address has an international domain name.                                                                                                                                                                                                 |
+| `hasInternationalMailboxName` | If true, the email address has an international mailbox name.                                                                                                                                                                                                |
+| `isDisposableEmailAddress`    | If true, the email address comes from a disposable email address (DEA) provider. <a href="https://verifalia.com/help/email-validations/what-is-a-disposable-email-address-dea">What is a disposable email address?</a>                                       |
+| `isFreeEmailAddress`          | If true, the email address comes from a free email address provider (e.g. gmail, yahoo, outlook / hotmail, ...).                                                                                                                                             |
+| `isRoleAccount`               | If true, the local part of the email address is a well-known role account.                                                                                                                                                                                   |
+| `status`                      | The status value for this entry; values known at the time this SDK is released are available through the `ValidationEntryStatus_*` constants.                                                                                                                |                                                                                                                                                                                                                             
+| `suggestions`                 | The potential corrections for the input data, in the event Verifalia identified potential typos during the verification process.                                                                                                                             |
+| `syntaxFailureIndex`          | The position of the character in the email address that eventually caused the syntax validation to fail.                                                                                                                                                     |
+
+Here is another example, showing some of the additional result details provided by Verifalia:
+
+```js
+const result = await verifalia
+    .emailValidations
+    .submit('bat[man@gmal.com');
+
+const entry = result.entries[0];
+
+console.log(`Classification: ${entry.classification}`);
+console.log(`Status: ${entry.status}`);
+console.log(`Syntax failure index: ${entry.syntaxFailureIndex}`);
+
+if (entry.suggestions) {
+    console.log('Suggestions:');
+
+    entry.suggestions.forEach(suggestion => {
+        console.log(`- ${suggestion}`);
+    });
+}
+
+// Classification: Undeliverable
+// Status: InvalidCharacterInSequence
+// Syntax failure index: 3
+// Suggestions:
+// - batman@gmail.com
+```
+
 ## How to validate a list of email addresses ##
 
 To verify a list of email addresses - instead of a single address - it is possible to pass an array of strings
@@ -278,13 +329,13 @@ Here is an example showing how to verify an array with some email addresses, usi
 ```ts
 const result = await verifalia
     .emailValidations
-    .submit([{
+    .submit([
         'batman@gmail.com',
         'steve.vai@best.music',
         'samantha42@yahoo.de'
-    }]);
+    ]);
 
-result.entries.forEach((item) => {
+result.entries.forEach(item => {
     console.log(`${item.inputData}: ${item.classification}`);
 });
 ```
@@ -296,11 +347,11 @@ And here, of course, the promise callback syntax version of the same:
 
 verifalia
     .emailValidations
-    .submit([{
+    .submit([
         'batman@gmail.com',
         'steve.vai@best.music',
         'samantha42@yahoo.de'
-    }])
+    ])
     .then(result => {
         result.entries.forEach((item) => {
             console.log(`${item.inputData}: ${item.classification}`);
@@ -483,11 +534,11 @@ job to the console window:
 ```ts
 const result = await verifalia
     .emailValidations
-    .submit([{
+    .submit([
         'batman@gmail.com',
         'steve.vai@best.music',
         'samantha42@yahoo.de'
-    }], {
+    ], {
         ...new WaitOptions(),
         progress: jobOverview => {
             console.log(`% completed: ${jobOverview.progress?.percentage * 100}`);
@@ -643,12 +694,12 @@ As a way to monitor and forecast the credits consumption for your account, the m
 
 Here is how to retrieve the daily credits consumption for a certain period:
 
-```javascript
+```js
 const dailyUsages = verifalia
     .credits
     .listDailyUsages({
         // from, to
-        dateFilter = new DateBetweenPredicate(new Date('2023-01-09'), new Date('2023-03-01'))
+        dateFilter: new DateBetweenPredicate(new Date('2024-01-09'), new Date('2024-03-01'))
     });
 
 for await (const dailyUsage of dailyUsages) {
@@ -658,13 +709,13 @@ for await (const dailyUsage of dailyUsages) {
 }
 
 // Prints out something like:
-// Sat Jan 10 2023
+// Sat Jan 10 2024
 //     Credit packs 1965.68
 //     Free daily credits 200
-// Mon Jan 12 2023
+// Mon Jan 12 2024
 //     Credit packs 0
 //     Free daily credits 185.628
-// Tue Jan 13 2023
+// Tue Jan 13 2024
 //     Credit packs 15.32
 //     Free daily credits 200
 // ...
@@ -674,6 +725,15 @@ for await (const dailyUsage of dailyUsages) {
 
 This section lists the changelog for the current major version of the library: for older versions,
 please see the [project releases](https://github.com/verifalia/verifalia-js-sdk/releases).
+
+## v4.1
+
+Released on January 11<sup>th</sup>, 2024
+
+- Added support for API v2.5
+- Added support for custom classification override rules
+- Added support for suggestions / corrections
+- Improved documentation
 
 ## v4.0
 

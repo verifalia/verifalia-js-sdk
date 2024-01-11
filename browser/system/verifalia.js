@@ -31,7 +31,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -76,7 +76,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -121,7 +121,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -241,7 +241,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -474,6 +474,11 @@ System.register('verifalia', ['tslib'], function (exports) {
              */
             var ValidationEntryStatus_MailExchangerIsParked = exports('ValidationEntryStatus_MailExchangerIsParked', 'MailExchangerIsParked');
             /**
+             * The system assigned a user-defined classification because the input data met the criteria specified in a
+             * custom classification override rule..
+             */
+            var ValidationEntryStatus_OverrideMatch = exports('ValidationEntryStatus_OverrideMatch', 'OverrideMatch');
+            /**
              * The lowest possible processing priority (speed) for a validation job.
              */
             var ValidationPriority_Lowest = exports('ValidationPriority_Lowest', 0);
@@ -492,7 +497,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -940,7 +945,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1300,7 +1305,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1417,7 +1422,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1509,7 +1514,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1558,7 +1563,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1600,7 +1605,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1642,7 +1647,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1685,7 +1690,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1730,7 +1735,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1786,7 +1791,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -1964,7 +1969,7 @@ System.register('verifalia', ['tslib'], function (exports) {
             }());
 
             // generated by genversion
-            var version = '4.0.0';
+            var version = '4.1.0';
 
             /**
              * @license
@@ -1972,7 +1977,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2014,7 +2019,7 @@ System.register('verifalia', ['tslib'], function (exports) {
                      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
                      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
                      */
-                    this.apiVersion = 'v2.4';
+                    this.apiVersion = 'v2.5';
                     if (!authenticator)
                         throw new Error('authenticator is null');
                     if (!baseUris || baseUris.length < 1)
@@ -2055,7 +2060,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2106,7 +2111,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2225,7 +2230,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2262,7 +2267,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2301,7 +2306,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2344,7 +2349,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2402,7 +2407,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31
@@ -2451,7 +2456,7 @@ System.register('verifalia', ['tslib'], function (exports) {
              * https://verifalia.com/
              * support@verifalia.com
              *
-             * Copyright (c) 2005-2023 Cobisi Research
+             * Copyright (c) 2005-2024 Cobisi Research
              *
              * Cobisi Research
              * Via Della Costituzione, 31

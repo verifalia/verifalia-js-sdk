@@ -4,7 +4,7 @@
  * https://verifalia.com/
  * support@verifalia.com
  *
- * Copyright (c) 2005-2023 Cobisi Research
+ * Copyright (c) 2005-2024 Cobisi Research
  *
  * Cobisi Research
  * Via Della Costituzione, 31
@@ -236,6 +236,11 @@ export declare const ValidationEntryStatus_Duplicate = "Duplicate";
  * The mail exchanger responsible for the email address is parked / inactive.
  */
 export declare const ValidationEntryStatus_MailExchangerIsParked = "MailExchangerIsParked";
+/**
+ * The system assigned a user-defined classification because the input data met the criteria specified in a
+ * custom classification override rule..
+ */
+export declare const ValidationEntryStatus_OverrideMatch = "OverrideMatch";
 /**
  * The lowest possible processing priority (speed) for a validation job.
  */
