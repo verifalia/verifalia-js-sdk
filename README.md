@@ -44,6 +44,7 @@ To learn more about Verifalia please see [https://verifalia.com][0]
   * [Getting the credits balance](#getting-the-credits-balance)
   * [Retrieving credits usage statistics](#retrieving-credits-usage-statistics)
 - [Changelog / What's new](#changelog---what-s-new)
+  * [v4.1](#v41)
   * [v4.0](#v40)
 
 # Getting started #
