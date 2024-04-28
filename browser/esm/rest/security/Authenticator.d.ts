@@ -30,9 +30,13 @@
  * THE SOFTWARE.
  */
 import { MultiplexedRestClient } from "../MultiplexedRestClient";
-import { RequestInit as NodeRequestInit } from "node-fetch";
+import { CancellationToken } from "../../common/CancellationToken";
+import { RestProblem } from "../RestProblem";
+import { RequestInit as NodeRequestInit, Response as NodeResponse } from "node-fetch";
 export interface Authenticator {
-    decorateRequest(restClient: MultiplexedRestClient, requestInit: NodeRequestInit | // HACK: Make the IDE's background compiler happy
-    RequestInit): Promise<void>;
+    authenticate(restClient: MultiplexedRestClient, requestInit: NodeRequestInit | // HACK: Make the IDE's background compiler happy
+    RequestInit, cancellationToken?: CancellationToken): Promise<void>;
+    handleUnauthorizedRequest(restClient: MultiplexedRestClient, response: NodeResponse | // HACK: Make the IDE's background compiler happy
+    Response, problem?: RestProblem, cancellationToken?: CancellationToken): Promise<void>;
 }
 //# sourceMappingURL=Authenticator.d.ts.map

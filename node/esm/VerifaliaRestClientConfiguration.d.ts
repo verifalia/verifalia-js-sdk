@@ -31,6 +31,7 @@
  */
 /// <reference types="node" />
 import { KeyObject } from "tls";
+import { Authenticator } from "./rest/security/Authenticator";
 export interface VerifaliaRestClientConfiguration {
     /**
      * The username or the browser app key to use while authenticating to the Verifalia API, if
@@ -76,5 +77,6 @@ export interface VerifaliaRestClientConfiguration {
      * Shared passphrase used for a single private key and/or a PFX.
      */
     passphrase?: string;
+    authenticator?: Authenticator;
 }
 //# sourceMappingURL=VerifaliaRestClientConfiguration.d.ts.map

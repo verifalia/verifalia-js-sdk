@@ -4,27 +4,31 @@
 Verifalia REST API - SDK and helper library for Javascript
 ==========================================================
 
-[Verifalia][0] provides a fast and accurate API for verifying email addresses in real-time and checking whether they are deliverable, invalid, or otherwise risky: this SDK library integrates with Verifalia and allows to [verify email addresses][0] on both Node.js backends and in the browser. 
+[Verifalia](https://verifalia.com) provides a fast and accurate API for verifying email addresses in real-time and checking whether they are deliverable, invalid, or otherwise risky: this SDK library integrates with Verifalia and allows to [verify email addresses](https://verifalia.com) on both Node.js backends and in the browser. 
 
 It includes artifacts for a wide range of module loaders, including CommonJS (suitable for Node.js) and native ES modules (ideal for modern front-end module bundlers like Webpack and Rollup, for front-end frameworks like Angular, React, Vue, etc. - and supported in Node.js v13+); it also comes with a turn-key single-file IIFE for browsers (compatible with ES5 or higher), with no external dependencies.
 
-To learn more about Verifalia please see [https://verifalia.com][0]
+To learn more about Verifalia please see [https://verifalia.com](https://verifalia.com)
 
 ## Table of contents
 
 - [Getting started](#getting-started)
   * [Install the package](#install-the-package)
   * [Using Verifalia in Node.js](#using-verifalia-in-nodejs)
-    + [CommonJS (default in Node.js)](#commonjs--default-in-nodejs-)
-    + [ES modules (available in Node.js v13 and higher)](#es-modules--available-in-nodejs-v13-and-higher-)
+    + [CommonJS (default in Node.js)](#commonjs-default-in-nodejs)
+    + [ES modules (available in Node.js v13 and higher)](#es-modules-available-in-nodejs-v13-and-higher)
   * [Using Verifalia in the browser](#using-verifalia-in-the-browser)
-    + [ES modules (ideal for: Webpack, Rollup, ..., Angular, React, Vue, ...)](#es-modules--ideal-for--webpack--rollup----angular--react--vue---)
+    + [ES modules (ideal for: Webpack, Rollup, ..., Angular, React, Vue, ...)](#es-modules-ideal-for-webpack-rollup--angular-react-vue-)
     + [CommonJS](#commonjs)
     + [AMD](#amd)
-    + [IIFE (single-file, which can be directly included in web-pages as is)](#iife--single-file--which-can-be-directly-included-in-web-pages-as-is-)
+    + [IIFE (single-file, which can be directly included in web-pages as is)](#iife-single-file-which-can-be-directly-included-in-web-pages-as-is)
   * [Authentication](#authentication)
-    + [Browser apps' keys](#browser-apps--keys)
-    + [Authenticating via X.509 client certificate (Node-only)](#authenticating-via-x509-client-certificate--node-only-)
+    + [Username and password](#username-and-password)
+    + [Browser app key](#browser-app-key)
+    + [Bearer token](#bearer-token)
+      + [Multi-Factor Authentication](#multi-factor-authentication)
+    + [X.509 client certificate (Node-only)](#x509-client-certificate-node-only)
+  + [Errors](#errors)
 - [Validating email addresses](#validating-email-addresses)
   * [How to validate an email address](#how-to-validate-an-email-address)
   * [How to validate a list of email addresses](#how-to-validate-a-list-of-email-addresses)
@@ -33,23 +37,23 @@ To learn more about Verifalia please see [https://verifalia.com][0]
     + [Quality level](#quality-level)
     + [Deduplication mode](#deduplication-mode)
     + [Data retention](#data-retention)
+    + [CAPTCHA - Bot detection](#captcha---bot-detection)
     + [Wait options](#wait-options)
       - [Avoid waiting](#avoid-waiting)
       - [Progress tracking](#progress-tracking)
     + [Completion callbacks](#completion-callbacks)
   * [Retrieving a job and its results](#retrieving-a-job-and-its-results)
   * [Exporting email verification results in different output formats](#exporting-email-verification-results-in-different-output-formats)
-  * [Don't forget to clean up, when you are done](#don-t-forget-to-clean-up--when-you-are-done)
+  * [Don't forget to clean up, when you are done](#dont-forget-to-clean-up-when-you-are-done)
 - [Managing credits](#managing-credits)
   * [Getting the credits balance](#getting-the-credits-balance)
   * [Retrieving credits usage statistics](#retrieving-credits-usage-statistics)
-- [Changelog / What's new](#changelog---what-s-new)
-  * [v4.1](#v41)
-  * [v4.0](#v40)
+- [Changelog / What's new](#changelog--whats-new)
+  * [v5.0](#v50)
 
-# Getting started #
+# Getting started
 
-## Install the package ##
+## Install the package
 
 The best and easiest way to add the Verifalia email verification Javascript library to your project is to use [npm](https://npmjs.org/), which will automatically download and install the required files. With npm installed, run the following from your project root:
 
@@ -59,13 +63,16 @@ $ npm install verifalia
 
 Once done, you can load the library into your application according to the module system you are using, as explained in the following sections.
 
-## Using Verifalia in Node.js ##
+## Using Verifalia in Node.js
 
-Node.JS applications use the CommonJS module system to load dependencies through the `require(...)` builtin function and, starting from Node.js v13, it is also possible to `import` native ES modules directly: this library includes both CommonJS and native ES modules support.
+Node.JS applications use the CommonJS module system to load dependencies through the `require(...)` builtin function and,
+starting from Node.js v13, it is also possible to `import` native ES modules directly: this library includes both CommonJS
+and native ES modules support.
 
-### CommonJS (default in Node.js) ###
+### CommonJS (default in Node.js)
 
-Using this method you can load any export through the `require(...)` Node.js builtin function. Here is how to load the `VerifaliaRestClient` class, which is the main export of this library:
+Using this method you can load any export through the `require(...)` Node.js builtin function. Here is how to load the
+`VerifaliaRestClient` class, which is the main export of this library:
 
 ```javascript
 const { VerifaliaRestClient } = require('verifalia');
@@ -73,9 +80,10 @@ const { VerifaliaRestClient } = require('verifalia');
 
 The build artifacts are available in the `node/cjs` folder.
 
-### ES modules (available in Node.js v13 and higher) ###
+### ES modules (available in Node.js v13 and higher)
 
-This is the most modern approach and relies on native ES module support in Node.js; here is how to load the `VerifaliaRestClient` class, which is the main export of this library:
+This is the most modern approach and relies on native ES module support in Node.js; here is how to load the `VerifaliaRestClient`
+class, which is the main export of this library:
 
 ```javascript
 import { VerifaliaRestClient } from 'verifalia/node/esm/index.mjs';
@@ -83,7 +91,7 @@ import { VerifaliaRestClient } from 'verifalia/node/esm/index.mjs';
 
 The build artifacts with native ES modules can be found in the `node/esm` folder.
 
-## Using Verifalia in the browser ##
+## Using Verifalia in the browser
 
 This library includes out of the box support for all modern front-end module bundlers like Webpack and Rollup and for front-end frameworks like Angular, React, Vue, etc. It comes with support for these module systems:
 
@@ -97,7 +105,7 @@ And with these additional build artifacts:
 - UMD;
 - IIFE.
 
-### ES modules (ideal for: Webpack, Rollup, ..., Angular, React, Vue, ...) ###
+### ES modules (ideal for: Webpack, Rollup, ..., Angular, React, Vue, ...)
 
 This is the most modern approach, which allows to improve the module loading time as well as to perform tree shaking on your final bundle; using the features of this library requires the use of the `import` keyword, as shown below:
 
@@ -107,7 +115,7 @@ import { VerifaliaRestClient } from 'verifalia';
 
 A build artifact with native ES modules is distributed in the `browser/esm` folder.
 
-### CommonJS ###
+### CommonJS
 
 Using this loading method you can use the features of this library through the `require` function, as shown below:
 
@@ -117,7 +125,7 @@ const { VerifaliaRestClient } = require('verifalia');
 
 The build artifact with the CommonJS module is available in the `browser/cjs` folder.
 
-### AMD ###
+### AMD
 
 Using this loading method you can use the features of this library through the `define` function, as shown below:
 
@@ -134,7 +142,7 @@ define(["verifalia"], function (verifaliaModule) {
 
 The build artifact with the CommonJS module is available in the `browser/amd` folder.
 
-### IIFE (single-file, which can be directly included in web-pages as is) ###
+### IIFE (single-file, which can be directly included in web-pages as is)
 
 While we always recommend using a module loader for a much better performance and duplicate code removal, you can also load the Verifalia SDK along with all its dependencies in a single script and include it in a web page through an IIFE, available at `browser/iife/verifalia.min.js`:
 
@@ -170,27 +178,36 @@ While we always recommend using a module loader for a much better performance an
 </html>
 ```
 
-## Authentication ##
+## Authentication
 
 First things first: authentication to the Verifalia API is performed by way of the username and password credentials of your root Verifalia account or
-those of a Verifalia user (previously known as sub-account): if you don't have a Verifalia account, just [register for a free one][4]. For security reasons, it is always advisable to [create and use a dedicated user][3] for accessing the API, as doing so will allow to assign only the specific needed permissions to it.
+those of a Verifalia user (previously known as sub-account): if you don't have a Verifalia account, just [register for a free one](https://verifalia.com/sign-up). For security reasons,
+it is always advisable to [create and use a dedicated user](https://verifalia.com/client-area#/users/new) for accessing the API from a Node app and to [create and use a dedicated user](https://verifalia.com/client-area#/users/new),
+as doing so will allow to assign only the specific needed permissions to it.
 
-Learn more about authenticating to the Verifalia API at [https://verifalia.com/developers#authentication][2]
+Learn more about authenticating to the Verifalia API at [https://verifalia.com/developers#authentication](https://verifalia.com/developers#authentication)
 
-Once you have your Verifalia credentials at hand, use them while creating a new instance of the `VerifaliaRestClient` class (see how to import it in your code in the sections above), which will be the starting point to every other operation against the Verifalia API:
+### Username and password
+
+The most straightforward method for authenticating against the Verifalia API involves using a username and password pair. These credentials can be applied
+during the creation of a new instance of the `VerifaliaRestClient` class, serving as the initial step for all interactions with the Verifalia API: the
+provided username and password will be automatically transmitted to the API using the HTTP Basic Auth method.
 
 ```ts
 const verifalia = new VerifaliaRestClient({
-    username: 'username',
-    password: 'password'
+    username: 'YOUR-USERNAME-HERE',
+    password: 'YOUR-PASSWORD-HERE'
 });
 ```
 
-### Browser apps' keys ###
+### Browser app key
 
-As an alternative to regular Verifalia users, browser apps come with a fixed and extremely small permissions set which only allows to submit email validations and retrieve their results, which may be ideal for a public website or app. If you wish to learn more about how to configure and manage Verifalia browser apps, please see https://verifalia.com/help/sub-accounts/how-to-manage-browser-apps
+As an alternative to regular Verifalia users, browser apps come with a fixed and minimal permissions set which only allows to submit email validations
+and retrieve their results, which may be ideal for a public website or app. If you wish to learn more about how to configure and manage Verifalia browser
+apps, please see https://verifalia.com/help/sub-accounts/how-to-manage-browser-apps
 
-A browser app key is essentially a username you can use while authenticating against the Verifalia API, which does not have a password. To employ a browser app key with this library, just use it as the `username` field while instantiating a `VerifaliaRestClient` object, as shown below:
+A browser app key is essentially a username you can use while authenticating against the Verifalia API, which does not have a password. To employ a browser
+app key with this library, just use it as the `username` field while instantiating a `VerifaliaRestClient` object, as shown below:
 
 ```ts
 const verifalia = new VerifaliaRestClient({
@@ -198,7 +215,42 @@ const verifalia = new VerifaliaRestClient({
 });
 ```
 
-### Authenticating via X.509 client certificate (Node-only) ###
+### Bearer token
+
+Bearer authentication offers higher security over password-based authentication, as the latter requires sending the actual credentials on each API call, while the former
+only requires it on a first, dedicated authentication request. On the other side, the first authentication request needed by Bearer authentication takes
+a non-negligible time: if you need to perform only a single request, using password-based authentication provides the same degree of security and is also faster.
+Bearer authentication requires a username and password and is thus incompatible with browser app keys.
+
+To authenticate using bearer tokens, provide the username and password to the `BearerAuthenticator` constructor, and then assign the resulting instance to the `authenticator`
+field while instantiating a `VerifaliaRestClient` object, as shown below:
+
+```ts
+const verifalia = new VerifaliaRestClient({
+    authenticator: new BearerAuthenticator('YOUR-USERNAME-HERE', 'YOUR-PASSWORD-HERE')
+});
+```
+
+#### Multi-Factor Authentication
+
+Bearer authentication supports Multi-Factor Authentication (MFA) and it is possible to configure the `BearerAuthenticator` object so that it obtains
+a Time-based One-time Password (TOTP) when necessary. To do that, pass an instance of an object with a method named `provideTotp()` which returns a `Promise<string>`
+containing the required TOTP: this could involve prompting the user to input it or retrieving it from an external device, for instance.
+
+```ts
+const verifalia = new VerifaliaRestClient({
+  authenticator: new BearerAuthenticator('YOUR-USERNAME-HERE',
+    'YOUR-PASSWORD-HERE',
+    {
+      async provideTotp() {
+        // TODO: Obtain the TOTP either from the user directly or from an external device
+        return 'YOUR-TOTP-HERE';
+      }
+    })
+});
+```
+
+### X.509 client certificate (Node-only)
 
 > :warning: This authentication method is only available in Node.js and not in the browser.
 
@@ -214,13 +266,37 @@ const verifalia = new VerifaliaRestClient({
 });
 ```
 
-# Validating email addresses #
+## Errors
+
+In case of API-related errors, the library throws instances of classes derived from `VerifaliaError`; these instances may include
+a `problem` field which, if present, contains a representation of the issue in the [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) `problem+json` format. This
+format offers a clearer understanding of the error and can pinpoint the exact reason for the error condition: in particular,
+the `problem.type` field contains an error string that helps distinguish between different errors that share the same HTTP
+status code.
+
+Furthermore, the library incorporates several typed exception classes, aiding in precisely conveying the reason for a specific
+error condition:
+
+- `AuthenticationError`, thrown in the event the user is unable to authenticate to Verifalia due to authentication-related issues, such as
+  invalid credentials or missing authentication tokens.
+- `AuthorizationError`, thrown in the event the user is authenticated but does not have the necessary permissions to access the requested
+  resource.
+- `CaptchaValidationError`, thrown in the event the provided CAPTCHA token failed the validation on the server side.
+- `EndPointServerError`, thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
+- `InsufficientCreditError`, thrown when the credit of the requesting account is not enough to accept a given
+  email validation job.
+- `OperationCanceledError`, thrown whenever an async function is canceled.
+- `RequestThrottledError`, thrown in the event a request exceeded the maximum configured email validations rate or the maximum number
+  of concurrent requests from the same IP address.
+- `ServiceUnreachableError`, thrown in the event all the Verifalia API endpoints are unreachable.
+
+# Validating email addresses
 
 Every operation related to verifying / validating email addresses is performed through the `emailValidations` property exposed by the `VerifaliaRestClient` instance you created above. The property contains references to methods which can be used to verify email addresses and manage past emaiil validation jobs, as explained below.
 
 **The library automatically waits for the completion of email verification jobs**: if needed, it is possible to adjust the wait options and have more control over the entire underlying polling process. Please refer to the [Wait options](#wait-options) section below for additional details.
 
-## How to validate an email address ##
+## How to validate an email address
 
 To validate an email address you can invoke the `submit()` method: it accepts one or more email addresses and any eventual verification options you wish to pass to Verifalia, including the expected results quality, deduplication preferences and processing priority.
 
@@ -318,7 +394,7 @@ if (entry.suggestions) {
 // - batman@gmail.com
 ```
 
-## How to validate a list of email addresses ##
+## How to validate a list of email addresses
 
 To verify a list of email addresses - instead of a single address - it is possible to pass an array of strings
 to `submit()`; if the email addresses to be verified are originally stored
@@ -487,6 +563,61 @@ const validation = await verifalia
             }
         ],
         retention: '0:10:0' // 10 minutes
+    });
+```
+
+### CAPTCHA - Bot detection
+
+Verifalia can automatically verify CAPTCHA tokens generated by multiple CAPTCHA service providers, ensuring that only
+verifications from genuine humans are processed; this prevents bots from consuming Verifalia credits or triggering
+throttling restrictions for legitimate users. 
+
+The supported CAPTCHA services are:
+
+- Cloudflare Turnstile;
+- Google reCAPTCHA v2 (both checkbox and invisible);
+- Google reCAPTCHA v3;
+- hCaptcha;
+
+To enable bot detection, start by entering the necessary CAPTCHA service settings (typically the secret key provided by
+the external CAPTCHA service) into the _Bot detection_ interface for the user or browser app used to authenticate, accessible
+in the [Verifalia client area](https://verifalia.com/client-area): these settings enable communication between the Verifalia servers and the configured
+CAPTCHA service.
+
+Once done, specify a `captcha` object at the time of the submission of an email verification job through the passed
+`ValidationRequest` (or `FileValidationRequest`, for file imports) instance, providing the type of the CAPTCHA service
+provider through the `provider` field and the CAPTCHA response token provided by that service in response to a CAPTCHA
+challenge by way of the `token` field.
+
+> To learn how to obtain a CAPTCHA response token, please consult the documentation for your selected CAPTCHA service provider:
+> - [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/);
+> - [Google reCAPTCHA v2](https://www.google.com/recaptcha/about/);
+> - [Google reCAPTCHA v3](https://www.google.com/recaptcha/about/);
+> - [hCaptcha](https://www.hcaptcha.com/).
+
+The `provider` field accepts one of the following values:
+
+- `Turnstile` (also exposed by the `CaptchaProvider.Turnstile` constant), for [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/);
+- `reCaptcha_v2` (also exposed by the `CaptchaProvider.ReCaptchaV2` constant), for [Google reCAPTCHA v2](https://www.google.com/recaptcha/about/);
+- `reCaptcha_v3` (also exposed by the `CaptchaProvider.ReCaptchaV3` constant), for [Google reCAPTCHA v3](https://www.google.com/recaptcha/about/);
+- `hCaptcha` (also exposed by the `CaptchaProvider.HCaptcha` constant), for [hCaptcha](https://www.hcaptcha.com/).
+
+Here is how, for example, one can specify a Cloudflare Turnstile CAPTCHA while verifying an email address:
+
+```ts
+const validation = await verifalia
+    .emailValidations
+    .submit({
+        entries: [
+            {
+                inputData: 'batman@gmail.com'
+            }
+        ],
+        captcha: {
+            provider: 'Turnstile',
+            // TODO: Retrieve the actual token from Turnstile, see https://developers.cloudflare.com/turnstile/get-started/
+            token: "0.HaR4xgf0...22788e0"
+        }
     });
 ```
 
@@ -665,11 +796,11 @@ verifalia
 
 Once deleted, a job is gone and there is no way to retrieve its email validation results.
 
-# Managing credits #
+# Managing credits
 
 To manage the Verifalia credits for your account you can use the `credits` property exposed by the `VerifaliaRestClient` instance created above.
 
-## Getting the credits balance ##
+## Getting the credits balance
 
 One of the most common tasks you may need to perform on your Verifalia account is retrieving the available number of free daily credits and credit packs. To do that, you can use the `getBalance()` method, which returns a `Balance` object, as shown in the next example:
 
@@ -687,9 +818,9 @@ console.log(`Free daily credits will reset in ${balance.freeCreditsResetIn}`);
 // Free daily credits will reset in 09:08:23
 ```
 
-To add credit packs to your Verifalia account visit [https://verifalia.com/client-area#/credits/add][5].
+To add credit packs to your Verifalia account visit [https://verifalia.com/client-area#/credits/add](https://verifalia.com/client-area#/credits/add).
 
-## Retrieving credits usage statistics ##
+## Retrieving credits usage statistics
 
 As a way to monitor and forecast the credits consumption for your account, the method `listDailyUsages()` allows to retrieve statistics about historical credits usage, returning an asynchronously iterable collection of `DailyUsage` instances. The method also allows to limit the period of interest by passing a `DailyUsageListingOptions` instance. Elements are returned only for the dates where consumption (either of free credits, credit packs or both) occurred.
 
@@ -727,32 +858,14 @@ for await (const dailyUsage of dailyUsages) {
 This section lists the changelog for the current major version of the library: for older versions,
 please see the [project releases](https://github.com/verifalia/verifalia-js-sdk/releases).
 
-## v4.1
+## v5.0
 
-Released on January 11<sup>th</sup>, 2024
+Released on May 2, 2024
 
-- Added support for API v2.5
-- Added support for custom classification override rules
-- Added support for suggestions / corrections
-- Improved documentation
-
-## v4.0
-
-Released on March 2<sup>nd</sup>, 2023
-
-- Added support for API v2.4
-- Added support for new completion callback options
-- Added support for parked mail exchangers detection
-- Added support for specifying a custom wait time while submitting and retrieving email verification jobs
-- Breaking change: renamed `WaitingStrategy` into `WaitOptions` and refactored the latter so that it now allows to
-adjust the underlying polling wait times
-- Breaking change: the default job submission and retrieval behavior is now to wait for the completion
-of jobs (but it is possible to change that through the new `WaitOptions` class)
-- Improved documentation
-
-[0]: https://verifalia.com
-[2]: https://verifalia.com/developers#authentication
-[3]: https://verifalia.com/client-area#/users/new
-[4]: https://verifalia.com/sign-up
-[5]: https://verifalia.com/client-area#/credits/add
-[6]: https://nodejs.org/api/esm.html
+- Added support for Verifalia API v2.6
+- Added support for multiple [CAPTCHA - Bot detection](#captcha---bot-detection) services.
+- Added support for [bearer token](#bearer-token) authentication and [Multi-Factor authentication](#multi-factor-authentication).
+- Improved error handling: added support for parsing [RFC-9457](https://datatracker.ietf.org/doc/rfc9457/) `problem+json` responses and returning problem details in errors.
+- Breaking change: the `invoke()` method in the `MultiplexedRestClient` class has been changed to accept instances of the new `RestRequest` class; if you're not using the `MultiplexedRestClient` class directly in your code, you won't be impacted by this change. 
+- Breaking change: the logic for `Authenticator` has been updated to accommodate bearer authentication and multi-factor authentication / TOTP; if you're not using a custom authentication method in your code, you won't be impacted by this change.
+- Improved documentation.

@@ -40,7 +40,10 @@ export { VerifaliaRestClientFactory } from './rest/VerifaliaRestClientFactory';
 /* @if TARGET='node' */
 export { ClientCertificateAuthenticator } from './rest/security/ClientCertificateAuthenticator';
 /* @endif */
+
 export { UsernamePasswordAuthenticator } from './rest/security/UsernamePasswordAuthenticator';
+export { BearerAuthenticator } from './rest/security/BearerAuthenticator';
+export { TotpProvider } from './rest/security/TotpProvider';
 
 // Email validations
 
@@ -78,17 +81,22 @@ export { VerifaliaRestClientConfiguration } from './VerifaliaRestClientConfigura
 
 // Errors
 
+export { AuthenticationError } from './errors/AuthenticationError';
 export { AuthorizationError } from './errors/AuthorizationError';
-export { EndpointServerError } from './errors/EndpointServerError';
+export { CaptchaValidationError } from './errors/CaptchaValidationError';
 export { InsufficientCreditError } from './errors/InsufficientCreditError';
+export { EndPointServerError } from './errors/EndPointServerError';
 export { OperationCanceledError } from './errors/OperationCanceledError';
+export { RestError } from './errors/RestError';
 export { RequestThrottledError } from './errors/RequestThrottledError';
 export { ServiceUnreachableError } from './errors/ServiceUnreachableError';
+export { VerifaliaError } from './errors/VerifaliaError';
 
 // Cancellation
 
 export { CancellationToken } from './common/CancellationToken';
 
-// REST constants
+// REST
 
+export { RestProblem } from './rest/RestProblem';
 export * from './rest/constants';

@@ -3,24 +3,24 @@
  * Verifalia - Email list cleaning and real-time email verification service
  * https://verifalia.com/
  * support@verifalia.com
- * 
+ *
  * Copyright (c) 2005-2024 Cobisi Research
- * 
+ *
  * Cobisi Research
  * Via Della Costituzione, 31
  * 35010 Vigonza
  * Italy - European Union
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,11 +29,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 import { VerifaliaError } from "./VerifaliaError";
-
-/**
- * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
- */
-export class EndpointServerError extends VerifaliaError {
+import { RestProblem } from "../rest/RestProblem";
+import { Response as NodeResponse } from "node-fetch";
+export declare class RestError extends VerifaliaError {
+    readonly response: NodeResponse;
+    readonly problem?: RestProblem;
+    constructor(response: NodeResponse, problem?: RestProblem);
 }
+//# sourceMappingURL=RestError.d.ts.map

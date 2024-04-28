@@ -34,6 +34,10 @@
  */
 export declare const MimeContentType_ApplicationJson = "application/json";
 /**
+ * RFC-9457 problem details (problem+json) content-type.
+ */
+export declare const MimeContentType_ApplicationProblemJson = "application/problem+json";
+/**
  * Plain-text files (.txt), with one email address per line.
  */
 export declare const MimeContentType_TextPlain = "text/plain";
@@ -53,4 +57,8 @@ export declare const MimeContentType_ExcelXls = "application/vnd.ms-excel";
  * Microsoft Excel workbook (.xslx).
  */
 export declare const MimeContentType_ExcelXlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+/**
+ * The problem+json type used to indicate the provided CAPTCHA token failed validation on the server side.
+ */
+export declare const ProblemType_CaptchaValidationFailed = "/problems/captcha-validation-failed";
 //# sourceMappingURL=index.d.ts.map

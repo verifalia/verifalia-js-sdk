@@ -30,10 +30,29 @@
  * THE SOFTWARE.
  */
 
-import { VerifaliaError } from "./VerifaliaError";
+import {RestProblem} from "../rest/RestProblem";
+import {RestError} from "./RestError";
+
+/* @if TARGET='node' */
+import {Response as NodeResponse} from "node-fetch";
+/* @endif */
 
 /**
- * Thrown in the event the user is unable to authenticate to Verifalia.
+ * Thrown in the event the user is authenticated but does not have the necessary permissions to access the requested
+ * resource.
  */
-export class AuthorizationError extends VerifaliaError {
+export class AuthorizationError extends RestError {
+    constructor(response:
+                    /* @if TARGET='node' */
+                    NodeResponse
+                    /* @endif */
+                    /* @if false */
+                    | // HACK: Make the IDE's background compiler happy
+                    /* @endif */
+                    /* @if TARGET='browser' */
+                    Response
+                /* @endif */
+        , problem?: RestProblem) {
+        super(response, problem);
+    }
 }

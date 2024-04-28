@@ -32,21 +32,23 @@
 
 import { MultiplexedRestClient } from "../MultiplexedRestClient";
 import { Authenticator } from "./Authenticator";
+import {CancellationToken} from "../../common/CancellationToken";
+import {AuthorizationError} from "../../errors/AuthorizationError";
+import {RestProblem} from "../RestProblem";
 
 /* @if TARGET='node' */
-import { RequestInit as NodeRequestInit } from "node-fetch";
+import {RequestInit as NodeRequestInit, Response as NodeResponse} from "node-fetch"
 /* @endif */
 
 /**
- * Allows to authenticate against the Verifalia API using with either a username-password
- * credentials pair or with a browser app-key.
+ * Allows authentication against the Verifalia API using either a username-password credentials pair or a browser app-key.
  */
 export class UsernamePasswordAuthenticator implements Authenticator {
-    private _username: string;
-    private _password: string;
+    private readonly _username: string;
+    private readonly _password: string;
 
     constructor(username: string, password?: string) {
-        if (!username && username.length === 0) {
+        if (!username) {
             throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
         }
 
@@ -54,7 +56,7 @@ export class UsernamePasswordAuthenticator implements Authenticator {
         this._password = password || '';
     }
 
-    public decorateRequest(restClient: MultiplexedRestClient, requestInit:
+    public authenticate(restClient: MultiplexedRestClient, requestInit:
             /* @if TARGET='node' */
             NodeRequestInit
             /* @endif */
@@ -64,6 +66,8 @@ export class UsernamePasswordAuthenticator implements Authenticator {
             /* @if TARGET='browser' */
             RequestInit
             /* @endif */
+            ,
+            cancellationToken?: CancellationToken
         ): Promise<void> {
 
         requestInit.headers = {
@@ -82,5 +86,23 @@ export class UsernamePasswordAuthenticator implements Authenticator {
         };
 
         return Promise.resolve();
+    }
+
+    public handleUnauthorizedRequest(restClient: MultiplexedRestClient,
+        response:
+             /* @if TARGET='node' */
+             NodeResponse
+             /* @endif */
+             /* @if false */
+             | // HACK: Make the IDE's background compiler happy
+             /* @endif */
+             /* @if TARGET='browser' */
+             Response
+            /* @endif */
+        ,
+        problem?: RestProblem,
+        cancellationToken?: CancellationToken): Promise<void> {
+
+        throw new AuthorizationError(response, problem);
     }
 }

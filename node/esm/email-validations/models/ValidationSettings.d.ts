@@ -41,14 +41,14 @@ export interface ValidationSettings {
      * timeouts settings.
      * Use one of Standard, High or Extreme values or a custom quality level ID if you have
      * one (custom quality levels are available to premium plans only).
-     * See the constants exported in the QualityLevelName.ts file.
+     * Please check the constants exported in the QualityLevelName.ts file for a list of supported values.
      */
     quality?: string;
     /**
      * The strategy Verifalia follows while determining which email addresses are duplicates,
      * within a multiple items job.
      * Duplicated items (after the first occurrence) will have the Duplicate status.
-     * See the constants exported in the DeduplicationMode.ts file.
+     * Please check the constants exported in the DeduplicationMode.ts file for a list of supported values.
      */
     deduplication?: string;
     /**
@@ -57,7 +57,6 @@ export interface ValidationSettings {
      * The allowed range of values spans from 0 (lowest priority) to 255 (highest priority), where the midway value (127) means
      * normal priority; if not specified, Verifalia processes all the concurrent validation jobs for an account using the same
      * priority.
-     * See the constants exported in the ValidationPriority.ts file.
      */
     priority?: number;
     /**
@@ -99,6 +98,21 @@ export interface ValidationSettings {
          * using a self-signed certificate.
          */
         skipServerCertificateValidation?: boolean;
+    };
+    /**
+     * An optional object containing the response of a CAPTCHA validation, which Verifalia will check at submission time
+     * before processing the email verification request.
+     */
+    captcha?: {
+        /**
+         * The CAPTCHA provider used to generate the provided token.
+         * Please check the constants exported in the CaptchaProvider.ts file for a list of supported values.
+         */
+        provider: string;
+        /**
+         * The CAPTCHA response token provided by the user.
+         */
+        token: string;
     };
 }
 //# sourceMappingURL=ValidationSettings.d.ts.map

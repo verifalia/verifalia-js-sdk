@@ -45,7 +45,7 @@ export class VerifaliaRestClientFactory implements RestClientFactory {
      * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
      * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
      */
-    public apiVersion = 'v2.5';
+    public apiVersion = 'v2.6';
 
     private _cachedRestClient: MultiplexedRestClient | undefined;
 

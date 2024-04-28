@@ -470,6 +470,65 @@
      * The highest possible relative processing priority (speed) for a validation job.
      */
     var ValidationPriority_Highest = 255;
+    /**
+     * hCaptcha.
+     */
+    var CaptchaProvider_HCaptcha = 'hCaptcha';
+    /**
+     * Google reCAPTCHA v2.
+     */
+    var CaptchaProvider_ReCaptchaV2 = 'reCaptcha_v2';
+    /**
+     * Google reCAPTCHA v3.
+     */
+    var CaptchaProvider_ReCaptchaV3 = 'reCaptcha_v3';
+    /**
+     * Cloudflare Turnstile.
+     */
+    var CaptchaProvider_Turnstile = 'Turnstile';
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    var RestRequest = /** @class */ (function () {
+        function RestRequest(method, resource, params, data, configOverride) {
+            this.method = method;
+            this.resource = resource;
+            this.params = params;
+            this.data = data;
+            this.configOverride = configOverride;
+        }
+        return RestRequest;
+    }());
 
     /**
      * @license
@@ -558,7 +617,7 @@
                             throw new Error('data type is unsupported.');
                         }
                         waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
-                        return [4 /*yield*/, restClient.invoke('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, data, undefined, cancellationToken)];
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, data, undefined), cancellationToken)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken)];
@@ -610,9 +669,9 @@
                             throw new Error('data type is unsupported.');
                         }
                         waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
-                        return [4 /*yield*/, restClient.invoke('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, formData, {
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('POST', "/email-validations?waitTime=" + waitOptionsOrDefault.submissionWaitTime, undefined, formData, {
                                 headers: headers
-                            }, cancellationToken)];
+                            }), cancellationToken)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, handleSubmitResponse(restClientFactory, response, waitOptionsOrDefault, cancellationToken)];
@@ -665,7 +724,7 @@
                     case 0:
                         waitOptionsOrDefault = waitOptions !== null && waitOptions !== void 0 ? waitOptions : WaitOptions.default;
                         restClient = restClientFactory.build();
-                        return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + id + "?waitTime=" + waitOptionsOrDefault.pollWaitTime, undefined, undefined, undefined, cancellationToken)];
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('GET', "/email-validations/" + id + "?waitTime=" + waitOptionsOrDefault.pollWaitTime), cancellationToken)];
                     case 1:
                         restResponse = _a.sent();
                         if (!(restResponse.response.status === 200 || restResponse.response.status === 202)) return [3 /*break*/, 3];
@@ -710,11 +769,11 @@
                 switch (_a.label) {
                     case 0:
                         restClient = restClientFactory.build();
-                        return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + id + "/entries", undefined, undefined, {
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('GET', "/email-validations/" + id + "/entries", undefined, undefined, {
                                 headers: {
                                     'Accept': contentType
                                 }
-                            }, cancellationToken)];
+                            }), cancellationToken)];
                     case 1:
                         restResponse = _a.sent();
                         if (restResponse.response.status === 200) {
@@ -738,7 +797,7 @@
                 switch (_a.label) {
                     case 0:
                         restClient = restClientFactory.build();
-                        return [4 /*yield*/, restClient.invoke('DELETE', "/email-validations/" + id, undefined, undefined, undefined, cancellationToken)];
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('DELETE', "/email-validations/" + id), cancellationToken)];
                     case 1:
                         restResponse = _a.sent();
                         if (restResponse.response.status === 200 || restResponse.response.status === 410) {
@@ -797,7 +856,7 @@
                         if (cursor.limit > 0) {
                             queryParams["limit"] = cursor.limit.toString();
                         }
-                        return [4 /*yield*/, restClient.invoke('GET', "/email-validations/" + validationId + "/entries", queryParams, undefined, undefined, cancellationToken)];
+                        return [4 /*yield*/, restClient.invoke(new RestRequest('GET', "/email-validations/" + validationId + "/entries", queryParams), cancellationToken)];
                     case 1:
                         restResponse = _b.sent();
                         if (!(restResponse.response.status === 200)) return [3 /*break*/, 3];
@@ -887,7 +946,7 @@
                                 }
                             }
                         }
-                        return [4 /*yield*/, tslib.__await(restClient.invoke('GET', "/email-validations", params, undefined, undefined, cancellationToken))];
+                        return [4 /*yield*/, tslib.__await(restClient.invoke(new RestRequest('GET', "/email-validations", params), cancellationToken))];
                     case 2:
                         response = _d.sent();
                         return [4 /*yield*/, tslib.__await(response.deserialize())];
@@ -1322,7 +1381,7 @@
             switch (_a.label) {
                 case 0:
                     restClient = restClientFactory.build();
-                    return [4 /*yield*/, restClient.invoke("GET", '/credits/balance', undefined, undefined, undefined, cancellationToken)];
+                    return [4 /*yield*/, restClient.invoke(new RestRequest('GET', '/credits/balance'), cancellationToken)];
                 case 1: return [4 /*yield*/, (_a.sent()).deserialize()];
                 case 2: return [2 /*return*/, _a.sent()];
             }
@@ -1364,7 +1423,7 @@
                                 }
                             }
                         }
-                        return [4 /*yield*/, tslib.__await(restClient.invoke('GET', "/credits/daily-usage", params, undefined, undefined, cancellationToken))];
+                        return [4 /*yield*/, tslib.__await(restClient.invoke(new RestRequest('GET', "/credits/daily-usage", params), cancellationToken))];
                     case 2:
                         response = _d.sent();
                         return [4 /*yield*/, tslib.__await(response.deserialize())];
@@ -1568,15 +1627,16 @@
      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
      * THE SOFTWARE.
      */
-    /**
-     * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
-     */
-    var EndpointServerError = /** @class */ (function (_super) {
-        tslib.__extends(EndpointServerError, _super);
-        function EndpointServerError() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var RestError = /** @class */ (function (_super) {
+        tslib.__extends(RestError, _super);
+        function RestError(response, problem) {
+            var _a;
+            var _this = _super.call(this, (_a = problem === null || problem === void 0 ? void 0 : problem.detail) !== null && _a !== void 0 ? _a : "The request generated an HTTP " + response.status + " status code.") || this;
+            _this.response = response;
+            _this.problem = problem;
+            return _this;
         }
-        return EndpointServerError;
+        return RestError;
     }(VerifaliaError));
 
     /**
@@ -1611,15 +1671,15 @@
      * THE SOFTWARE.
      */
     /**
-     * Thrown in the event the user is unable to authenticate to Verifalia.
+     * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
      */
-    var AuthorizationError = /** @class */ (function (_super) {
-        tslib.__extends(AuthorizationError, _super);
-        function AuthorizationError() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var EndPointServerError = /** @class */ (function (_super) {
+        tslib.__extends(EndPointServerError, _super);
+        function EndPointServerError(response, problem) {
+            return _super.call(this, response, problem) || this;
         }
-        return AuthorizationError;
-    }(VerifaliaError));
+        return EndPointServerError;
+    }(RestError));
 
     /**
      * @license
@@ -1658,11 +1718,11 @@
      */
     var RequestThrottledError = /** @class */ (function (_super) {
         tslib.__extends(RequestThrottledError, _super);
-        function RequestThrottledError() {
-            return _super.call(this, "The current request has been throttled; please try again later.") || this;
+        function RequestThrottledError(response, problem) {
+            return _super.call(this, response, problem) || this;
         }
         return RequestThrottledError;
-    }(VerifaliaError));
+    }(RestError));
 
     /**
      * @license
@@ -1703,11 +1763,11 @@
      */
     var InsufficientCreditError = /** @class */ (function (_super) {
         tslib.__extends(InsufficientCreditError, _super);
-        function InsufficientCreditError() {
-            return _super.call(this, "The credit of the requesting account is too low to complete the operation: please visit https://verifalia.com/client-area#/credits/add to add credit packs to your account.") || this;
+        function InsufficientCreditError(response, problem) {
+            return _super.call(this, response, problem) || this;
         }
         return InsufficientCreditError;
-    }(VerifaliaError));
+    }(RestError));
 
     /**
      * @license
@@ -1745,6 +1805,10 @@
      */
     var MimeContentType_ApplicationJson = 'application/json';
     /**
+     * RFC-9457 problem details (problem+json) content-type.
+     */
+    var MimeContentType_ApplicationProblemJson = 'application/problem+json';
+    /**
      * Plain-text files (.txt), with one email address per line.
      */
     var MimeContentType_TextPlain = 'text/plain';
@@ -1764,6 +1828,142 @@
      * Microsoft Excel workbook (.xslx).
      */
     var MimeContentType_ExcelXlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    /**
+     * The problem+json type used to indicate the provided CAPTCHA token failed validation on the server side.
+     */
+    var ProblemType_CaptchaValidationFailed = '/problems/captcha-validation-failed';
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    /**
+     * Thrown in the event the user is unable to authenticate to Verifalia due to authentication-related issues, such as
+     * invalid credentials or missing authentication tokens.
+     */
+    var AuthenticationError = /** @class */ (function (_super) {
+        tslib.__extends(AuthenticationError, _super);
+        function AuthenticationError(response, problem) {
+            return _super.call(this, response, problem) || this;
+        }
+        return AuthenticationError;
+    }(RestError));
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    /**
+     * Thrown in the event the provided CAPTCHA token failed the validation on the server side.
+     */
+    var CaptchaValidationError = /** @class */ (function (_super) {
+        tslib.__extends(CaptchaValidationError, _super);
+        function CaptchaValidationError(response, problem) {
+            return _super.call(this, response, problem) || this;
+        }
+        return CaptchaValidationError;
+    }(AuthenticationError));
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    function parseRestProblem(response) {
+        return tslib.__awaiter(this, void 0, void 0, function () {
+            var responseContentType;
+            return tslib.__generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        responseContentType = response.headers.get('Content-Type');
+                        if (!(responseContentType && responseContentType.includes(MimeContentType_ApplicationProblemJson))) return [3 /*break*/, 2];
+                        return [4 /*yield*/, response.json()];
+                    case 1: return [2 /*return*/, _a.sent()];
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
+    }
 
     /**
      * @license
@@ -1808,7 +2008,7 @@
             this._baseUris = baseUris;
             this._noOfInvocations = 0;
         }
-        MultiplexedRestClient.prototype.invoke = function (method, resource, params, data, configOverride, cancellationToken) {
+        MultiplexedRestClient.prototype.invoke = function (request, cancellationToken) {
             return tslib.__awaiter(this, void 0, void 0, function () {
                 var errors, abortController, onCanceled, _loop_1, this_1, idxAttempt, state_1;
                 var _this = this;
@@ -1825,20 +2025,20 @@
                         case 1:
                             _a.trys.push([1, , 6, 7]);
                             _loop_1 = function (idxAttempt) {
-                                var baseUri, requestInit, queryString, url, response, error_1, _a, _b;
-                                return tslib.__generator(this, function (_c) {
-                                    switch (_c.label) {
+                                var baseUri, requestInit, queryString, url, response, error_1, problem;
+                                return tslib.__generator(this, function (_a) {
+                                    switch (_a.label) {
                                         case 0:
                                             baseUri = this_1._baseUris[this_1._noOfInvocations++ % this_1._baseUris.length];
                                             requestInit = {
-                                                method: method,
-                                                body: data && data instanceof FormData
-                                                    ? data
-                                                    : JSON.stringify(data),
+                                                method: request.method,
+                                                body: request.data && request.data instanceof FormData
+                                                    ? request.data
+                                                    : JSON.stringify(request.data),
                                                 redirect: 'manual',
                                                 headers: {
                                                     // Default accepted MIME content type
-                                                    'Accept': MimeContentType_ApplicationJson
+                                                    'Accept': MimeContentType_ApplicationJson + ", " + MimeContentType_ApplicationProblemJson
                                                 }
                                             };
                                             // Cancellation support
@@ -1849,60 +2049,74 @@
                                             if (this_1._userAgent) {
                                                 requestInit.headers = tslib.__assign(tslib.__assign({}, requestInit.headers), { 'User-Agent': this_1._userAgent });
                                             }
-                                            if (method === 'POST' || method === 'PUT') {
+                                            if (request.method === 'POST' || request.method === 'PUT') {
                                                 requestInit.headers = tslib.__assign(tslib.__assign({}, requestInit.headers), { 
                                                     // Default posted MIME content type
                                                     'Content-Type': MimeContentType_ApplicationJson });
                                             }
-                                            requestInit = tslib.__assign(tslib.__assign({}, requestInit), configOverride);
-                                            return [4 /*yield*/, this_1._authenticator.decorateRequest(this_1, requestInit)];
+                                            requestInit = tslib.__assign(tslib.__assign({}, requestInit), request.configOverride);
+                                            if (!!request.skipAuthentication) return [3 /*break*/, 2];
+                                            return [4 /*yield*/, this_1._authenticator.authenticate(this_1, requestInit, cancellationToken)];
                                         case 1:
-                                            _c.sent();
-                                            queryString = params
+                                            _a.sent();
+                                            _a.label = 2;
+                                        case 2:
+                                            queryString = request.params
                                                 ? Object
-                                                    .entries(params)
+                                                    .entries(request.params)
                                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                                     .map(function (_a) {
                                                     var key = _a[0];
-                                                    return key + "=" + encodeURIComponent(params[key]);
+                                                    return key + "=" + encodeURIComponent(request.params[key]);
                                                 })
                                                     .join('&')
                                                 : null;
-                                            url = "" + baseUri + resource + (queryString ? '?' + queryString : '');
-                                            _c.label = 2;
-                                        case 2:
-                                            _c.trys.push([2, 4, , 5]);
-                                            return [4 /*yield*/, fetch(url, requestInit)];
+                                            url = "" + baseUri + request.resource + (queryString ? '?' + queryString : '');
+                                            _a.label = 3;
                                         case 3:
-                                            response = _c.sent();
-                                            return [3 /*break*/, 5];
+                                            _a.trys.push([3, 5, , 6]);
+                                            return [4 /*yield*/, fetch(url, requestInit)];
                                         case 4:
-                                            error_1 = _c.sent();
+                                            response = _a.sent();
+                                            return [3 /*break*/, 6];
+                                        case 5:
+                                            error_1 = _a.sent();
                                             if (error_1.name === 'AbortError') {
                                                 // The request has been canceled
                                                 throw new OperationCanceledError();
                                             }
                                             errors.push(error_1);
                                             return [2 /*return*/, "continue"];
-                                        case 5:
+                                        case 6: return [4 /*yield*/, parseRestProblem(response)];
+                                        case 7:
+                                            problem = _a.sent();
                                             // Internal server error HTTP 5xx
                                             if (response.status >= 500 && response.status <= 599) {
-                                                errors.push(new EndpointServerError("Endpoint " + baseUri + " returned an HTTP " + response.status + " status code."));
+                                                errors.push(new EndPointServerError(response, problem));
                                                 return [2 /*return*/, "continue"];
                                             }
-                                            if (!(response.status === 401 || response.status === 403)) return [3 /*break*/, 7];
-                                            _a = AuthorizationError.bind;
-                                            _b = response.statusText;
-                                            return [4 /*yield*/, response.text()];
-                                        case 6: throw new (_a.apply(AuthorizationError, [void 0, _b + (_c.sent()) + ' ' + url]))();
-                                        case 7:
+                                            // Authentication error
+                                            if (response.status === 401) {
+                                                if (problem && problem.type === ProblemType_CaptchaValidationFailed) {
+                                                    throw new CaptchaValidationError(response, problem);
+                                                }
+                                                else {
+                                                    throw new AuthenticationError(response, problem);
+                                                }
+                                            }
+                                            if (!(response.status === 403)) return [3 /*break*/, 9];
+                                            return [4 /*yield*/, this_1._authenticator.handleUnauthorizedRequest(this_1, response, problem, cancellationToken)];
+                                        case 8:
+                                            _a.sent();
+                                            _a.label = 9;
+                                        case 9:
                                             // Payment required
                                             if (response.status === 402) {
-                                                throw new InsufficientCreditError();
+                                                throw new InsufficientCreditError(response, problem);
                                             }
                                             // Throttling
                                             if (response.status === 429) {
-                                                throw new RequestThrottledError();
+                                                throw new RequestThrottledError(response, problem);
                                             }
                                             return [2 /*return*/, { value: {
                                                         deserialize: function () { return tslib.__awaiter(_this, void 0, void 0, function () { return tslib.__generator(this, function (_a) {
@@ -1949,7 +2163,7 @@
     }());
 
     // generated by genversion
-    var version = '4.1.0';
+    var version = '5.0.0';
 
     /**
      * @license
@@ -1999,7 +2213,7 @@
              * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
              * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
              */
-            this.apiVersion = 'v2.5';
+            this.apiVersion = 'v2.6';
             if (!authenticator)
                 throw new Error('authenticator is null');
             if (!baseUris || baseUris.length < 1)
@@ -2066,21 +2280,66 @@
      * THE SOFTWARE.
      */
     /**
-     * Allows to authenticate against the Verifalia API using with either a username-password
-     * credentials pair or with a browser app-key.
+     * Thrown in the event the user is authenticated but does not have the necessary permissions to access the requested
+     * resource.
+     */
+    var AuthorizationError = /** @class */ (function (_super) {
+        tslib.__extends(AuthorizationError, _super);
+        function AuthorizationError(response, problem) {
+            return _super.call(this, response, problem) || this;
+        }
+        return AuthorizationError;
+    }(RestError));
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    /**
+     * Allows authentication against the Verifalia API using either a username-password credentials pair or a browser app-key.
      */
     var UsernamePasswordAuthenticator = /** @class */ (function () {
         function UsernamePasswordAuthenticator(username, password) {
-            if (!username && username.length === 0) {
+            if (!username) {
                 throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
             }
             this._username = username;
             this._password = password || '';
         }
-        UsernamePasswordAuthenticator.prototype.decorateRequest = function (restClient, requestInit) {
+        UsernamePasswordAuthenticator.prototype.authenticate = function (restClient, requestInit, cancellationToken) {
             requestInit.headers = tslib.__assign(tslib.__assign({}, requestInit.headers), { 'Authorization': 'Basic ' +
                     btoa(this._username + ":" + this._password) });
             return Promise.resolve();
+        };
+        UsernamePasswordAuthenticator.prototype.handleUnauthorizedRequest = function (restClient, response, problem, cancellationToken) {
+            throw new AuthorizationError(response, problem);
         };
         return UsernamePasswordAuthenticator;
     }());
@@ -2167,7 +2426,7 @@
          * to use while authenticating to the Verifalia service.
          */
         function VerifaliaRestClient(config) {
-            var _a;
+            var _a, _b;
             /**
              * Default Verifalia base URIs.
              */
@@ -2189,19 +2448,184 @@
             // Builds the authenticator
             var authenticator;
             var baseUris;
-            if (config.username) {
-                // User-name password authentication
-                authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
+            if (config.authenticator) {
+                authenticator = config.authenticator;
                 baseUris = (_a = config.baseUris) !== null && _a !== void 0 ? _a : this._baseUris;
             }
-            else {
-                throw new Error('Invalid configuration: either specify your user credentials or your browser-app key.');
+            else if (config.username) {
+                // User-name password authentication
+                authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
+                baseUris = (_b = config.baseUris) !== null && _b !== void 0 ? _b : this._baseUris;
             }
-            this._restClientfactory = new VerifaliaRestClientFactory(authenticator, baseUris);
-            this.credits = new CreditsRestClient(this._restClientfactory);
-            this.emailValidations = new EmailValidationsRestClient(this._restClientfactory);
+            else {
+                throw new Error('Invalid configuration: either specify your user credentials, your browser-app key or an Authenticator instance.');
+            }
+            this._restClientFactory = new VerifaliaRestClientFactory(authenticator, baseUris);
+            this.credits = new CreditsRestClient(this._restClientFactory);
+            this.emailValidations = new EmailValidationsRestClient(this._restClientFactory);
         }
         return VerifaliaRestClient;
+    }());
+
+    /**
+     * @license
+     * Verifalia - Email list cleaning and real-time email verification service
+     * https://verifalia.com/
+     * support@verifalia.com
+     *
+     * Copyright (c) 2005-2024 Cobisi Research
+     *
+     * Cobisi Research
+     * Via Della Costituzione, 31
+     * 35010 Vigonza
+     * Italy - European Union
+     *
+     * Permission is hereby granted, free of charge, to any person obtaining a copy
+     * of this software and associated documentation files (the "Software"), to deal
+     * in the Software without restriction, including without limitation the rights
+     * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     * copies of the Software, and to permit persons to whom the Software is
+     * furnished to do so, subject to the following conditions:
+     *
+     * The above copyright notice and this permission notice shall be included in
+     * all copies or substantial portions of the Software.
+     *
+     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     * THE SOFTWARE.
+     */
+    var JwtClaimMfaRequiredName = "verifalia:mfa";
+    var MaxNoOfMfaAttempts = 3;
+    /**
+     * Allows authentication against the Verifalia API using bearer authentication.
+     */
+    var BearerAuthenticator = /** @class */ (function () {
+        function BearerAuthenticator(username, password, totpProvider) {
+            if (!username) {
+                throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
+            }
+            if (!password) {
+                throw Error('password is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
+            }
+            this._username = username;
+            this._password = password;
+            this._totpProvider = totpProvider;
+        }
+        BearerAuthenticator.prototype.authenticate = function (restClient, requestInit, cancellationToken) {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var authRequest, authResponse, problem, bearerAuthenticationResponse, jwt, authFactors;
+                return tslib.__generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!!this._accessToken) return [3 /*break*/, 6];
+                            authRequest = new RestRequest('POST', '/auth/tokens', undefined, {
+                                username: this._username,
+                                password: this._password
+                            });
+                            authRequest.skipAuthentication = true;
+                            return [4 /*yield*/, restClient.invoke(authRequest, cancellationToken)];
+                        case 1:
+                            authResponse = _a.sent();
+                            if (!(authResponse.response.status !== 200)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, parseRestProblem(authResponse.response)];
+                        case 2:
+                            problem = _a.sent();
+                            throw new AuthenticationError(authResponse.response, problem);
+                        case 3: return [4 /*yield*/, authResponse.deserialize()];
+                        case 4:
+                            bearerAuthenticationResponse = _a.sent();
+                            this._accessToken = bearerAuthenticationResponse.accessToken;
+                            jwt = this.parseJwt(this._accessToken);
+                            authFactors = jwt[JwtClaimMfaRequiredName];
+                            if (!authFactors) return [3 /*break*/, 6];
+                            return [4 /*yield*/, this.provideAdditionalAuthFactor(restClient, authFactors, cancellationToken)];
+                        case 5:
+                            bearerAuthenticationResponse = _a.sent();
+                            this._accessToken = bearerAuthenticationResponse.accessToken;
+                            _a.label = 6;
+                        case 6:
+                            requestInit.headers = tslib.__assign(tslib.__assign({}, requestInit.headers), { 'Authorization': "Bearer " + this._accessToken });
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        BearerAuthenticator.prototype.provideAdditionalAuthFactor = function (restClient, authFactors, cancellationToken) {
+            // We only support TOTP right now, but we may need to handle other factors in the future
+            if (authFactors.find(function (factor) { return factor === 'totp'; })) {
+                return this.provideTotpFactor(restClient, cancellationToken);
+            }
+            else {
+                throw new Error("No supported authentication factor was found among the advertised options: " + JSON.stringify(authFactors) + ".");
+            }
+        };
+        BearerAuthenticator.prototype.provideTotpFactor = function (restClient, cancellationToken) {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var idxAttempt, totp, totpVerificationRequest, totpVerificationResponse, exception_1;
+                return tslib.__generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this._totpProvider) {
+                                throw new Error('A multi-factor authentication is required but no token provider has been provided.');
+                            }
+                            idxAttempt = 0;
+                            _a.label = 1;
+                        case 1:
+                            if (!(idxAttempt < MaxNoOfMfaAttempts)) return [3 /*break*/, 9];
+                            cancellationToken === null || cancellationToken === void 0 ? void 0 : cancellationToken.throwIfCancellationRequested();
+                            return [4 /*yield*/, this._totpProvider
+                                    .provideTotp(cancellationToken)];
+                        case 2:
+                            totp = _a.sent();
+                            totpVerificationRequest = new RestRequest('POST', '/auth/totp/verifications', undefined, {
+                                passCode: totp
+                            }, {
+                                headers: {
+                                    'Authorization': "Bearer " + this._accessToken
+                                }
+                            });
+                            _a.label = 3;
+                        case 3:
+                            _a.trys.push([3, 7, , 8]);
+                            return [4 /*yield*/, restClient.invoke(totpVerificationRequest, cancellationToken)];
+                        case 4:
+                            totpVerificationResponse = _a.sent();
+                            if (!totpVerificationResponse.response.ok) return [3 /*break*/, 6];
+                            return [4 /*yield*/, totpVerificationResponse.deserialize()];
+                        case 5: return [2 /*return*/, _a.sent()];
+                        case 6: return [3 /*break*/, 8];
+                        case 7:
+                            exception_1 = _a.sent();
+                            if (exception_1 instanceof AuthorizationError) ;
+                            else {
+                                throw exception_1;
+                            }
+                            return [3 /*break*/, 8];
+                        case 8:
+                            idxAttempt++;
+                            return [3 /*break*/, 1];
+                        case 9: throw new Error("Invalid TOTP token provided after " + MaxNoOfMfaAttempts + " attempt(s): aborting the authentication.");
+                    }
+                });
+            });
+        };
+        BearerAuthenticator.prototype.handleUnauthorizedRequest = function (restClient, response, problem, cancellationToken) {
+            throw new AuthorizationError(response, problem);
+        };
+        BearerAuthenticator.prototype.parseJwt = function (token) {
+            // Adapted from https://stackoverflow.com/a/38552302/904178
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        };
+        return BearerAuthenticator;
     }());
 
     /**
@@ -2498,8 +2922,15 @@
         return CancellationToken;
     }());
 
+    exports.AuthenticationError = AuthenticationError;
     exports.AuthorizationError = AuthorizationError;
+    exports.BearerAuthenticator = BearerAuthenticator;
     exports.CancellationToken = CancellationToken;
+    exports.CaptchaProvider_HCaptcha = CaptchaProvider_HCaptcha;
+    exports.CaptchaProvider_ReCaptchaV2 = CaptchaProvider_ReCaptchaV2;
+    exports.CaptchaProvider_ReCaptchaV3 = CaptchaProvider_ReCaptchaV3;
+    exports.CaptchaProvider_Turnstile = CaptchaProvider_Turnstile;
+    exports.CaptchaValidationError = CaptchaValidationError;
     exports.CreditsRestClient = CreditsRestClient;
     exports.DateBetweenPredicate = DateBetweenPredicate;
     exports.DateEqualityPredicate = DateEqualityPredicate;
@@ -2507,19 +2938,22 @@
     exports.DeduplicationMode_Relaxed = DeduplicationMode_Relaxed;
     exports.DeduplicationMode_Safe = DeduplicationMode_Safe;
     exports.EmailValidationsRestClient = EmailValidationsRestClient;
-    exports.EndpointServerError = EndpointServerError;
+    exports.EndPointServerError = EndPointServerError;
     exports.InsufficientCreditError = InsufficientCreditError;
     exports.MimeContentType_ApplicationJson = MimeContentType_ApplicationJson;
+    exports.MimeContentType_ApplicationProblemJson = MimeContentType_ApplicationProblemJson;
     exports.MimeContentType_ExcelXls = MimeContentType_ExcelXls;
     exports.MimeContentType_ExcelXlsx = MimeContentType_ExcelXlsx;
     exports.MimeContentType_TextCsv = MimeContentType_TextCsv;
     exports.MimeContentType_TextPlain = MimeContentType_TextPlain;
     exports.MimeContentType_TextTsv = MimeContentType_TextTsv;
     exports.OperationCanceledError = OperationCanceledError;
+    exports.ProblemType_CaptchaValidationFailed = ProblemType_CaptchaValidationFailed;
     exports.QualityLevelName_Extreme = QualityLevelName_Extreme;
     exports.QualityLevelName_High = QualityLevelName_High;
     exports.QualityLevelName_Standard = QualityLevelName_Standard;
     exports.RequestThrottledError = RequestThrottledError;
+    exports.RestError = RestError;
     exports.ServiceUnreachableError = ServiceUnreachableError;
     exports.UsernamePasswordAuthenticator = UsernamePasswordAuthenticator;
     exports.ValidationEntryClassification_Deliverable = ValidationEntryClassification_Deliverable;
@@ -2576,6 +3010,7 @@
     exports.ValidationStatus_Deleted = ValidationStatus_Deleted;
     exports.ValidationStatus_Expired = ValidationStatus_Expired;
     exports.ValidationStatus_InProgress = ValidationStatus_InProgress;
+    exports.VerifaliaError = VerifaliaError;
     exports.VerifaliaRestClient = VerifaliaRestClient;
     exports.VerifaliaRestClientFactory = VerifaliaRestClientFactory;
     exports.WaitOptions = WaitOptions;

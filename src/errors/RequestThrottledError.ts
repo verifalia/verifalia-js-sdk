@@ -30,14 +30,29 @@
  * THE SOFTWARE.
  */
 
-import { VerifaliaError } from "./VerifaliaError";
+import {RestProblem} from "../rest/RestProblem";
+import {RestError} from "./RestError";
+
+/* @if TARGET='node' */
+import {Response as NodeResponse} from "node-fetch";
+/* @endif */
 
 /**
  * Thrown in the event a request exceeded the maximum configured email validations rate or the maximum number
  * of concurrent requests from the same IP address.
  */
-export class RequestThrottledError extends VerifaliaError {
-    constructor() {
-        super(`The current request has been throttled; please try again later.`);
+export class RequestThrottledError extends RestError {
+    constructor(response:
+                    /* @if TARGET='node' */
+                    NodeResponse
+                    /* @endif */
+                    /* @if false */
+                    | // HACK: Make the IDE's background compiler happy
+                    /* @endif */
+                    /* @if TARGET='browser' */
+                    Response
+                /* @endif */
+        , problem?: RestProblem) {
+        super(response, problem);
     }
 }

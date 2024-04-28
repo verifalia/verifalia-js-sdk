@@ -32,6 +32,7 @@
 
 /* @if TARGET='node' */
 import { KeyObject } from "tls";
+import {Authenticator} from "./rest/security/Authenticator";
 /* @endif */
 
 export interface VerifaliaRestClientConfiguration {
@@ -85,7 +86,9 @@ export interface VerifaliaRestClientConfiguration {
      * This field is used only for client-certificate authentication.
      * Shared passphrase used for a single private key and/or a PFX.
      */
-    passphrase?: string
+    passphrase?: string;
     
     /* @endif */
+    
+    authenticator?: Authenticator;
 }

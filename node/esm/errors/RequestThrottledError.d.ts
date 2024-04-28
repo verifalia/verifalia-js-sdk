@@ -29,12 +29,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { VerifaliaError } from "./VerifaliaError";
+import { RestProblem } from "../rest/RestProblem";
+import { RestError } from "./RestError";
+import { Response as NodeResponse } from "node-fetch";
 /**
  * Thrown in the event a request exceeded the maximum configured email validations rate or the maximum number
  * of concurrent requests from the same IP address.
  */
-export declare class RequestThrottledError extends VerifaliaError {
-    constructor();
+export declare class RequestThrottledError extends RestError {
+    constructor(response: NodeResponse, problem?: RestProblem);
 }
 //# sourceMappingURL=RequestThrottledError.d.ts.map

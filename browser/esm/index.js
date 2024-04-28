@@ -1,8 +1,9 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter } from 'tslib';
-import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-80a5094a.js';
-export { O as OperationCanceledError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-80a5094a.js';
-export { DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_OverrideMatch, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.js';
+import { a as submitEmailValidationFile, s as submitEmailValidation, g as getEmailValidation, d as deleteEmailValidation, l as listEmailValidations, e as exportEmailValidationEntries, V as VerifaliaError, O as OperationCanceledError } from './index-3ef00d7e.js';
+export { O as OperationCanceledError, V as VerifaliaError, W as WaitOptions, d as deleteEmailValidation, e as exportEmailValidationEntries, g as getEmailValidation, l as listEmailValidations, s as submitEmailValidation, a as submitEmailValidationFile } from './index-3ef00d7e.js';
+export { CaptchaProvider_HCaptcha, CaptchaProvider_ReCaptchaV2, CaptchaProvider_ReCaptchaV3, CaptchaProvider_Turnstile, DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe, QualityLevelName_Extreme, QualityLevelName_High, QualityLevelName_Standard, ValidationEntryClassification_Deliverable, ValidationEntryClassification_Risky, ValidationEntryClassification_Undeliverable, ValidationEntryClassification_Unknown, ValidationEntryStatus_AtSignNotFound, ValidationEntryStatus_CatchAllConnectionFailure, ValidationEntryStatus_CatchAllValidationTimeout, ValidationEntryStatus_DnsConnectionFailure, ValidationEntryStatus_DnsQueryTimeout, ValidationEntryStatus_DomainDoesNotExist, ValidationEntryStatus_DomainHasNullMx, ValidationEntryStatus_DomainIsMisconfigured, ValidationEntryStatus_DomainIsWellKnownDea, ValidationEntryStatus_DomainPartCompliancyFailure, ValidationEntryStatus_DoubleDotSequence, ValidationEntryStatus_Duplicate, ValidationEntryStatus_InvalidAddressLength, ValidationEntryStatus_InvalidCharacterInSequence, ValidationEntryStatus_InvalidEmptyQuotedWord, ValidationEntryStatus_InvalidFoldingWhiteSpaceSequence, ValidationEntryStatus_InvalidLocalPartLength, ValidationEntryStatus_InvalidWordBoundaryStart, ValidationEntryStatus_IspSpecificSyntaxFailure, ValidationEntryStatus_LocalEndPointRejected, ValidationEntryStatus_LocalPartIsWellKnownRoleAccount, ValidationEntryStatus_LocalSenderAddressRejected, ValidationEntryStatus_MailExchangerIsHoneypot, ValidationEntryStatus_MailExchangerIsParked, ValidationEntryStatus_MailExchangerIsWellKnownDea, ValidationEntryStatus_MailboxConnectionFailure, ValidationEntryStatus_MailboxDoesNotExist, ValidationEntryStatus_MailboxIsDea, ValidationEntryStatus_MailboxTemporarilyUnavailable, ValidationEntryStatus_MailboxValidationTimeout, ValidationEntryStatus_OverrideMatch, ValidationEntryStatus_ServerDoesNotSupportInternationalMailboxes, ValidationEntryStatus_ServerIsCatchAll, ValidationEntryStatus_ServerTemporaryUnavailable, ValidationEntryStatus_SmtpConnectionFailure, ValidationEntryStatus_SmtpConnectionTimeout, ValidationEntryStatus_SmtpDialogError, ValidationEntryStatus_Success, ValidationEntryStatus_UnacceptableDomainLiteral, ValidationEntryStatus_UnbalancedCommentParenthesis, ValidationEntryStatus_UnexpectedQuotedPairSequence, ValidationEntryStatus_UnhandledException, ValidationEntryStatus_UnmatchedQuotedPair, ValidationPriority_Highest, ValidationPriority_Lowest, ValidationPriority_Normal, ValidationStatus_Completed, ValidationStatus_Deleted, ValidationStatus_Expired, ValidationStatus_InProgress } from './email-validations/constants.js';
+import { R as RestRequest } from './RestRequest-90d7ab0c.js';
 import { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.js';
 export { getCreditsBalance, listCreditsDailyUsages } from './credits/functions.js';
 
@@ -526,10 +527,13 @@ class ServiceUnreachableError extends VerifaliaError {
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/**
- * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
- */
-class EndpointServerError extends VerifaliaError {
+class RestError extends VerifaliaError {
+    constructor(response, problem) {
+        var _a;
+        super((_a = problem === null || problem === void 0 ? void 0 : problem.detail) !== null && _a !== void 0 ? _a : `The request generated an HTTP ${response.status} status code.`);
+        this.response = response;
+        this.problem = problem;
+    }
 }
 
 /**
@@ -564,9 +568,12 @@ class EndpointServerError extends VerifaliaError {
  * THE SOFTWARE.
  */
 /**
- * Thrown in the event the user is unable to authenticate to Verifalia.
+ * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
  */
-class AuthorizationError extends VerifaliaError {
+class EndPointServerError extends RestError {
+    constructor(response, problem) {
+        super(response, problem);
+    }
 }
 
 /**
@@ -604,9 +611,9 @@ class AuthorizationError extends VerifaliaError {
  * Thrown in the event a request exceeded the maximum configured email validations rate or the maximum number
  * of concurrent requests from the same IP address.
  */
-class RequestThrottledError extends VerifaliaError {
-    constructor() {
-        super(`The current request has been throttled; please try again later.`);
+class RequestThrottledError extends RestError {
+    constructor(response, problem) {
+        super(response, problem);
     }
 }
 
@@ -647,9 +654,9 @@ class RequestThrottledError extends VerifaliaError {
  *
  * To add credit packs to your Verifalia account please visit https://verifalia.com/client-area#/credits/add
  */
-class InsufficientCreditError extends VerifaliaError {
-    constructor() {
-        super(`The credit of the requesting account is too low to complete the operation: please visit https://verifalia.com/client-area#/credits/add to add credit packs to your account.`);
+class InsufficientCreditError extends RestError {
+    constructor(response, problem) {
+        super(response, problem);
     }
 }
 
@@ -689,6 +696,10 @@ class InsufficientCreditError extends VerifaliaError {
  */
 const MimeContentType_ApplicationJson = 'application/json';
 /**
+ * RFC-9457 problem details (problem+json) content-type.
+ */
+const MimeContentType_ApplicationProblemJson = 'application/problem+json';
+/**
  * Plain-text files (.txt), with one email address per line.
  */
 const MimeContentType_TextPlain = 'text/plain';
@@ -708,6 +719,131 @@ const MimeContentType_ExcelXls = 'application/vnd.ms-excel';
  * Microsoft Excel workbook (.xslx).
  */
 const MimeContentType_ExcelXlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+/**
+ * The problem+json type used to indicate the provided CAPTCHA token failed validation on the server side.
+ */
+const ProblemType_CaptchaValidationFailed = '/problems/captcha-validation-failed';
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2024 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+/**
+ * Thrown in the event the user is unable to authenticate to Verifalia due to authentication-related issues, such as
+ * invalid credentials or missing authentication tokens.
+ */
+class AuthenticationError extends RestError {
+    constructor(response, problem) {
+        super(response, problem);
+    }
+}
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2024 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+/**
+ * Thrown in the event the provided CAPTCHA token failed the validation on the server side.
+ */
+class CaptchaValidationError extends AuthenticationError {
+    constructor(response, problem) {
+        super(response, problem);
+    }
+}
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2024 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+function parseRestProblem(response) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const responseContentType = response.headers.get('Content-Type');
+        if (responseContentType && responseContentType.includes(MimeContentType_ApplicationProblemJson)) {
+            return yield response.json();
+        }
+    });
+}
 
 /**
  * @license
@@ -751,7 +887,7 @@ class MultiplexedRestClient {
         this._baseUris = baseUris;
         this._noOfInvocations = 0;
     }
-    invoke(method, resource, params, data, configOverride, cancellationToken) {
+    invoke(request, cancellationToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const errors = [];
             const abortController = new AbortController();
@@ -764,14 +900,14 @@ class MultiplexedRestClient {
                 for (let idxAttempt = 0; idxAttempt < this._baseUris.length; idxAttempt++) {
                     const baseUri = this._baseUris[this._noOfInvocations++ % this._baseUris.length];
                     let requestInit = {
-                        method,
-                        body: data && data instanceof FormData
-                            ? data
-                            : JSON.stringify(data),
+                        method: request.method,
+                        body: request.data && request.data instanceof FormData
+                            ? request.data
+                            : JSON.stringify(request.data),
                         redirect: 'manual',
                         headers: {
                             // Default accepted MIME content type
-                            'Accept': MimeContentType_ApplicationJson
+                            'Accept': `${MimeContentType_ApplicationJson}, ${MimeContentType_ApplicationProblemJson}`
                         }
                     };
                     // Cancellation support
@@ -782,21 +918,23 @@ class MultiplexedRestClient {
                     if (this._userAgent) {
                         requestInit.headers = Object.assign(Object.assign({}, requestInit.headers), { 'User-Agent': this._userAgent });
                     }
-                    if (method === 'POST' || method === 'PUT') {
+                    if (request.method === 'POST' || request.method === 'PUT') {
                         requestInit.headers = Object.assign(Object.assign({}, requestInit.headers), { 
                             // Default posted MIME content type
                             'Content-Type': MimeContentType_ApplicationJson });
                     }
-                    requestInit = Object.assign(Object.assign({}, requestInit), configOverride);
-                    yield this._authenticator.decorateRequest(this, requestInit);
-                    const queryString = params
+                    requestInit = Object.assign(Object.assign({}, requestInit), request.configOverride);
+                    if (!request.skipAuthentication) {
+                        yield this._authenticator.authenticate(this, requestInit, cancellationToken);
+                    }
+                    const queryString = request.params
                         ? Object
-                            .entries(params)
+                            .entries(request.params)
                             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                            .map(([key]) => `${key}=${encodeURIComponent(params[key])}`)
+                            .map(([key]) => `${key}=${encodeURIComponent(request.params[key])}`)
                             .join('&')
                         : null;
-                    const url = `${baseUri}${resource}${queryString ? '?' + queryString : ''}`;
+                    const url = `${baseUri}${request.resource}${queryString ? '?' + queryString : ''}`;
                     // Display outgoing requests to the API on the console (debug build only)
                     let response;
                     try {
@@ -810,22 +948,33 @@ class MultiplexedRestClient {
                         errors.push(error);
                         continue;
                     }
+                    // Parse any eventual RFC-9457 problem
+                    const problem = yield parseRestProblem(response);
                     // Internal server error HTTP 5xx
                     if (response.status >= 500 && response.status <= 599) {
-                        errors.push(new EndpointServerError(`Endpoint ${baseUri} returned an HTTP ${response.status} status code.`));
+                        errors.push(new EndPointServerError(response, problem));
                         continue;
                     }
-                    // Authentication / authorization error
-                    if (response.status === 401 || response.status === 403) {
-                        throw new AuthorizationError(response.statusText + (yield response.text()) + ' ' + url);
+                    // Authentication error
+                    if (response.status === 401) {
+                        if (problem && problem.type === ProblemType_CaptchaValidationFailed) {
+                            throw new CaptchaValidationError(response, problem);
+                        }
+                        else {
+                            throw new AuthenticationError(response, problem);
+                        }
+                    }
+                    // Authorization error
+                    if (response.status === 403) {
+                        yield this._authenticator.handleUnauthorizedRequest(this, response, problem, cancellationToken);
                     }
                     // Payment required
                     if (response.status === 402) {
-                        throw new InsufficientCreditError();
+                        throw new InsufficientCreditError(response, problem);
                     }
                     // Throttling
                     if (response.status === 429) {
-                        throw new RequestThrottledError();
+                        throw new RequestThrottledError(response, problem);
                     }
                     return {
                         deserialize: () => __awaiter(this, void 0, void 0, function* () { return (yield response.json()); }),
@@ -848,7 +997,7 @@ class MultiplexedRestClient {
 }
 
 // generated by genversion
-const version = '4.1.0';
+const version = '5.0.0';
 
 /**
  * @license
@@ -898,7 +1047,7 @@ class VerifaliaRestClientFactory {
          * Gets or sets the version of the Verifalia API to use when making requests; defaults to the latest API
          * version supported by this SDK. Warning: changing this value may affect the stability of the SDK itself.
          */
-        this.apiVersion = 'v2.5';
+        this.apiVersion = 'v2.6';
         if (!authenticator)
             throw new Error('authenticator is null');
         if (!baseUris || baseUris.length < 1)
@@ -962,21 +1111,64 @@ class VerifaliaRestClientFactory {
  * THE SOFTWARE.
  */
 /**
- * Allows to authenticate against the Verifalia API using with either a username-password
- * credentials pair or with a browser app-key.
+ * Thrown in the event the user is authenticated but does not have the necessary permissions to access the requested
+ * resource.
+ */
+class AuthorizationError extends RestError {
+    constructor(response, problem) {
+        super(response, problem);
+    }
+}
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2024 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+/**
+ * Allows authentication against the Verifalia API using either a username-password credentials pair or a browser app-key.
  */
 class UsernamePasswordAuthenticator {
     constructor(username, password) {
-        if (!username && username.length === 0) {
+        if (!username) {
             throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
         }
         this._username = username;
         this._password = password || '';
     }
-    decorateRequest(restClient, requestInit) {
+    authenticate(restClient, requestInit, cancellationToken) {
         requestInit.headers = Object.assign(Object.assign({}, requestInit.headers), { 'Authorization': 'Basic ' +
                 btoa(this._username + ":" + this._password) });
         return Promise.resolve();
+    }
+    handleUnauthorizedRequest(restClient, response, problem, cancellationToken) {
+        throw new AuthorizationError(response, problem);
     }
 }
 
@@ -1062,7 +1254,7 @@ class VerifaliaRestClient {
      * to use while authenticating to the Verifalia service.
      */
     constructor(config) {
-        var _a;
+        var _a, _b;
         /**
          * Default Verifalia base URIs.
          */
@@ -1084,17 +1276,154 @@ class VerifaliaRestClient {
         // Builds the authenticator
         let authenticator;
         let baseUris;
-        if (config.username) {
-            // User-name password authentication
-            authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
+        if (config.authenticator) {
+            authenticator = config.authenticator;
             baseUris = (_a = config.baseUris) !== null && _a !== void 0 ? _a : this._baseUris;
         }
-        else {
-            throw new Error('Invalid configuration: either specify your user credentials or your browser-app key.');
+        else if (config.username) {
+            // User-name password authentication
+            authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
+            baseUris = (_b = config.baseUris) !== null && _b !== void 0 ? _b : this._baseUris;
         }
-        this._restClientfactory = new VerifaliaRestClientFactory(authenticator, baseUris);
-        this.credits = new CreditsRestClient(this._restClientfactory);
-        this.emailValidations = new EmailValidationsRestClient(this._restClientfactory);
+        else {
+            throw new Error('Invalid configuration: either specify your user credentials, your browser-app key or an Authenticator instance.');
+        }
+        this._restClientFactory = new VerifaliaRestClientFactory(authenticator, baseUris);
+        this.credits = new CreditsRestClient(this._restClientFactory);
+        this.emailValidations = new EmailValidationsRestClient(this._restClientFactory);
+    }
+}
+
+/**
+ * @license
+ * Verifalia - Email list cleaning and real-time email verification service
+ * https://verifalia.com/
+ * support@verifalia.com
+ *
+ * Copyright (c) 2005-2024 Cobisi Research
+ *
+ * Cobisi Research
+ * Via Della Costituzione, 31
+ * 35010 Vigonza
+ * Italy - European Union
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+const JwtClaimMfaRequiredName = "verifalia:mfa";
+const MaxNoOfMfaAttempts = 3;
+/**
+ * Allows authentication against the Verifalia API using bearer authentication.
+ */
+class BearerAuthenticator {
+    constructor(username, password, totpProvider) {
+        if (!username) {
+            throw Error('username is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
+        }
+        if (!password) {
+            throw Error('password is null or empty: please visit https://verifalia.com/client-area to set up a new user or a new browser app, if you don\'t have one.');
+        }
+        this._username = username;
+        this._password = password;
+        this._totpProvider = totpProvider;
+    }
+    authenticate(restClient, requestInit, cancellationToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Request a new security token to the Verifalia API, if one is not yet available
+            if (!this._accessToken) {
+                const authRequest = new RestRequest('POST', '/auth/tokens', undefined, {
+                    username: this._username,
+                    password: this._password
+                });
+                authRequest.skipAuthentication = true;
+                const authResponse = yield restClient.invoke(authRequest, cancellationToken);
+                if (authResponse.response.status !== 200) {
+                    const problem = yield parseRestProblem(authResponse.response);
+                    throw new AuthenticationError(authResponse.response, problem);
+                }
+                let bearerAuthenticationResponse = yield authResponse.deserialize();
+                this._accessToken = bearerAuthenticationResponse.accessToken;
+                /* eslint-disable */
+                const jwt = this.parseJwt(this._accessToken);
+                /* eslint-enable */
+                const authFactors = jwt[JwtClaimMfaRequiredName];
+                if (authFactors) {
+                    bearerAuthenticationResponse = yield this.provideAdditionalAuthFactor(restClient, authFactors, cancellationToken);
+                    this._accessToken = bearerAuthenticationResponse.accessToken;
+                }
+            }
+            requestInit.headers = Object.assign(Object.assign({}, requestInit.headers), { 'Authorization': `Bearer ${this._accessToken}` });
+        });
+    }
+    provideAdditionalAuthFactor(restClient, authFactors, cancellationToken) {
+        // We only support TOTP right now, but we may need to handle other factors in the future
+        if (authFactors.find(factor => factor === 'totp')) {
+            return this.provideTotpFactor(restClient, cancellationToken);
+        }
+        else {
+            throw new Error(`No supported authentication factor was found among the advertised options: ${JSON.stringify(authFactors)}.`);
+        }
+    }
+    provideTotpFactor(restClient, cancellationToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this._totpProvider) {
+                throw new Error('A multi-factor authentication is required but no token provider has been provided.');
+            }
+            for (let idxAttempt = 0; idxAttempt < MaxNoOfMfaAttempts; idxAttempt++) {
+                cancellationToken === null || cancellationToken === void 0 ? void 0 : cancellationToken.throwIfCancellationRequested();
+                // Retrieve the one-time token from the configured device
+                const totp = yield this._totpProvider
+                    .provideTotp(cancellationToken);
+                // Validates the provided token against the Verifalia API
+                const totpVerificationRequest = new RestRequest('POST', '/auth/totp/verifications', undefined, {
+                    passCode: totp
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${this._accessToken}`
+                    }
+                });
+                try {
+                    const totpVerificationResponse = yield restClient.invoke(totpVerificationRequest, cancellationToken);
+                    if (totpVerificationResponse.response.ok) {
+                        return yield totpVerificationResponse.deserialize();
+                    }
+                }
+                catch (exception) {
+                    if (exception instanceof AuthorizationError) ;
+                    else {
+                        throw exception;
+                    }
+                }
+            }
+            throw new Error(`Invalid TOTP token provided after ${MaxNoOfMfaAttempts} attempt(s): aborting the authentication.`);
+        });
+    }
+    handleUnauthorizedRequest(restClient, response, problem, cancellationToken) {
+        throw new AuthorizationError(response, problem);
+    }
+    parseJwt(token) {
+        // Adapted from https://stackoverflow.com/a/38552302/904178
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
     }
 }
 
@@ -1376,4 +1705,4 @@ class CancellationToken {
     }
 }
 
-export { AuthorizationError, CancellationToken, CreditsRestClient, DateBetweenPredicate, DateEqualityPredicate, EmailValidationsRestClient, EndpointServerError, InsufficientCreditError, MimeContentType_ApplicationJson, MimeContentType_ExcelXls, MimeContentType_ExcelXlsx, MimeContentType_TextCsv, MimeContentType_TextPlain, MimeContentType_TextTsv, RequestThrottledError, ServiceUnreachableError, UsernamePasswordAuthenticator, VerifaliaRestClient, VerifaliaRestClientFactory };
+export { AuthenticationError, AuthorizationError, BearerAuthenticator, CancellationToken, CaptchaValidationError, CreditsRestClient, DateBetweenPredicate, DateEqualityPredicate, EmailValidationsRestClient, EndPointServerError, InsufficientCreditError, MimeContentType_ApplicationJson, MimeContentType_ApplicationProblemJson, MimeContentType_ExcelXls, MimeContentType_ExcelXlsx, MimeContentType_TextCsv, MimeContentType_TextPlain, MimeContentType_TextTsv, ProblemType_CaptchaValidationFailed, RequestThrottledError, RestError, ServiceUnreachableError, UsernamePasswordAuthenticator, VerifaliaRestClient, VerifaliaRestClientFactory };

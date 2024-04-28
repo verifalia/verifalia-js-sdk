@@ -31,14 +31,16 @@
  */
 import { MultiplexedRestClient } from "../MultiplexedRestClient";
 import { Authenticator } from "./Authenticator";
+import { CancellationToken } from "../../common/CancellationToken";
+import { RestProblem } from "../RestProblem";
 /**
- * Allows to authenticate against the Verifalia API using with either a username-password
- * credentials pair or with a browser app-key.
+ * Allows authentication against the Verifalia API using either a username-password credentials pair or a browser app-key.
  */
 export declare class UsernamePasswordAuthenticator implements Authenticator {
-    private _username;
-    private _password;
+    private readonly _username;
+    private readonly _password;
     constructor(username: string, password?: string);
-    decorateRequest(restClient: MultiplexedRestClient, requestInit: RequestInit): Promise<void>;
+    authenticate(restClient: MultiplexedRestClient, requestInit: RequestInit, cancellationToken?: CancellationToken): Promise<void>;
+    handleUnauthorizedRequest(restClient: MultiplexedRestClient, response: Response, problem?: RestProblem, cancellationToken?: CancellationToken): Promise<void>;
 }
 //# sourceMappingURL=UsernamePasswordAuthenticator.d.ts.map

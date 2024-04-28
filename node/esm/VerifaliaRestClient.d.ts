@@ -52,7 +52,7 @@ export declare class VerifaliaRestClient {
      * Default Verifalia base URIs for client-certificate authentication.
      */
     private _baseCcaUris;
-    private _restClientfactory;
+    private readonly _restClientFactory;
     /**
      * Allows to manage the credits for the Verifalia account.
      */

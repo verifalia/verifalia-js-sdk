@@ -35,15 +35,22 @@
 
 import { Authenticator } from './security/Authenticator';
 import { ServiceUnreachableError } from '../errors/ServiceUnreachableError';
-import { EndpointServerError } from '../errors/EndpointServerError';
-import { AuthorizationError } from '../errors/AuthorizationError';
+import { EndPointServerError } from '../errors/EndPointServerError';
 import { Logger } from '../diagnostics/Logger';
 import { RequestThrottledError } from '../errors/RequestThrottledError';
 import { InsufficientCreditError } from '../errors/InsufficientCreditError';
 import { OperationCanceledError } from '../errors/OperationCanceledError';
 import { CancellationToken } from '../common/CancellationToken';
-import { MimeContentType_ApplicationJson } from './constants';
+import {
+    MimeContentType_ApplicationJson,
+    MimeContentType_ApplicationProblemJson,
+    ProblemType_CaptchaValidationFailed
+} from './constants';
+import {RestRequest} from "./RestRequest";
 import { RestResponse } from './RestResponse';
+import {AuthenticationError} from "../errors/AuthenticationError";
+import {CaptchaValidationError} from "../errors/CaptchaValidationError";
+import {parseRestProblem} from "./functions";
 
 /* @if TARGET='node' */
 import AbortController from "abort-controller"
@@ -58,8 +65,8 @@ const logger = new Logger('verifalia');
 
 export class MultiplexedRestClient {
     private _authenticator: Authenticator;
-    private _baseUris: string[];
-    private _userAgent: string | undefined;
+    private readonly _baseUris: string[];
+    private readonly _userAgent: string | undefined;
     private _noOfInvocations: number;
 
     constructor(authenticator: Authenticator, baseUris: string[], userAgent: string | undefined = undefined) {
@@ -72,14 +79,9 @@ export class MultiplexedRestClient {
         this._noOfInvocations = 0;
     }
 
-    public async invoke<T>(method: 'HEAD' | 'GET' | 'POST' | 'PUT' | 'DELETE',
-        resource: string,
-        params?: any,
-        data?: any,
-        configOverride?: any,
+    public async invoke<T>(request: RestRequest,
         cancellationToken?: CancellationToken): Promise<RestResponse<T>> {
         const errors: any[] = [];
-
         const abortController = new AbortController()
         const onCanceled = () => abortController.abort();
 
@@ -104,14 +106,14 @@ export class MultiplexedRestClient {
                     RequestInit
                     /* @endif */
                     = {
-                    method,
-                    body: data && data instanceof FormData
-                        ? data as any
-                        : JSON.stringify(data),
+                    method: request.method,
+                    body: request.data && request.data instanceof FormData
+                        ? request.data as any
+                        : JSON.stringify(request.data),
                     redirect: 'manual',
                     headers: {
                         // Default accepted MIME content type
-                        'Accept': MimeContentType_ApplicationJson
+                        'Accept': `${MimeContentType_ApplicationJson}, ${MimeContentType_ApplicationProblemJson}`
                     }
                 };
 
@@ -130,7 +132,7 @@ export class MultiplexedRestClient {
                     };
                 }
 
-                if (method === 'POST' || method === 'PUT') {
+                if (request.method === 'POST' || request.method === 'PUT') {
                     requestInit.headers = {
                         ...requestInit.headers,
                         // Default posted MIME content type
@@ -140,28 +142,30 @@ export class MultiplexedRestClient {
 
                 requestInit = {
                     ...requestInit,
-                    ...configOverride
+                    ...request.configOverride
                 };
 
-                await this._authenticator.decorateRequest(this, requestInit);
+                if (!request.skipAuthentication) {
+                    await this._authenticator.authenticate(this, requestInit, cancellationToken);
+                }
 
-                const queryString = params
+                const queryString = request.params
                     ? Object
-                        .entries(params)
+                        .entries(request.params)
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                        .map(([key]) => `${key}=${encodeURIComponent(params[key])}`)
+                        .map(([key]) => `${key}=${encodeURIComponent(request.params[key])}`)
                         .join('&')
                     : null;
 
-                const url = `${baseUri}${resource}${queryString ? '?' + queryString : ''}`;
+                const url = `${baseUri}${request.resource}${queryString ? '?' + queryString : ''}`;
 
                 // Display outgoing requests to the API on the console (debug build only)
 
                 /* @if ENVIRONMENT!='production' */
                 logger.log('RequestInit', requestInit);
                 logger.log('invoking URL', url);
-                logger.log('params', JSON.stringify(params));
-                logger.log('data', JSON.stringify(data));
+                logger.log('params', JSON.stringify(request.params));
+                logger.log('data', JSON.stringify(request.data));
                 logger.log('headers', JSON.stringify(requestInit.headers));
                 /* @endif */
 
@@ -178,8 +182,7 @@ export class MultiplexedRestClient {
                     ;
 
                 try {
-                    response = await fetch(url,
-                        requestInit);
+                    response = await fetch(url, requestInit);
                 }
                 catch (error) {
                     if (error.name === 'AbortError') {
@@ -191,30 +194,45 @@ export class MultiplexedRestClient {
                     errors.push(error);
                     continue;
                 }
+                
+                // Parse any eventual RFC-9457 problem
+
+                const problem = await parseRestProblem(response);
 
                 // Internal server error HTTP 5xx
 
                 if (response.status >= 500 && response.status <= 599) {
-                    errors.push(new EndpointServerError(`Endpoint ${baseUri} returned an HTTP ${response.status} status code.`));
+                    errors.push(new EndPointServerError(response, problem));
                     continue;
                 }
 
-                // Authentication / authorization error
+                // Authentication error
 
-                if (response.status === 401 || response.status === 403) {
-                    throw new AuthorizationError(response.statusText + (await response.text()) + ' ' + url);
+                if (response.status === 401) {
+                    if (problem && problem.type === ProblemType_CaptchaValidationFailed) {
+                        throw new CaptchaValidationError(response, problem);
+                    }
+                    else {
+                        throw new AuthenticationError(response, problem);
+                    }
+                }
+                
+                // Authorization error
+
+                if (response.status === 403) {
+                    await this._authenticator.handleUnauthorizedRequest(this, response, problem, cancellationToken);
                 }
 
                 // Payment required
 
                 if (response.status === 402) {
-                    throw new InsufficientCreditError();
+                    throw new InsufficientCreditError(response, problem);
                 }
 
                 // Throttling
 
                 if (response.status === 429) {
-                    throw new RequestThrottledError();
+                    throw new RequestThrottledError(response, problem);
                 }
 
                 return {

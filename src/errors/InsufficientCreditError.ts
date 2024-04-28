@@ -30,7 +30,12 @@
  * THE SOFTWARE.
  */
 
-import { VerifaliaError } from "./VerifaliaError";
+import {RestProblem} from "../rest/RestProblem";
+import {RestError} from "./RestError";
+
+/* @if TARGET='node' */
+import {Response as NodeResponse} from "node-fetch";
+/* @endif */
 
 /**
  * Thrown when the credit of the requesting account is not enough to accept a given
@@ -38,8 +43,18 @@ import { VerifaliaError } from "./VerifaliaError";
  * 
  * To add credit packs to your Verifalia account please visit https://verifalia.com/client-area#/credits/add
  */
-export class InsufficientCreditError extends VerifaliaError {
-    constructor() {
-        super(`The credit of the requesting account is too low to complete the operation: please visit https://verifalia.com/client-area#/credits/add to add credit packs to your account.`);
+export class InsufficientCreditError extends RestError {
+    constructor(response:
+                    /* @if TARGET='node' */
+                    NodeResponse
+                    /* @endif */
+                    /* @if false */
+                    | // HACK: Make the IDE's background compiler happy
+                    /* @endif */
+                    /* @if TARGET='browser' */
+                    Response
+                /* @endif */
+        , problem?: RestProblem) {
+        super(response, problem);
     }
 }

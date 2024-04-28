@@ -29,10 +29,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { VerifaliaError } from "./VerifaliaError";
+import { CancellationToken } from "../../common/CancellationToken";
 /**
- * Thrown in the rare event a Verifalia API endpoint returns an HTTP server error status code (HTTP 5xx).
+ * Provides time-based one-time passwords (TOTP) for multi-factor authentication.
  */
-export declare class EndpointServerError extends VerifaliaError {
+export interface TotpProvider {
+    provideTotp(cancellationToken?: CancellationToken): Promise<string>;
 }
-//# sourceMappingURL=EndpointServerError.d.ts.map
+//# sourceMappingURL=TotpProvider.d.ts.map

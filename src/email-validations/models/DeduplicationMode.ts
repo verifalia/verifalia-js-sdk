@@ -30,11 +30,7 @@
  * THE SOFTWARE.
  */
 
-import {
-    DeduplicationMode_Off,
-    DeduplicationMode_Relaxed,
-    DeduplicationMode_Safe
-} from "../constants";
+import {DeduplicationMode_Off, DeduplicationMode_Relaxed, DeduplicationMode_Safe} from "../constants";
 
 export const DeduplicationMode = {
     /**

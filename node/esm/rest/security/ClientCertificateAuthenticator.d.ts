@@ -32,15 +32,18 @@
 /// <reference types="node" />
 import { MultiplexedRestClient } from "../MultiplexedRestClient";
 import { Authenticator } from "./Authenticator";
-import { RequestInit as NodeRequestInit } from "node-fetch";
+import { RequestInit as NodeRequestInit, Response as NodeResponse } from "node-fetch";
 import { KeyObject } from "tls";
+import { CancellationToken } from "../../common/CancellationToken";
+import { RestProblem } from "../RestProblem";
 /**
  * Allows to authenticate against the Verifalia API using an X.509 client certificate.
  * Learn more: https://verifalia.com/help/sub-accounts/what-is-x509-tls-client-certificate-authentication
  */
 export declare class ClientCertificateAuthenticator implements Authenticator {
-    private _agent;
+    private readonly _agent;
     constructor(cert: string | Buffer | (string | Buffer)[], key: string | Buffer | (Buffer | KeyObject)[], passphrase?: string);
-    decorateRequest(restClient: MultiplexedRestClient, requestInit: NodeRequestInit): Promise<void>;
+    authenticate(restClient: MultiplexedRestClient, requestInit: NodeRequestInit): Promise<void>;
+    handleUnauthorizedRequest(restClient: MultiplexedRestClient, response: NodeResponse, problem?: RestProblem, cancellationToken?: CancellationToken): Promise<void>;
 }
 //# sourceMappingURL=ClientCertificateAuthenticator.d.ts.map

@@ -36,6 +36,7 @@ import { Balance } from "../models/Balance";
 import { DailyUsage } from "../models/DailyUsage";
 import { DailyUsageListingOptions } from "../models/DailyUsageListingOptions";
 import { DailyUsageListSegment } from "../models/DailyUsageListSegment";
+import {RestRequest} from "../../rest/RestRequest";
 
 /**
  * Returns the current credits balance for the Verifalia account.
@@ -47,11 +48,8 @@ export const getCreditsBalance = async (restClientFactory: RestClientFactory, ca
     const restClient = restClientFactory.build();
 
     return await (
-        await restClient.invoke<Balance>("GET",
-            '/credits/balance',
-            undefined,
-            undefined,
-            undefined,
+        await restClient.invoke<Balance>(new RestRequest('GET',
+            '/credits/balance'),
             cancellationToken
         )
     ).deserialize();
@@ -91,12 +89,10 @@ export async function* listCreditsDailyUsages(restClientFactory: RestClientFacto
             }
         }
 
-        const response = await restClient.invoke<DailyUsageListSegment>(
+        const response = await restClient.invoke<DailyUsageListSegment>(new RestRequest(
             'GET',
             `/credits/daily-usage`,
-            params,
-            undefined,
-            undefined,
+            params),
             cancellationToken
         );
 

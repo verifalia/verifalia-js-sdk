@@ -74,7 +74,7 @@ export class VerifaliaRestClient {
         'https://api-cca-3.verifalia.com',
     ];
 
-    private _restClientfactory: RestClientFactory;
+    private readonly _restClientFactory: RestClientFactory;
 
     /**
      * Allows to manage the credits for the Verifalia account.
@@ -125,7 +125,8 @@ export class VerifaliaRestClient {
      * to use while authenticating to the Verifalia service.
      */
     constructor(config: VerifaliaRestClientConfiguration) {
-        if (!config) throw new Error('config is null');
+        if (!config)
+            throw new Error('config is null');
 
         /* @if ENVIRONMENT!='production' */
         logger.log('Compilation', '/*@echo TARGET*/', '/*@echo FORMAT*/');
@@ -136,7 +137,11 @@ export class VerifaliaRestClient {
         let authenticator: Authenticator;
         let baseUris: string[];
 
-        if (config.username) {
+        if (config.authenticator) {
+            authenticator = config.authenticator;
+            baseUris = config.baseUris ?? this._baseUris;
+        }
+        else if (config.username) {
             // User-name password authentication
 
             authenticator = new UsernamePasswordAuthenticator(config.username, config.password);
@@ -152,15 +157,15 @@ export class VerifaliaRestClient {
         /* @endif */
         else {
             /* @if TARGET='node' */
-            throw new Error('Invalid configuration: either specify your user credentials, your browser-app key or your client certificate.');
+            throw new Error('Invalid configuration: either specify your user credentials, your browser-app key, your client certificate or an Authenticator instance.');
             /* @else */
-            throw new Error('Invalid configuration: either specify your user credentials or your browser-app key.');
+            throw new Error('Invalid configuration: either specify your user credentials, your browser-app key or an Authenticator instance.');
             /* @endif */
         }
 
-        this._restClientfactory = new VerifaliaRestClientFactory(authenticator, baseUris);
+        this._restClientFactory = new VerifaliaRestClientFactory(authenticator, baseUris);
         
-        this.credits = new CreditsRestClient(this._restClientfactory);
-        this.emailValidations = new EmailValidationsRestClient(this._restClientfactory);
+        this.credits = new CreditsRestClient(this._restClientFactory);
+        this.emailValidations = new EmailValidationsRestClient(this._restClientFactory);
     }
 }

@@ -29,14 +29,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { VerifaliaError } from "./VerifaliaError";
+import { RestProblem } from "../rest/RestProblem";
+import { RestError } from "./RestError";
 /**
  * Thrown when the credit of the requesting account is not enough to accept a given
  * email validation job.
  *
  * To add credit packs to your Verifalia account please visit https://verifalia.com/client-area#/credits/add
  */
-export declare class InsufficientCreditError extends VerifaliaError {
-    constructor();
+export declare class InsufficientCreditError extends RestError {
+    constructor(response: Response, problem?: RestProblem);
 }
 //# sourceMappingURL=InsufficientCreditError.d.ts.map

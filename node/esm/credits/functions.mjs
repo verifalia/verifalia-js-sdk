@@ -1,5 +1,6 @@
 // (c) Verifalia - email verification service - https://verifalia.com
 import { __awaiter, __asyncGenerator, __await } from 'tslib';
+import { R as RestRequest } from '../RestRequest-9419b849.mjs';
 
 /**
  * @license
@@ -40,7 +41,7 @@ import { __awaiter, __asyncGenerator, __await } from 'tslib';
  */
 const getCreditsBalance = (restClientFactory, cancellationToken) => __awaiter(void 0, void 0, void 0, function* () {
     const restClient = restClientFactory.build();
-    return yield (yield restClient.invoke("GET", '/credits/balance', undefined, undefined, undefined, cancellationToken)).deserialize();
+    return yield (yield restClient.invoke(new RestRequest('GET', '/credits/balance'), cancellationToken)).deserialize();
 });
 /**
  * Lists the daily usages of the credits for the Verifalia account.
@@ -72,7 +73,7 @@ function listCreditsDailyUsages(restClientFactory, options, cancellationToken) {
                     }
                 }
             }
-            const response = yield __await(restClient.invoke('GET', `/credits/daily-usage`, params, undefined, undefined, cancellationToken));
+            const response = yield __await(restClient.invoke(new RestRequest('GET', `/credits/daily-usage`, params), cancellationToken));
             // TODO: Check the response status code
             listSegment = yield __await(response.deserialize());
             for (const item of listSegment.data) {

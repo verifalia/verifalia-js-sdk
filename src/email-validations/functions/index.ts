@@ -47,6 +47,7 @@ import { FileValidationRequest } from "../models/FileValidationRequest";
 import { ValidationOverviewListingOptions } from "../models/ValidationOverviewListingOptions";
 import { RestResponse } from "../../rest/RestResponse";
 import { Stream } from "stream";
+import {RestRequest} from "../../rest/RestRequest";
 
 // Node-specific
 
@@ -123,12 +124,12 @@ export async function submitEmailValidation(restClientFactory: RestClientFactory
 
     const waitOptionsOrDefault = waitOptions ?? WaitOptions.default;
 
-    const response = await restClient.invoke<PartialValidation>(
+    const response = await restClient.invoke<PartialValidation>(new RestRequest(
         'POST',
         `/email-validations?waitTime=${waitOptionsOrDefault.submissionWaitTime}`,
         undefined,
         data,
-        undefined,
+        undefined),
         cancellationToken
     );
 
@@ -208,14 +209,14 @@ export async function submitEmailValidationFile(restClientFactory: RestClientFac
 
     const waitOptionsOrDefault = waitOptions ?? WaitOptions.default;
 
-    const response = await restClient.invoke<PartialValidation>(
+    const response = await restClient.invoke<PartialValidation>(new RestRequest(
         'POST',
         `/email-validations?waitTime=${waitOptionsOrDefault.submissionWaitTime}`,
         undefined,
         formData,
         {
             headers
-        },
+        }),
         cancellationToken
     );
 
@@ -272,12 +273,9 @@ export async function getEmailValidation(restClientFactory: RestClientFactory,
     const waitOptionsOrDefault = waitOptions ?? WaitOptions.default;
 
     const restClient = restClientFactory.build();
-    const restResponse = await restClient.invoke<PartialValidation>(
+    const restResponse = await restClient.invoke<PartialValidation>(new RestRequest(
         'GET',
-        `/email-validations/${id}?waitTime=${waitOptionsOrDefault.pollWaitTime}`,
-        undefined,
-        undefined,
-        undefined,
+        `/email-validations/${id}?waitTime=${waitOptionsOrDefault.pollWaitTime}`),
         cancellationToken
     );
 
@@ -329,7 +327,7 @@ export async function exportEmailValidationEntries(restClientFactory: RestClient
     cancellationToken?: CancellationToken): Promise<Stream> {
 
     const restClient = restClientFactory.build();
-    const restResponse = await restClient.invoke<PartialValidation>(
+    const restResponse = await restClient.invoke<PartialValidation>(new RestRequest(
         'GET',
         `/email-validations/${id}/entries`,
         undefined,
@@ -338,7 +336,7 @@ export async function exportEmailValidationEntries(restClientFactory: RestClient
             headers: {
                 'Accept': contentType
             }                    
-        },
+        }),
         cancellationToken
     );
 
@@ -357,12 +355,9 @@ export async function exportEmailValidationEntries(restClientFactory: RestClient
  */
 export async function deleteEmailValidation(restClientFactory: RestClientFactory, id: string, cancellationToken?: CancellationToken): Promise<void> {
     const restClient = restClientFactory.build();
-    const restResponse = await restClient.invoke<void>(
+    const restResponse = await restClient.invoke<void>(new RestRequest(
         'DELETE',
-        `/email-validations/${id}`,
-        undefined,
-        undefined,
-        undefined,
+        `/email-validations/${id}`),
         cancellationToken
     );
 
@@ -419,12 +414,10 @@ async function listEntriesSegmentedAsync(restClientFactory: RestClientFactory, v
         queryParams["limit"] = cursor.limit.toString();
     }
 
-    const restResponse = await restClient.invoke<ValidationEntryListSegment>(
+    const restResponse = await restClient.invoke<ValidationEntryListSegment>(new RestRequest(
         'GET',
         `/email-validations/${validationId}/entries`,
-        queryParams,
-        undefined,
-        undefined,
+        queryParams),
         cancellationToken
     );
 
@@ -515,12 +508,10 @@ export async function* listEmailValidations(restClientFactory: RestClientFactory
             }
         }
 
-        const response = await restClient.invoke<ValidationOverviewListingSegment>(
+        const response = await restClient.invoke<ValidationOverviewListingSegment>(new RestRequest(
             'GET',
             `/email-validations`,
-            params,
-            undefined,
-            undefined,
+            params),
             cancellationToken
         );
 

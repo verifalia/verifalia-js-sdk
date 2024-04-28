@@ -310,3 +310,23 @@ export const ValidationPriority_Normal = 127;
  * The highest possible relative processing priority (speed) for a validation job.
  */
 export const ValidationPriority_Highest = 255;
+
+/**
+ * hCaptcha.
+ */
+export const CaptchaProvider_HCaptcha = 'hCaptcha';
+
+/**
+ * Google reCAPTCHA v2.
+ */
+export const CaptchaProvider_ReCaptchaV2 = 'reCaptcha_v2';
+
+/**
+ * Google reCAPTCHA v3.
+ */
+export const CaptchaProvider_ReCaptchaV3 = 'reCaptcha_v3';
+
+/**
+ * Cloudflare Turnstile.
+ */
+export const CaptchaProvider_Turnstile = 'Turnstile';

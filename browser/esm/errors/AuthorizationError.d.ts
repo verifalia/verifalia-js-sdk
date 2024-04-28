@@ -29,10 +29,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { VerifaliaError } from "./VerifaliaError";
+import { RestProblem } from "../rest/RestProblem";
+import { RestError } from "./RestError";
 /**
- * Thrown in the event the user is unable to authenticate to Verifalia.
+ * Thrown in the event the user is authenticated but does not have the necessary permissions to access the requested
+ * resource.
  */
-export declare class AuthorizationError extends VerifaliaError {
+export declare class AuthorizationError extends RestError {
+    constructor(response: Response, problem?: RestProblem);
 }
 //# sourceMappingURL=AuthorizationError.d.ts.map
