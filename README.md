@@ -1,4 +1,4 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.5-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.6-green)
 [![NPM](https://img.shields.io/npm/v/verifalia.svg)](https://www.npmjs.com/package/verifalia)
 
 Verifalia REST API - SDK and helper library for Javascript
@@ -583,6 +583,8 @@ To enable bot detection, start by entering the necessary CAPTCHA service setting
 the external CAPTCHA service) into the _Bot detection_ interface for the user or browser app used to authenticate, accessible
 in the [Verifalia client area](https://verifalia.com/client-area): these settings enable communication between the Verifalia servers and the configured
 CAPTCHA service.
+
+> To get detailed guidance on setting up Verifalia with your selected CAPTCHA service settings, check out: [How to integrate with a CAPTCHA provider and prevent bot submissions](https://verifalia.com/help/email-verification-widget/how-to-integrate-with-captcha-and-prevent-automated-submissions)
 
 Once done, specify a `captcha` object at the time of the submission of an email verification job through the passed
 `ValidationRequest` (or `FileValidationRequest`, for file imports) instance, providing the type of the CAPTCHA service
